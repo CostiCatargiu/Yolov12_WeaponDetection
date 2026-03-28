@@ -1,14 +1,12 @@
-<!-- Optional banner -->
+# 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLOv11s
+
+**Custom architecture and loss modifications for enhanced small-object weapon detection**
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
   <img src="https://github.com/user-attachments/assets/07c743cf-aff7-4231-9f3a-88f1612b5ee9" alt="test2gun" width="30%">
   <img src="https://github.com/user-attachments/assets/919c529b-797b-4124-9ffd-931b765fd53a" alt="test3gun" width="30%">
 </p>
-
-# 🔫 NewWeaponDataset
-
-A **small-object weapon detection dataset** for multi-class classification, featuring **knife**, **pistol**, **long_gun**, and **no_weapon** categories.
 
 <p align="center">
   <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">
@@ -20,11 +18,34 @@ A **small-object weapon detection dataset** for multi-class classification, feat
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Format-YOLOv5%20%2F%20YOLOv8-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Model-YOLOv12s_Custom-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Model-YOLOv11s-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Focus-Small_Object_Detection-purple?style=flat-square" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
-  <img src="https://img.shields.io/badge/Videos-~1200-orange?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
 </p>
+
+---
+
+## 📖 Overview
+
+This repository accompanies our **research paper** on **small-object weapon detection**. We present:
+
+- 📦 A **custom dataset** built from **~1,200 YouTube videos** with **59,305 images** and **76,705 annotated instances**
+- 🏗️ A **modified YOLOv12s architecture** with **P2–P5 detection heads** optimized for **small object detection**
+- 📉 A **custom loss function** with **size-aware weighting** and **tuned TaskAligned assigner**
+- 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
+- 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
+
+### 🔬 Research Contributions
+
+| Contribution | Description |
+|--------------|-------------|
+| 🏗️ **P2–P5 Architecture** | Added high-resolution **P2 head (stride 1/4)** for better small object feature extraction |
+| 📉 **Custom Loss Function** | Size-aware box weighting, auxiliary center L1 loss, epoch-scheduled clipping |
+| 🎯 **Tuned Assigner** | `topk=25`, `β=4.0` for increased positives and softer gating |
+| 🔍 **Ablation Study** | Extensive search across loss weights, architecture mods, and training configs |
+| 📊 **Cross-Model Transfer** | Applied best YOLOv12s configs to YOLOv11s to measure generalization |
 
 ---
 
