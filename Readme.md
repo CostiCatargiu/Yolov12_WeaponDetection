@@ -36,16 +36,18 @@ This repository accompanies our **research paper** on **small-object weapon dete
 - 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
 
 ---
-
 ## 💡 Applications
 
-- 📹 **Surveillance** and security systems
-- 🛡️ **Public safety** monitoring
-- 🚪 **Access control** systems
-- ⚠️ **Threat detection** in crowded environments
+| Domain | Use Cases |
+|--------|-----------|
+| 📹 **Surveillance** | CCTV monitoring, real-time threat detection, smart city integration |
+| 🛡️ **Public Safety** | Transportation hubs, stadiums, schools, public gatherings |
+| 🚪 **Access Control** | Entry point screening, secure facilities, building protection |
+| 🚔 **Law Enforcement** | Real-time threat assessment, evidence analysis, situational awareness |
+| 🤖 **Research & AI** | Benchmark dataset, model training, small-object detection research |
+
 
 ---
-
 
 ### 🔬 Research Contributions
 
