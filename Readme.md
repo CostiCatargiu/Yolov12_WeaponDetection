@@ -113,48 +113,8 @@ NewWeaponDataset/
 <b>Total:</b>                          <b>100%</b>    │  <b>59,305 images</b>  │  <b>76,705 instances</b>
 </pre>
 
-
-
 ---
 
-## 🚀 Quick Start
-
-### 📦 Installation
-
-pip install roboflow
-
-### ⬇️ Download Dataset
-
-from roboflow import Roboflow
-
-rf = Roboflow(api_key="YOUR_API_KEY")
-project = rf.workspace("gundetectiondataset").project("weapondataset-oi2g3")
-dataset = project.version(8).download("yolov8")
-
-### 🏋️ Train with YOLOv8
-
-yolo detect train data=path/to/data.yaml model=yolov8n.pt epochs=100 imgsz=640
-
-
-## 📄 License
-
-This dataset is released under the [MIT License](LICENSE).
-
----
-
-## 📚 Citation
-
-If you use this dataset in your research, please cite:
-
-@misc{newweapondataset2024,
-  title={NewWeaponDataset: Small-Object Weapon Detection Dataset},
-  author={GunDetectionDataset},
-  year={2024},
-  publisher={Roboflow Universe},
-  url={https://universe.roboflow.com/gundetectiondataset}
-}
-
----
 
 ## 🙏 Acknowledgments
 
