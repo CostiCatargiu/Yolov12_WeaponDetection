@@ -1,187 +1,156 @@
+# 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLOv11s
 
----
-
-## 🏗️ Architecture: YOLOv12s P2–P5 vs Baseline P3–P5
-
-| Aspect | P2–P5 (Custom) | P3–P5 (Baseline) | Why It Helps |
-|--------|----------------|------------------|--------------|
-| **Output Strides** | P2 (1/4), P3 (1/8), P4 (1/16), P5 (1/32) | P3–P5 only | High-res P2 grid covers very small boxes |
-| **P2 Pathway** | Upsample + concat with early C3k2 | — | Preserves fine edges/texture |
-| **Head Width** | 256-ch Conv/A2C2f | 192–256 | Extra capacity for minute cues |
-| **# Detect Heads** | 4 (P2–P5) | 3 (P3–P5) | More scale-specialization |
-| **AP_S (tiny)** | ↑ Higher | Lower | Denser supervision at small strides |
-| **Best For** | Small, dense, crowded datasets | Medium/large objects | Matches receptive field to object size |
-
----
-
-## 📉 Loss Function Modifications
-
-| Aspect | Modified (Custom) | Baseline | Effect on Tiny Objects |
-|--------|-------------------|----------|------------------------|
-| **Assigner** | `topk=25`, `β=4.0` | `topk=10`, `β=6.0` | More positives & softer gate → higher recall |
-| **Box Weighting** | Inverse-area × α + score × (1-α), α anneals | Score-only | Prioritizes small boxes early |
-| **Center Aux Loss** | L1 on centers for small GT (decay) | — | Faster center alignment for tiny `W×H` |
-| **Loss Clipping** | Epoch-scheduled caps for IoU/DFL | — | Tames spikes in crowded scenes |
-| **DFL** | Size-aware weighting | Standard | Stabilizes edge bins for small boxes |
-| **CLS Loss (Detect)** | BCE (option: Focal) | BCE | Use Focal if small-class recall is low |
-| **CLS Loss (OBB)** | Focal | BCE | Better imbalance handling |
-
----
-
-## 📊 Results: Custom vs Original YOLOv12s
-
-### 🎯 Per-Class Detection Performance
-
-| Class | Original (Detections / Avg Conf) | Custom (Detections / Avg Conf) | Winner |
-|-------|----------------------------------|--------------------------------|--------|
-| 🗡️ Knife | 525 / 0.746 | **593 / 0.786** | ✅ Custom |
-| 🎯 Long Gun | 698 / 0.746 | **814 / 0.781** | ✅ Custom |
-| 🚫 No Weapon | 245 / 0.731 | **386 / 0.740** | ✅ Custom |
-| 🔫 Pistol | 936 / 0.761 | **1111 / 0.787** | ✅ Custom |
-
-### 📈 Detection Accuracy (TP/FP/FN, P/R, F1)
-
-| Class | Original F1 | Custom F1 | Δ |
-|-------|-------------|-----------|---|
-| 🗡️ Knife | 0.805 | **0.846** | +0.041 |
-| 🎯 Long Gun | 0.792 | **0.850** | +0.058 |
-| 🚫 No Weapon | 0.463 | **0.579** | +0.116 |
-| 🔫 Pistol | 0.809 | **0.867** | +0.058 |
-
-### 📊 Overall Metrics
-
-| Metric | Original | Custom | Δ |
-|--------|----------|--------|---|
-| **Precision** | 0.925 | 0.897 | -0.028 |
-| **Recall** | 0.631 | **0.740** | **+0.109** |
-| **F1 Score** | 0.750 | **0.811** | **+0.061** |
-| **False Negatives** | 1,299 | **917** | **-382** |
-| **Avg Confidence** | 0.750 | **0.779** | +0.029 |
-
----
-
-## ✅ Key Findings
-
-| Finding | Impact |
-|---------|--------|
-| 📈 **Recall +11 pts** | Catches significantly more small objects |
-| 🎯 **F1 +6 pts** | Better overall balance |
-| 🚫 **No Weapon +8 pts** | Biggest improvement on hard negatives |
-| ⚠️ **Precision -2.8 pts** | Acceptable trade-off for recall gains |
-| 🔢 **FNs -382** | Fewer missed detections |
-
----
-
-## 🔍 Detection Examples
-
-<table>
-<tr>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/89bc6fd9-a52f-4620-8611-9f63bd392599" alt="7_compare" width="100%"><br><sub>Example 1</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/c50d8762-7e5f-40c3-9e4e-ad8754f5a5dd" alt="13_compare" width="100%"><br><sub>Example 2</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/d7f883cb-bb85-4432-ad97-285c2e27ddb8" alt="36_compare" width="100%"><br><sub>Example 3</sub></td>
-</tr>
-<tr>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/e2167e20-c0a4-4f4b-8bf9-a8ad4ec9c6fb" alt="68_compare" width="100%"><br><sub>Example 4</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/a215bab3-9899-4ae2-a6e6-cb5a4e9641a3" alt="127_compare" width="100%"><br><sub>Example 5</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/cb07b5fc-f636-4d43-b737-d0ea129045cd" alt="128_compare" width="100%"><br><sub>Example 6</sub></td>
-</tr>
-<tr>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/24eb0e7d-72d3-4af7-b3fd-9597424a804d" alt="132_compare" width="100%"><br><sub>Example 7</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/29c1e79b-d06c-427b-b96e-e531b64c3282" alt="151_compare" width="100%"><br><sub>Example 8</sub></td>
-<td align="center" width="33%"><img src="https://github.com/user-attachments/assets/743218e8-fbd7-4b1b-8574-8a68bdc7baa1" alt="200_compare" width="100%"><br><sub>Example 9</sub></td>
-</tr>
-</table>
-
----
-
-## 📈 Training Comparison
-
-<table>
-<tr>
-<td align="center" width="50%">
-<img src="https://github.com/user-attachments/assets/09326857-5418-4a62-836e-f9ec443327ff" alt="confusion_matrix_custom" width="100%" />
-<br><sub>Confusion Matrix — Custom Model</sub>
-</td>
-<td align="center" width="50%">
-<img src="https://github.com/user-attachments/assets/6faf2f7b-6679-4270-a389-0ac0c3e96a78" alt="confusion_matrix_original" width="100%" />
-<br><sub>Confusion Matrix — Original Model</sub>
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-<img src="https://github.com/user-attachments/assets/74b5d9eb-638f-4360-a07d-d66cab2dfbbb" alt="training_custom" width="100%" />
-<br><sub>Training Results — Custom Model</sub>
-</td>
-<td align="center" width="50%">
-<img src="https://github.com/user-attachments/assets/d064675b-c23a-4aea-a71a-dfcadb355f8f" alt="training_original" width="100%" />
-<br><sub>Training Results — Original Model</sub>
-</td>
-</tr>
-</table>
-
----
-
-## 🚀 Quick Start
-
-### 📦 Installation
-
-pip install roboflow ultralytics
-
-### ⬇️ Download Dataset
-
-from roboflow import Roboflow
-
-rf = Roboflow(api_key="YOUR_API_KEY")
-project = rf.workspace("gundetectiondataset").project("weapondataset-oi2g3")
-dataset = project.version(8).download("yolov8")
-
-### 🏋️ Train Custom YOLOv12s
-
-yolo detect train data=path/to/data.yaml model=yolov12s-p2p5.yaml epochs=100 imgsz=640
-
-### 🏋️ Train YOLOv11s with Best Config
-
-yolo detect train data=path/to/data.yaml model=yolo11s-custom.yaml epochs=100 imgsz=640
-
----
-
-## 💡 Applications
-
-- 📹 **Surveillance** and security systems
-- 🛡️ **Public safety** monitoring
-- 🚪 **Access control** systems
-- ⚠️ **Threat detection** in crowded environments
-
----
-
-## 📄 License
-
-This project is released under the [MIT License](LICENSE).
-
----
-
-## 📚 Citation
-
-If you use this dataset or methodology in your research, please cite:
-
-@misc{weapondetection2024,
-  title={Small-Object Weapon Detection with Custom YOLOv12s and YOLOv11s},
-  author={Authors},
-  year={2024},
-  publisher={GitHub},
-  url={https://github.com/your-repo}
-}
-
----
-
-## 🙏 Acknowledgments
-
-- 🌐 Dataset hosted on [Roboflow Universe](https://universe.roboflow.com/)
-- 🎥 Video sources from YouTube for diverse real-world scenarios
-- 🧠 Built upon [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) framework
-
----
+**Custom architecture and loss modifications for enhanced small-object weapon detection**
 
 <p align="center">
-  <b>🛡️ Advancing public safety through optimized small-object detection 🛡️</b>
+  <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
+  <img src="https://github.com/user-attachments/assets/07c743cf-aff7-4231-9f3a-88f1612b5ee9" alt="test2gun" width="30%">
+  <img src="https://github.com/user-attachments/assets/919c529b-797b-4124-9ffd-931b765fd53a" alt="test3gun" width="30%">
+</p>
+
+<p align="center">
+  <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">
+    <img src="https://img.shields.io/badge/NoGun_Dataset-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="NoGun Dataset">
+  </a>
+  <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">
+    <img src="https://img.shields.io/badge/WeaponDataset_v8-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="WeaponDataset v8">
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Model-YOLOv12s_Custom-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Model-YOLOv11s-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Focus-Small_Object_Detection-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
+</p>
+
+---
+
+## 📖 Overview
+
+This repository accompanies our **research paper** on **small-object weapon detection**. We present:
+
+- 📦 A **custom dataset** built from **~1,200 YouTube videos** with **59,305 images** and **76,705 annotated instances**
+- 🏗️ A **modified YOLOv12s architecture** with **P2–P5 detection heads** optimized for **small object detection**
+- 📉 A **custom loss function** with **size-aware weighting** and **tuned TaskAligned assigner**
+- 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
+- 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
+
+### 🔬 Research Contributions
+
+| Contribution | Description |
+|--------------|-------------|
+| 🏗️ **P2–P5 Architecture** | Added high-resolution **P2 head (stride 1/4)** for better small object feature extraction |
+| 📉 **Custom Loss Function** | Size-aware box weighting, auxiliary center L1 loss, epoch-scheduled clipping |
+| 🎯 **Tuned Assigner** | `topk=25`, `β=4.0` for increased positives and softer gating |
+| 🔍 **Ablation Study** | Extensive search across loss weights, architecture mods, and training configs |
+| 📊 **Cross-Model Transfer** | Applied best YOLOv12s configs to YOLOv11s to measure generalization |
+
+---
+
+## ⚡ At a Glance
+
+<table>
+  <tr>
+    <td><b>🖼️ Images</b></td>
+    <td><b>59,305</b></td>
+  </tr>
+  <tr>
+    <td><b>🔢 Instances</b></td>
+    <td><b>76,705</b> (0 empty labels)</td>
+  </tr>
+  <tr>
+    <td><b>🏷️ Classes</b></td>
+    <td><code>knife</code>, <code>long_gun</code>, <code>no_weapon</code>, <code>pistol</code></td>
+  </tr>
+  <tr>
+    <td><b>🧰 Format</b></td>
+    <td>YOLO: <code>class x_center y_center width height</code> (normalized)</td>
+  </tr>
+  <tr>
+    <td><b>📜 License</b></td>
+    <td>MIT</td>
+  </tr>
+  <tr>
+    <td><b>☁️ Hosting</b></td>
+    <td>
+      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">Roboflow Universe: NoGun</a> &nbsp;•&nbsp;
+      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">Roboflow App: WeaponDataset v8</a>
+    </td>
+  </tr>
+  <tr>
+    <td><b>📦 Training Results</b></td>
+    <td>
+      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing">Google Drive – Original Model</a> &nbsp;•&nbsp;
+      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing">Google Drive – Custom Model</a>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🏷️ Classes
+
+| Class | Description |
+|-------|-------------|
+| 🗡️ `knife` | Bladed weapons including knives and similar objects |
+| 🔫 `pistol` | Handguns and short firearms |
+| 🎯 `long_gun` | Rifles, shotguns, and other long-barreled firearms |
+| 🚫 `no_weapon` | Hard negatives (phones, tools, umbrellas, etc.) |
+
+---
+
+## ❓ Why Include `no_weapon`?
+
+The `no_weapon` class serves as **hard negatives** — visually similar objects frequently misclassified as weapons:
+
+- ✅ **Reduces false positives** in production
+- ✅ **Improves precision** in crowded scenes
+- ✅ **Distinguishes weapons** from everyday objects (📱 phones, 🔧 tools, ☂️ umbrellas, 📷 camera equipment)
+
+---
+
+## 📊 Dataset Summary
+
+| Split | Images | % of Images | Instances | knife | long_gun | no_weapon | pistol |
+|-------|-------:|------------:|----------:|------:|---------:|----------:|-------:|
+| Train | 49,079 | 82.76% | 63,452 | 10,511 **(16.57%)** | 19,273 **(30.37%)** | 10,161 **(16.01%)** | 23,507 **(37.05%)** |
+| Valid | 7,552 | 12.73% | 9,730 | 1,813 **(18.63%)** | 2,750 **(28.26%)** | 1,324 **(13.61%)** | 3,843 **(39.50%)** |
+| Test | 2,674 | 4.51% | 3,523 | 686 **(19.47%)** | 941 **(26.71%)** | 656 **(18.62%)** | 1,240 **(35.20%)** |
+| **Total** | **59,305** | **100%** | **76,705** | **13,010 (16.96%)** | **22,964 (29.94%)** | **12,141 (15.83%)** | **28,590 (37.27%)** |
+
+---
+
+## 📐 Annotation Size Analysis
+
+Objects categorized by **normalized bounding box area** (`w × h`):
+
+| Size Category | Area Threshold | Train | Valid | Test | Total | % |
+|---------------|----------------|------:|------:|-----:|------:|--:|
+| 🔍 **Small** | ≤ 0.02 | 15,548 | 2,821 | 966 | 19,335 | **25.2%** |
+| 📦 **Medium** | 0.02 – 0.20 | 33,032 | 5,135 | 1,869 | 40,036 | **52.2%** |
+| 🟫 **Large** | > 0.20 | 14,872 | 1,774 | 688 | 17,334 | **22.6%** |
+
+> 📌 **~25% small objects** ensures sufficient representation for small-object detection training.
+
+---
+
+## 🔳 Size Previews
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2f4dd189-1ba0-4340-a101-2c55e42b27e5" alt="mosaic_small" width="30%">
+  <img src="https://github.com/user-attachments/assets/727e3de5-209c-4698-a6f0-bf717d19d22a" alt="mosaic_medium" width="30%">
+  <img src="https://github.com/user-attachments/assets/8f45f604-baac-4d59-bfcf-20da3475eed3" alt="mosaic_large" width="30%">
+</p>
+<p align="center"><sub>Small | Medium | Large</sub></p>
+
+---
+
+## 🧪 Split Distribution
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Train-82.76%25-228be6?style=flat-square&labelColor=111827" />
+  <img src="https://img.shields.io/badge/Valid-12.73%25-845ef7?style=flat-square&labelColor=111827" />
+  <img src="https://img.shields.io/badge/Test-4.51%25-15aabf?style=flat-square&labelColor=111827" />
 </p>
