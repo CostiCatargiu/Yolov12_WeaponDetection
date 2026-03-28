@@ -6,47 +6,143 @@
   <img src="https://github.com/user-attachments/assets/919c529b-797b-4124-9ffd-931b765fd53a" alt="test3gun" width="30%">
 </p>
 
-<h1 align="center">🔫🗡️ NewWeaponDataset</h1>
-<div align="left" style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', 'Helvetica Neue', Arial; font-size: 15px; line-height: 1.6;">
-  <h3 style="margin:0 0 8px 0;">🧩 Small-Object Weapon Detection Dataset</h3>
-  <p>
-    Public, small-object-focused dataset for multi-class weapon detection covering
-    <b>knife</b>, <b>pistol</b>, <b>long_gun</b>, and a <b>no_weapon</b> hard-negative class.
-    Sourced from <b>≈1,200 YouTube videos</b> 🎥; representative frames were extracted to capture a wide variety of
-    <b>resolutions</b>, <b>aspect ratios</b>, and <b>scene types</b> (🌞 day / 🌙 night, CCTV and handheld).
-    Scenes include <b>occlusions</b>, <b>motion blur</b>, and <b>cluttered backgrounds</b> to stress-test tiny targets 🔎.
-  </p>
+# NewWeaponDataset
 
-  <p>
-    <b>Why <code>no_weapon</code>?</b> 🚫🔫
-    Explicit negatives teach the model to distinguish real weapons from visually similar items
-    (phones, tools, umbrellas, camera rigs), which <b>reduces false positives</b> and improves precision
-    in crowded or low-quality footage.
-  </p>
-
-
-
-
-</div>
-
+A small-object weapon detection dataset for multi-class classification, featuring **knife**, **pistol**, **long_gun**, and **no_weapon** categories.
 
 <p align="center">
   <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">
-    <img src="https://img.shields.io/badge/Open%20NoGun%20Dataset-000?logo=roboflow&logoColor=white&style=for-the-badge" alt="Open NoGun Dataset on Roboflow">
+    <img src="https://img.shields.io/badge/NoGun_Dataset-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="NoGun Dataset">
   </a>
   <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">
-    <img src="https://img.shields.io/badge/Open%20WeaponDataset%20v8-000?logo=roboflow&logoColor=white&style=for-the-badge" alt="Open WeaponDataset v8 on Roboflow">
+    <img src="https://img.shields.io/badge/WeaponDataset_v8-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="WeaponDataset v8">
   </a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Format-YOLOv5%2Fv8-1f77b4?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/License-MIT-6c757d?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Hosted-Roboflow%20Universe-20c997?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Public-Yes-2ca02c?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Format-YOLOv5%20%2F%20YOLOv8-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/Images-~1200_videos-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
 </p>
 
 ---
+
+## Overview
+
+A public, small-object-focused dataset designed for robust weapon detection in challenging real-world conditions. Built from approximately **1,200 YouTube videos**, this dataset captures diverse scenarios to train models that perform reliably in production environments.
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Multi-class Detection** | knife, pistol, long_gun, no_weapon |
+| **Diverse Sources** | ~1,200 YouTube videos with varied content |
+| **Resolution Variety** | Multiple resolutions and aspect ratios |
+| **Scene Diversity** | Day/night, CCTV, handheld footage |
+| **Real-world Challenges** | Occlusions, motion blur, cluttered backgrounds |
+
+---
+
+## Classes
+
+| Class | Description |
+|-------|-------------|
+| `knife` | Bladed weapons including knives and similar objects |
+| `pistol` | Handguns and short firearms |
+| `long_gun` | Rifles, shotguns, and other long-barreled firearms |
+| `no_weapon` | Hard negatives (phones, tools, umbrellas, etc.) |
+
+---
+
+## Why Include `no_weapon`?
+
+The `no_weapon` class serves as **hard negatives** — visually similar objects that are frequently misclassified as weapons. Including these examples:
+
+- Reduces false positives in production
+- Improves precision in crowded scenes
+- Trains the model to distinguish weapons from everyday objects (phones, tools, umbrellas, camera equipment)
+
+---
+
+## Dataset Structure
+
+NewWeaponDataset/
+├── train/
+│   ├── images/
+│   └── labels/
+├── valid/
+│   ├── images/
+│   └── labels/
+├── test/
+│   ├── images/
+│   └── labels/
+└── data.yaml
+
+---
+
+## Quick Start
+
+### Installation
+
+pip install roboflow
+
+### Download Dataset
+
+from roboflow import Roboflow
+
+rf = Roboflow(api_key="YOUR_API_KEY")
+project = rf.workspace("gundetectiondataset").project("weapondataset-oi2g3")
+dataset = project.version(8).download("yolov8")
+
+### Train with YOLOv8
+
+yolo detect train data=path/to/data.yaml model=yolov8n.pt epochs=100 imgsz=640
+
+---
+
+## Applications
+
+- Surveillance and security systems
+- Public safety monitoring
+- Access control systems
+- Threat detection in crowded environments
+
+---
+
+## License
+
+This dataset is released under the [MIT License](LICENSE).
+
+---
+
+## Citation
+
+If you use this dataset in your research, please cite:
+
+@misc{newweapondataset2024,
+  title={NewWeaponDataset: Small-Object Weapon Detection Dataset},
+  author={GunDetectionDataset},
+  year={2024},
+  publisher={Roboflow Universe},
+  url={https://universe.roboflow.com/gundetectiondataset}
+}
+
+---
+
+## Acknowledgments
+
+- Dataset hosted on [Roboflow Universe](https://universe.roboflow.com/)
+- Video sources from YouTube for diverse real-world scenarios
+
+---
+
+<p align="center">
+  <sub>Built for advancing public safety through computer vision</sub>
+</p>
+
 
 ## ⚡ At a Glance
 
