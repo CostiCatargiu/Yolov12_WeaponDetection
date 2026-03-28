@@ -62,6 +62,48 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
+
+## ⚡ Dataset Summary
+
+<table>
+  <tr>
+    <td><b>🖼️ Images</b></td>
+    <td><b>59,305</b></td>
+  </tr>
+  <tr>
+    <td><b>🔢 Instances</b></td>
+    <td><b>76,705</b> (0 empty labels)</td>
+  </tr>
+  <tr>
+    <td><b>🏷️ Classes</b></td>
+    <td><code>knife</code>, <code>long_gun</code>, <code>no_weapon</code>, <code>pistol</code></td>
+  </tr>
+  <tr>
+    <td><b>🧰 Format</b></td>
+    <td>YOLO: <code>class x_center y_center width height</code> (normalized)</td>
+  </tr>
+  <tr>
+    <td><b>📜 License</b></td>
+    <td>MIT</td>
+  </tr>
+  <tr>
+    <td><b>☁️ Hosting</b></td>
+    <td>
+      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">Roboflow Universe: NoGun</a> &nbsp;•&nbsp;
+      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">Roboflow App: WeaponDataset v8</a>
+    </td>
+  </tr>
+  <tr>
+    <td><b>📦 Training results</b></td>
+    <td>
+      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing">Google Drive – Training Results OriginalModel</a> &nbsp;•&nbsp;
+      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing">Google Drive – Training Results CustomModel</a>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## ✨ Key Features of the New Weapon Dataset
 
 | Feature | Description |
@@ -113,51 +155,8 @@ NewWeaponDataset/
 <b>Total:</b>                          <b>100%</b>    │  <b>59,305 images</b>  │  <b>76,705 instances</b>
 </pre>
 
----
-
-
-## ⚡ At a Glance
-
-<table>
-  <tr>
-    <td><b>🖼️ Images</b></td>
-    <td><b>59,305</b></td>
-  </tr>
-  <tr>
-    <td><b>🔢 Instances</b></td>
-    <td><b>76,705</b> (0 empty labels)</td>
-  </tr>
-  <tr>
-    <td><b>🏷️ Classes</b></td>
-    <td><code>knife</code>, <code>long_gun</code>, <code>no_weapon</code>, <code>pistol</code></td>
-  </tr>
-  <tr>
-    <td><b>🧰 Format</b></td>
-    <td>YOLO: <code>class x_center y_center width height</code> (normalized)</td>
-  </tr>
-  <tr>
-    <td><b>📜 License</b></td>
-    <td>MIT</td>
-  </tr>
-  <tr>
-    <td><b>☁️ Hosting</b></td>
-    <td>
-      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">Roboflow Universe: NoGun</a> &nbsp;•&nbsp;
-      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">Roboflow App: WeaponDataset v8</a>
-    </td>
-  </tr>
-  <tr>
-    <td><b>📦 Training results</b></td>
-    <td>
-      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing">Google Drive – Training Results OriginalModel</a> &nbsp;•&nbsp;
-      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing">Google Drive – Training Results CustomModel</a>
-    </td>
-  </tr>
-</table>
-
 
 ---
-
 
 ### Dataset Summary
 
