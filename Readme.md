@@ -85,17 +85,20 @@ The `no_weapon` class serves as **hard negatives** — visually similar objects 
 
 <pre>
 NewWeaponDataset/
-├── 📂 train/
+├── 📂 train/                   <b>82.76%</b>  │  49,079 images  │  63,452 instances
 │   ├── 🖼️ images/
 │   └── 🏷️ labels/
-├── 📂 valid/
+├── 📂 valid/                   <b>12.73%</b>  │  7,552 images   │  9,730 instances
 │   ├── 🖼️ images/
 │   └── 🏷️ labels/
-├── 📂 test/
+├── 📂 test/                    <b>4.51%</b>   │  2,674 images   │  3,523 instances
 │   ├── 🖼️ images/
 │   └── 🏷️ labels/
 └── ⚙️ data.yaml
+────────────────────────────────────────────────────────────────────
+<b>Total:</b>                          <b>100%</b>    │  <b>59,305 images</b>  │  <b>76,705 instances</b>
 </pre>
+
 
 
 ---
