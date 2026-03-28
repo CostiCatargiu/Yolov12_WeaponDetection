@@ -116,18 +116,6 @@ NewWeaponDataset/
 ---
 
 
-## 🙏 Acknowledgments
-
-- 🌐 Dataset hosted on [Roboflow Universe](https://universe.roboflow.com/)
-- 🎥 Video sources from YouTube for diverse real-world scenarios
-
----
-
-<p align="center">
-  <b>🛡️ Built for advancing public safety through computer vision 🛡️</b>
-</p>
-
-
 ## ⚡ At a Glance
 
 <table>
