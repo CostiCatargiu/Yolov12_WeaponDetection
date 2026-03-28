@@ -62,7 +62,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
-## ✨ Key Features of the New Weapon Dataset Dataset
+## ✨ Key Features of the New Weapon Dataset
 
 | Feature | Description |
 |---------|-------------|
