@@ -1,4 +1,4 @@
-# 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLOv11s
+# 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s
 
 **Custom architecture and loss modifications for enhanced small-object weapon detection**
 
@@ -47,15 +47,10 @@ This repository accompanies our **research paper** on **small-object weapon dete
 | 🔍 **Ablation Study** | Extensive search across loss weights, architecture mods, and training configs |
 | 📊 **Cross-Model Transfer** | Applied best YOLOv12s configs to YOLOv11s to measure generalization |
 
----
-
-## 📖 Overview
-
-A **public**, small-object-focused dataset designed for **robust weapon detection** in challenging real-world conditions. Built from approximately **🎥 1,200 YouTube videos**, this dataset captures diverse scenarios to train models that perform reliably in **production environments**.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features of the New Weapon Dataset Dataset
 
 | Feature | Description |
 |---------|-------------|
