@@ -35,6 +35,18 @@ This repository accompanies our **research paper** on **small-object weapon dete
 - 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
 - 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
 
+---
+
+## 💡 Applications
+
+- 📹 **Surveillance** and security systems
+- 🛡️ **Public safety** monitoring
+- 🚪 **Access control** systems
+- ⚠️ **Threat detection** in crowded environments
+
+---
+
+
 ### 🔬 Research Contributions
 
 | Contribution | Description |
@@ -121,16 +133,6 @@ dataset = project.version(8).download("yolov8")
 
 yolo detect train data=path/to/data.yaml model=yolov8n.pt epochs=100 imgsz=640
 
----
-
-## 💡 Applications
-
-- 📹 **Surveillance** and security systems
-- 🛡️ **Public safety** monitoring
-- 🚪 **Access control** systems
-- ⚠️ **Threat detection** in crowded environments
-
----
 
 ## 📄 License
 
