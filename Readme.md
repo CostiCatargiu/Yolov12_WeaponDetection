@@ -83,6 +83,7 @@ The `no_weapon` class serves as **hard negatives** — visually similar objects 
 
 ## 📁 Dataset Structure
 
+<pre>
 NewWeaponDataset/
 ├── 📂 train/
 │   ├── 🖼️ images/
@@ -94,6 +95,8 @@ NewWeaponDataset/
 │   ├── 🖼️ images/
 │   └── 🏷️ labels/
 └── ⚙️ data.yaml
+</pre>
+
 
 ---
 
