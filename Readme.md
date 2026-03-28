@@ -158,7 +158,7 @@ NewWeaponDataset/
 
 ---
 
-### Dataset Summary
+## 📁 Dataset Distribution
 
 | Split   | Images | % of images | Instances | knife                | long_gun             | no_weapon            | pistol               |
 |-------- | -----: | ----------: | --------: | -------------------: | -------------------: | -------------------: | -------------------: |
