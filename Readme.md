@@ -1,7 +1,5 @@
 # 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s
 
-**Custom architecture and loss modifications for enhanced small-object weapon detection**
-
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
   <img src="https://github.com/user-attachments/assets/07c743cf-aff7-4231-9f3a-88f1612b5ee9" alt="test2gun" width="30%">
