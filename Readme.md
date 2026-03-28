@@ -1,4 +1,4 @@
-# 🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s
+<h1 align="center">🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s</h1>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
