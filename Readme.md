@@ -29,11 +29,8 @@
 
 <table>
   <tr>
-    <th align="center" colspan="2">📊 Ablation Study Overview</th>
-  </tr>
-  <tr>
-    <td align="center"><b>🧪 Total Experiments</b></td>
-    <td align="center"><b>⏱️ Total Training Time</b></td>
+    <th align="center">🧪 Total Experiments</th>
+    <th align="center">⏱️ Total Training Time</th>
   </tr>
   <tr>
     <td align="center"><code>219</code></td>
@@ -43,77 +40,89 @@
 
 <table>
   <tr>
-    <th align="center" colspan="3">📈 Performance Improvements (Custom vs Baseline)</th>
+    <th align="center" colspan="4">📈 Performance Improvements</th>
   </tr>
   <tr>
     <th align="center">Metric</th>
-    <th align="center">🔷 YOLOv12s</th>
-    <th align="center">🔶 YOLO11s</th>
+    <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom</sub></th>
+    <th align="center">🔶 YOLO11s<br><sub>Baseline → Custom</sub></th>
+    <th align="center">⚔️ Custom vs Custom<br><sub>YOLO11s → YOLOv12s</sub></th>
   </tr>
   <tr>
     <td align="left"><b>mAP50</b></td>
     <td align="center">0.816 → <b>0.857</b> <sub>(+5.04%)</sub></td>
     <td align="center">0.782 → <b>0.828</b> <sub>(+5.88%)</sub></td>
+    <td align="center">0.828 → <b>0.857</b> <sub>(+3.43%)</sub></td>
   </tr>
   <tr>
     <td align="left"><b>mAP50-95</b></td>
     <td align="center">0.525 → <b>0.574</b> <sub>(+9.32%)</sub></td>
     <td align="center">0.502 → <b>0.555</b> <sub>(+10.53%)</sub></td>
+    <td align="center">0.555 → <b>0.574</b> <sub>(+3.29%)</sub></td>
   </tr>
   <tr>
     <td align="left"><b>Precision</b></td>
     <td align="center">0.831 → <b>0.889</b> <sub>(+6.94%)</sub></td>
     <td align="center">0.792 → <b>0.863</b> <sub>(+8.94%)</sub></td>
+    <td align="center">0.863 → <b>0.889</b> <sub>(+2.98%)</sub></td>
   </tr>
   <tr>
     <td align="left"><b>Recall</b></td>
     <td align="center">0.746 → <b>0.811</b> <sub>(+8.79%)</sub></td>
     <td align="center">0.698 → <b>0.776</b> <sub>(+11.14%)</sub></td>
+    <td align="center">0.776 → <b>0.811</b> <sub>(+4.59%)</sub></td>
   </tr>
   <tr>
     <td align="left"><b>F1 Score</b></td>
     <td align="center">0.786 → <b>0.848</b> <sub>(+7.91%)</sub></td>
     <td align="center">0.742 → <b>0.817</b> <sub>(+10.10%)</sub></td>
+    <td align="center">0.817 → <b>0.848</b> <sub>(+3.82%)</sub></td>
   </tr>
   <tr>
-    <td colspan="3" align="center"><b>🔍 Size-Specific mAP50</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
     <td align="center">0.530 → <b>0.574</b> <sub>(+8.22%)</sub></td>
     <td align="center">0.498 → <b>0.542</b> <sub>(+8.98%)</sub></td>
+    <td align="center">0.542 → <b>0.574</b> <sub>(+5.76%)</sub></td>
   </tr>
   <tr>
     <td align="left">📦 <b>Medium</b></td>
     <td align="center">0.750 → <b>0.796</b> <sub>(+6.11%)</sub></td>
     <td align="center">0.718 → <b>0.765</b> <sub>(+6.51%)</sub></td>
+    <td align="center">0.765 → <b>0.796</b> <sub>(+4.06%)</sub></td>
   </tr>
   <tr>
     <td align="left">🟫 <b>Large</b></td>
     <td align="center">0.828 → <b>0.871</b> <sub>(+5.24%)</sub></td>
     <td align="center">0.796 → <b>0.842</b> <sub>(+5.76%)</sub></td>
+    <td align="center">0.842 → <b>0.871</b> <sub>(+3.54%)</sub></td>
   </tr>
   <tr>
-    <td colspan="3" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
     <td align="center">0.297 → <b>0.336</b> <sub>(+13.10%)</sub></td>
     <td align="center">0.276 → <b>0.316</b> <sub>(+14.55%)</sub></td>
+    <td align="center">0.316 → <b>0.336</b> <sub>(+6.32%)</sub></td>
   </tr>
   <tr>
     <td align="left">📦 <b>Medium</b></td>
     <td align="center">0.424 → <b>0.467</b> <sub>(+10.23%)</sub></td>
     <td align="center">0.402 → <b>0.448</b> <sub>(+11.30%)</sub></td>
+    <td align="center">0.448 → <b>0.467</b> <sub>(+4.24%)</sub></td>
   </tr>
   <tr>
     <td align="left">🟫 <b>Large</b></td>
     <td align="center">0.550 → <b>0.604</b> <sub>(+9.74%)</sub></td>
     <td align="center">0.524 → <b>0.584</b> <sub>(+11.59%)</sub></td>
+    <td align="center">0.584 → <b>0.604</b> <sub>(+3.31%)</sub></td>
   </tr>
 </table>
 
-<sub>🔍 <b>Key Finding:</b> Custom loss function achieves up to <b>+14.55% improvement</b> on small objects (mAP50-95) — the primary focus of this research.</sub>
+<sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+14.55%</b> improvement on small objects | YOLOv12s outperforms YOLO11s by <b>+6.32%</b> on small objects (mAP50-95)</sub>
 
 </div>
 
