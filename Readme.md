@@ -96,9 +96,9 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
     <td><code>α_end = 0.4</code></td>
   </tr>
   <tr>
-    <td><code>small_obj_ps</code></td>
-    <td>0, 5</td>
-    <td><code>small_obj_ps = 32</code></td>
+    <td><code>small_obj_px</code></td>
+    <td>32</td>
+    <td><code>small_obj_px = 32</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>2. Center Loss Weight</b></td>
@@ -149,7 +149,7 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
   </tr>
   <tr>
     <td><code>Beta</code></td>
-    <td>—</td>
+    <td>4, 5, 6, 7, 8, 10</td>
     <td><code>Beta = 7</code></td>
   </tr>
   <tr>
