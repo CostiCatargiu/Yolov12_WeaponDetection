@@ -75,45 +75,54 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
-
 ## ⚡ Dataset Summary
 
 <table>
   <tr>
-    <td><b>🖼️ Images</b></td>
-    <td><b>59,305</b></td>
+    <th align="left" width="200">📋 Property</th>
+    <th align="left">📊 Details</th>
   </tr>
   <tr>
-    <td><b>🔢 Instances</b></td>
-    <td><b>76,705</b> (0 empty labels)</td>
+    <td>🖼️ <b>Total Images</b></td>
+    <td><code>59,305</code></td>
   </tr>
   <tr>
-    <td><b>🏷️ Classes</b></td>
-    <td><code>knife</code>, <code>long_gun</code>, <code>no_weapon</code>, <code>pistol</code></td>
+    <td>🔢 <b>Total Instances</b></td>
+    <td><code>76,705</code> (0 empty labels)</td>
   </tr>
   <tr>
-    <td><b>🧰 Format</b></td>
-    <td>YOLO: <code>class x_center y_center width height</code> (normalized)</td>
-  </tr>
-  <tr>
-    <td><b>📜 License</b></td>
-    <td>MIT</td>
-  </tr>
-  <tr>
-    <td><b>☁️ Hosting</b></td>
+    <td>🏷️ <b>Classes</b></td>
     <td>
-      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">Roboflow Universe: NoGun</a> &nbsp;•&nbsp;
-      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">Roboflow App: WeaponDataset v8</a>
+      <img src="https://img.shields.io/badge/knife-E74C3C?style=flat-square" />
+      <img src="https://img.shields.io/badge/long__gun-3498DB?style=flat-square" />
+      <img src="https://img.shields.io/badge/no__weapon-95A5A6?style=flat-square" />
+      <img src="https://img.shields.io/badge/pistol-9B59B6?style=flat-square" />
     </td>
   </tr>
   <tr>
-    <td><b>📦 Training results</b></td>
+    <td>🧰 <b>Format</b></td>
+    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized)</td>
+  </tr>
+  <tr>
+    <td>📜 <b>License</b></td>
+    <td><img src="https://img.shields.io/badge/MIT-green?style=flat-square" /></td>
+  </tr>
+  <tr>
+    <td>☁️ <b>Hosting</b></td>
     <td>
-      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing">Google Drive – Training Results OriginalModel</a> &nbsp;•&nbsp;
-      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing">Google Drive – Training Results CustomModel</a>
+      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+    </td>
+  </tr>
+  <tr>
+    <td>📦 <b>Training Results</b></td>
+    <td>
+      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing"><img src="https://img.shields.io/badge/Google_Drive-Original_Model-4285F4?style=flat-square&logo=googledrive&logoColor=white" /></a>
+      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing"><img src="https://img.shields.io/badge/Google_Drive-Custom_Model-4285F4?style=flat-square&logo=googledrive&logoColor=white" /></a>
     </td>
   </tr>
 </table>
+
 
 ---
 
