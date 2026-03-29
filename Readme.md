@@ -179,11 +179,27 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 
 | Setting | Value |
 |---------|-------|
-| 📊 **Dataset Size** | **17%** of the full dataset (for faster iteration) |
+| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
 | 🔄 **Epochs per Run** | **70 epochs** |
 | 📦 **Batch Size** | **64** |
+| 🖼️ **Image Size** | **640×640** |
 | ⏱️ **Time per Run** | ~1.2 hours |
 | 🔬 **Methodology** | Grid search with **isolated phases** |
+
+---
+
+### 🖥️ Hardware & Software Configuration
+
+| Component | Specification |
+|-----------|---------------|
+| 💻 **Operating System** | Ubuntu 22.04.3 LTS |
+| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
+| 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
+| 🗄️ **RAM** | DDR5 64GB (6000MHz) |
+| 💾 **Storage** | SSD 2TB |
+| 🐍 **Python** | 3.10.2 |
+| 🔥 **PyTorch** | 2.1.2 |
+| ⚡ **CUDA** | 12.1 |
 
 ---
 
@@ -267,6 +283,8 @@ tal_beta: 6.0
 </pre>
 
 > 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
+
+
 
 </details>
 
