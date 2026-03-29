@@ -475,7 +475,7 @@ After identifying the best combination, we trained on the **full dataset (100%)*
 
 ---
 
-### 🚀 YOLO11s Transfer Experiments
+### 🚀 YOLO26s Transfer Experiments
 
 After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO11s** to validate cross-architecture generalization.
 
@@ -488,12 +488,36 @@ Using the optimal parameters discovered from YOLOv12s, we tested the following c
 | Phases | Combinations Tested |
 |--------|---------------------|
 | **2 phases** | A+B, A+C1, A+D, B+C1, B+D, C1+D |
-| **3 phases** | A+B+C1, A+B+D, A+C1+D, B+C1+D |
-| **4 phases** | **A+B+C1+D 🏆** |
+| **3 phases** | ** A+B+C1 🏆**, A+B+D, A+C1+D, B+C1+D |
+| **4 phases** | A+B+C1+D |
 
 <sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
 
 > 🏆 **Winner:** Combination **A + B + C1 + D** also achieved the best performance on YOLO11s, confirming successful cross-architecture transfer.
+
+<details>
+<summary><b>📊 Click to view YOLO26s Combination Results</b></summary>
+
+<br>
+
+### 📈 All Combinations Performance Comparison
+
+<p align="center">
+<img width="1942" height="796" alt="image" src="https://github.com/user-attachments/assets/2d6045d6-c412-4a11-bd78-8f41b95fb52e" />
+
+</p>
+
+---
+
+### 🏆 Winner (A + B + C1) — Full Dataset Training Results
+
+After identifying the best combination, we trained on the **full dataset (100%)** for **~11 hours**:
+
+<p align="center">
+<img width="1921" height="783" alt="image" src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" />
+</p>
+
+</details>
 
 ---
 
