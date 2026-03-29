@@ -175,17 +175,6 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
 - 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
 
-### ⚙️ Experimental Setup
-
-| Setting | Value |
-|---------|-------|
-| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
-| 🔄 **Epochs per Run** | **70 epochs** |
-| 📦 **Batch Size** | **64** |
-| 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Time per Run** | ~1.2 hours |
-| 🔬 **Methodology** | Grid search with **isolated phases** |
-
 ---
 
 ### 🖥️ Hardware & Software Configuration
@@ -283,6 +272,8 @@ tal_beta: 6.0
 </pre>
 
 > 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
+
+> ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
 
 
