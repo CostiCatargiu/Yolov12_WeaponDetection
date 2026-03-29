@@ -314,7 +314,6 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 </details>
 
 ---
-
 ## 🔬 Ablation Study Results
 
 <details>
@@ -330,12 +329,13 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 | 🔄 **Epochs per Run** | **70 epochs** |
 | 📦 **Batch Size** | **64** |
 | 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Time per Run** | ~1.2 hours |
+| ⏱️ **Time per Run (YOLOv12s)** | ~1.2 hours |
+| ⏱️ **Time per Run (YOLO11s)** | ~1.0 hours |
 | 🔬 **Methodology** | Grid search with **isolated phases** |
 
 ---
 
-### 🧪 Grid Search Experiments Summary
+### 🧪 YOLOv12s Grid Search Experiments
 
 We conducted a **comprehensive ablation study** across **180 valid experiments** to identify optimal hyperparameters for small-object weapon detection.
 
@@ -424,7 +424,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <td><code>20</code></td>
   </tr>
   <tr>
-    <td><b>📊 Overall</b></td>
+    <td><b>📊 Grid Search Total</b></td>
     <td align="center">—</td>
     <td align="center">—</td>
     <td align="center"><b>180 / 12 / 192</b></td>
@@ -435,7 +435,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
 
 ---
 
-### 🔗 Phase Combination Experiments
+### 🔗 YOLOv12s Phase Combination Experiments
 
 After identifying the **optimal parameters** for each individual phase, we conducted **26 additional experiments** to find the **best combination**:
 
@@ -448,10 +448,10 @@ After identifying the **optimal parameters** for each individual phase, we condu
 
 <sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, C2 = DFL Clipping, D = TAL Alpha-Beta</sub>
 
-> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance.
+> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance on YOLOv12s.
 
 <details>
-<summary><b>📊 Click to view Combination Experiment Results</b></summary>
+<summary><b>📊 Click to view YOLOv12s Combination Results</b></summary>
 
 <br>
 
@@ -465,6 +465,8 @@ After identifying the **optimal parameters** for each individual phase, we condu
 
 ### 🏆 Winner (A + B + C1 + D) — Full Dataset Training Results
 
+After identifying the best combination, we trained on the **full dataset (100%)** for **~11 hours**:
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
 </p>
@@ -473,9 +475,31 @@ After identifying the **optimal parameters** for each individual phase, we condu
 
 ---
 
+### 🚀 YOLO11s Transfer Experiments
+
+After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO11s** to validate cross-architecture generalization.
+
+> ⚠️ **Note:** Phase C2 (DFL Clipping) is **not applicable** to YOLO11s architecture and was excluded from all experiments.
+
+### 🔗 YOLO11s Combination Experiments
+
+Using the optimal parameters discovered from YOLOv12s, we tested the following combinations:
+
+| Phases | Combinations Tested |
+|--------|---------------------|
+| **2 phases** | A+B, A+C1, A+D, B+C1, B+D, C1+D |
+| **3 phases** | A+B+C1, A+B+D, A+C1+D, B+C1+D |
+| **4 phases** | **A+B+C1+D 🏆** |
+
+<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
+
+> 🏆 **Winner:** Combination **A + B + C1 + D** also achieved the best performance on YOLO11s, confirming successful cross-architecture transfer.
+
+---
+
 ### ✅ Final Optimal Configuration
 
-The best performing combination was **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL Alpha-Beta):
+The best performing combination for both architectures was **A + B + C1 + D**:
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
@@ -495,7 +519,7 @@ center_loss_weight_min: 0.01
 iou_clip_start: 6
 iou_clip_end: 2
 
-# Phase C2: DFL Clipping ❌ (Disabled)
+# Phase C2: DFL Clipping ❌ (Disabled / Not applicable to YOLO11s)
 dfl_clip_start: 100.0
 dfl_clip_end: 100.0
 
@@ -507,18 +531,41 @@ tal_beta: 7
 
 ---
 
+### 📊 Complete Training Summary
+
+| Model | Phase | Dataset | Experiments | Time per Run | Total Time |
+|-------|-------|---------|-------------|--------------|------------|
+| **YOLOv12s** | Grid Search | 17% | 180 | ~1.2h | ~216h |
+| **YOLOv12s** | Combinations | 17% | 26 | ~1.2h | ~31h |
+| **YOLOv12s** | 🏆 Final Training | **100%** | 1 | — | **~11h** |
+| **YOLO11s** | Combinations | 17% | 11 | ~1.0h | ~11h |
+| **YOLO11s** | 🏆 Final Training | **100%** | 1 | — | **~9h** |
+
+---
+
+### 📈 Total Training Investment
+
+| Metric | Value |
+|--------|-------|
+| 🧪 **Total Experiments** | **219** |
+| ⏱️ **Ablation Time (17% dataset)** | ~258 hours (~10.75 days) |
+| ⏱️ **Full Dataset Training** | ~20 hours (11h + 9h) |
+| ⏱️ **Grand Total** | **~278 hours (~11.6 days)** |
+
+---
+
 ### 📌 Key Takeaways
 
-- ⏱️ **Total Training Time:** ~248 hours (**~10.3 days**) across **206 experiments**
-  - 🔬 **Phase tuning:** ~216 hours (180 valid experiments)
-  - 🔗 **Combination testing:** ~31 hours (26 combination experiments)
+- ⏱️ **Total Training Time:** ~278 hours (**~11.6 days**) across **219 experiments**
 - ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
 - ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
-- 🔗 **Combination Experiments:** 26 additional runs to find optimal phase combinations
 - 🏆 **Best Combination:** **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL)
-- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
-- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
-- 🔧 **Loss Clipping:** IoU clipping stabilizes training on dense small-object scenes (DFL clipping provided diminishing returns)
+- 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO11s
+- ⚡ **YOLO11s Efficiency:** ~17% faster per experiment compared to YOLOv12s
+- 🚫 **DFL Clipping (C2):** Not applicable to YOLO11s, excluded from transfer experiments
+- 🎯 **Most Impactful:** TAL Alpha-Beta tuning showed significant impact on small-object recall
+- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early
+- 🔧 **Loss Clipping:** IoU clipping stabilizes training (DFL clipping provided diminishing returns)
 
 ---
 
@@ -557,8 +604,8 @@ center_loss_decay_epochs: 1     # Irrelevant when weight=0
 # ───────────────────────────────────────────────────────────────
 iou_clip_start: 100.0     # No clipping (very high)
 iou_clip_end: 100.0       # No clipping (very high)
-dfl_clip_start: 100.0     # No clipping (very high)
-dfl_clip_end: 100.0       # No clipping (very high)
+dfl_clip_start: 100.0     # No clipping (very high) — N/A for YOLO11s
+dfl_clip_end: 100.0       # No clipping (very high) — N/A for YOLO11s
 
 # ───────────────────────────────────────────────────────────────
 # Phase D: TAL Alpha-Beta (DEFAULT)
@@ -573,3 +620,4 @@ tal_beta: 6.0
 > ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
 </details>
+
