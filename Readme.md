@@ -166,13 +166,112 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
   </tr>
 </table>
 
+
+---
+
+### 🔗 Phase Combination Experiments
+
+After identifying the **optimal parameters** for each individual phase, we conducted additional experiments to find the **best combination** of phases:
+
+| # | Combination | Phases Enabled |
+|---|-------------|----------------|
+| 1 | A + B | Alpha + Center Loss |
+| 2 | A + C1 | Alpha + IoU Clipping |
+| 3 | A + C2 | Alpha + DFL Clipping |
+| 4 | A + D | Alpha + TAL |
+| 5 | B + C1 | Center Loss + IoU Clipping |
+| 6 | B + C2 | Center Loss + DFL Clipping |
+| 7 | B + D | Center Loss + TAL |
+| 8 | C1 + C2 | IoU + DFL Clipping |
+| 9 | C1 + D | IoU Clipping + TAL |
+| 10 | C2 + D | DFL Clipping + TAL |
+| 11 | A + B + C1 | Alpha + Center Loss + IoU Clipping |
+| 12 | A + B + C2 | Alpha + Center Loss + DFL Clipping |
+| 13 | A + B + D | Alpha + Center Loss + TAL |
+| 14 | A + C1 + C2 | Alpha + IoU + DFL Clipping |
+| 15 | A + C1 + D | Alpha + IoU Clipping + TAL |
+| 16 | A + C2 + D | Alpha + DFL Clipping + TAL |
+| 17 | B + C1 + C2 | Center Loss + IoU + DFL Clipping |
+| 18 | B + C1 + D | Center Loss + IoU Clipping + TAL |
+| 19 | B + C2 + D | Center Loss + DFL Clipping + TAL |
+| 20 | C1 + C2 + D | IoU + DFL Clipping + TAL |
+| 21 | A + B + C1 + C2 | Alpha + Center Loss + Both Clipping |
+| 22 | **A + B + C1 + D** | **Alpha + Center Loss + IoU Clipping + TAL** 🏆 |
+| 23 | A + B + C2 + D | Alpha + Center Loss + DFL Clipping + TAL |
+| 24 | A + C1 + C2 + D | Alpha + Both Clipping + TAL |
+| 25 | B + C1 + C2 + D | Center Loss + Both Clipping + TAL |
+| 26 | A + B + C1 + C2 + D | All phases enabled |
+
+> 🏆 **Winner:** Combination **#22 (A + B + C1 + D)** achieved the best overall performance.
+
+<details>
+<summary><b>📊 Click to view Combination Experiment Results</b></summary>
+
+<br>
+
+### 📈 All Combinations Performance Comparison
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e19006d3-229f-4b72-b2c5-5c89ab1abbc8" alt="Combination Results" width="100%" />
+</p>
+
+---
+
+### 🏆 Winner (A + B + C1 + D) — Full Dataset Training Results
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
+</p>
+
+</details>
+
+---
+
+### ✅ Final Optimal Configuration
+
+The best performing combination was **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL Alpha-Beta):
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🏆 Best Configuration: A + B + C1 + D
+# ═══════════════════════════════════════════════════════════════
+
+# Phase A: Alpha Scheduling ✅
+alpha_start: 0.9
+alpha_end: 0.4
+small_obj_px: 32
+
+# Phase B: Center Loss ✅
+center_loss_weight_init: 0.05
+center_loss_weight_min: 0.01
+
+# Phase C1: IoU Clipping ✅
+iou_clip_start: 6
+iou_clip_end: 2
+
+# Phase C2: DFL Clipping ❌ (Disabled)
+dfl_clip_start: 100.0
+dfl_clip_end: 100.0
+
+# Phase D: TAL Alpha-Beta ✅
+tal_topk: 20
+tal_alpha: 1
+tal_beta: 7
+</pre>
+
+
 ### 📌 Key Takeaways
 
-- ⏱️ **Total Training Time:** ~217 hours (**~9 days**) across **192 experiments**
-- ✅ **Valid Configurations:** 180 out of 192 (**93.75% success rate**)
+- ⏱️ **Total Training Time:** ~248 hours (**~10.3 days**) across **206 experiments**
+  - 🔬 **Phase tuning:** ~216 hours (180 valid experiments)
+  - 🔗 **Combination testing:** ~31 hours (26 combination experiments)
+- ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
+- ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `min < init`
+- 🔗 **Combination Experiments:** 26 additional runs to find optimal phase combinations
+- 🏆 **Best Combination:** **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL)
 - 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
-- 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
+- 🔧 **Loss Clipping:** IoU clipping stabilizes training on dense small-object scenes (DFL clipping provided diminishing returns)
 
 ---
 
