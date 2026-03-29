@@ -175,21 +175,53 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
 - 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
 
+### ⚙️ Experimental Setup
+
+| Setting | Value |
+|---------|-------|
+| 📊 **Dataset Size** | **17%** of the full dataset (for faster iteration) |
+| 🔄 **Epochs per Run** | **70 epochs** |
+| 📦 **Batch Size** | **64** |
+| ⏱️ **Time per Run** | ~1.2 hours |
+| 🔬 **Methodology** | Grid search with **isolated phases** |
+
+### 📄 Reproducibility Config
+
+To reproduce the ablation experiments, use the following default configuration:
+
+```yaml
+# Training Settings
+epochs: 70
+batch: 64
+imgsz: 640
+dataset: "weapon_dataset_17pct"  # 17% subset for grid search
+
+# Phase A: Alpha Scheduling (DISABLED)
+alpha_start: 1.0
+alpha_end: 1.0
+small_obj_boost: 1.0
+small_obj_px: 32
+
+# Phase B: Center Loss (DISABLED)
+center_loss_weight_init: 0.0
+center_loss_weight_min: 0.0
+center_loss_decay_epochs: 1
+
+# Phase C: Adaptive Clipping (DISABLED)
+iou_clip_start: 100.0
+iou_clip_end: 100.0
+dfl_clip_start: 100.0
+dfl_clip_end: 100.0
+
+# Phase D: TAL Alpha-Beta (DEFAULT)
+tal_topk: 10
+tal_alpha: 0.5
+tal_beta: 6.0
+
+
 </details>
 
 
----
-
-
-### 🔬 Research Contributions
-
-| Contribution | Description |
-|--------------|-------------|
-| 🏗️ **P2–P5 Architecture** | Added high-resolution **P2 head (stride 1/4)** for better small object feature extraction |
-| 📉 **Custom Loss Function** | Size-aware box weighting, auxiliary center L1 loss, epoch-scheduled clipping |
-| 🎯 **Tuned Assigner** | `topk=25`, `β=4.0` for increased positives and softer gating |
-| 🔍 **Ablation Study** | Extensive search across loss weights, architecture mods, and training configs |
-| 📊 **Cross-Model Transfer** | Applied best YOLOv12s configs to YOLOv11s to measure generalization |
 
 ---
 
