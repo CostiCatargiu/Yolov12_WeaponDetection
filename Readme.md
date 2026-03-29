@@ -85,14 +85,14 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
   <tr>
     <td rowspan="3"><b>1. Alpha Scheduling</b></td>
     <td><code>α_start</code></td>
-    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
-    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
+    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
     <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
     <td><code>0.9</code></td>
   </tr>
   <tr>
     <td><code>α_end</code></td>
-    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
+    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
     <td><code>0.4</code></td>
   </tr>
   <tr>
