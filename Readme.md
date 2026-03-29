@@ -33,7 +33,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 - 🏗️ A **modified YOLOv12s architecture** with **P2–P5 detection heads** optimized for **small object detection**
 - 📉 A **custom loss function** with **size-aware weighting** and **tuned TaskAligned assigner**
 - 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
-- 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
+- 📊 **Transfer validation** to **YOLO26s** using the best-performing configurations from YOLOv12s
 
 ### 📑 What You'll Find Below
 
@@ -45,7 +45,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 | 📉 **Loss Function Ablation** | Custom loss components and tuning results |
 | 🧪 **Experiment Results** | Performance metrics, confusion matrices, training curves |
 | 🔍 **Prediction Examples** | Side-by-side comparisons (Original vs Custom model) |
-| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLOv11s |
+| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLO26s |
 
 
 ---
