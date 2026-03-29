@@ -72,7 +72,6 @@ This repository accompanies our **research paper** on **small-object weapon dete
 | 🔍 **Ablation Study** | Extensive search across loss weights, architecture mods, and training configs |
 | 📊 **Cross-Model Transfer** | Applied best YOLOv12s configs to YOLOv11s to measure generalization |
 
-
 ---
 
 ## ⚡ Dataset Summary
@@ -123,100 +122,53 @@ This repository accompanies our **research paper** on **small-object weapon dete
   </tr>
 </table>
 
-
 ---
-
-## ✨ Key Features of the New Weapon Dataset
-
-| Feature | Description |
-|---------|-------------|
-| 🎯 **Multi-class Detection** | knife, pistol, long_gun, no_weapon |
-| 🎬 **Diverse Sources** | ~1,200 YouTube videos with varied content |
-| 📐 **Resolution Variety** | Multiple resolutions and aspect ratios |
-| 🌓 **Scene Diversity** | Day/night, CCTV, handheld footage |
-| 💨 **Real-world Challenges** | Occlusions, motion blur, cluttered backgrounds |
-
----
-
-## 🏷️ Classes
-
-| Class | Description |
-|-------|-------------|
-| 🗡️ `knife` | Bladed weapons including knives and similar objects |
-| 🔫 `pistol` | Handguns and short firearms |
-| 🎯 `long_gun` | Rifles, shotguns, and other long-barreled firearms |
-| 🚫 `no_weapon` | Hard negatives (phones, tools, umbrellas, etc.) |
-
----
-
-## ❓ Why Include `no_weapon`?
-
-The `no_weapon` class serves as **hard negatives** — visually similar objects that are frequently misclassified as weapons. Including these examples:
-
-- ✅ **Reduces false positives** in production
-- ✅ **Improves precision** in crowded scenes
-- ✅ **Distinguishes weapons** from everyday objects (📱 phones, 🔧 tools, ☂️ umbrellas, 📷 camera equipment)
-
----
-
-## 📁 Dataset Overview
 
 <details>
-<summary><b>📊 Click to expand Dataset Statistics & Distribution</b></summary>
+<summary><b>✨ Key Features of the Dataset</b></summary>
 
 <br>
 
-### 📈 Dataset Summary
+The **NewWeaponDataset** is specifically designed for **small-object weapon detection** with the following characteristics:
 
-<table>
-  <tr>
-    <th align="left" width="200">📋 Property</th>
-    <th align="left">📊 Details</th>
-  </tr>
-  <tr>
-    <td>🖼️ <b>Total Images</b></td>
-    <td><code>59,305</code></td>
-  </tr>
-  <tr>
-    <td>🔢 <b>Total Instances</b></td>
-    <td><code>76,705</code> (0 empty labels)</td>
-  </tr>
-  <tr>
-    <td>🏷️ <b>Classes</b></td>
-    <td>
-      <img src="https://img.shields.io/badge/knife-E74C3C?style=flat-square" />
-      <img src="https://img.shields.io/badge/long__gun-3498DB?style=flat-square" />
-      <img src="https://img.shields.io/badge/no__weapon-95A5A6?style=flat-square" />
-      <img src="https://img.shields.io/badge/pistol-9B59B6?style=flat-square" />
-    </td>
-  </tr>
-  <tr>
-    <td>🧰 <b>Format</b></td>
-    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized)</td>
-  </tr>
-  <tr>
-    <td>📜 <b>License</b></td>
-    <td><img src="https://img.shields.io/badge/MIT-green?style=flat-square" /></td>
-  </tr>
-  <tr>
-    <td>☁️ <b>Hosting</b></td>
-    <td>
-      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
-      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
-    </td>
-  </tr>
-  <tr>
-    <td>📦 <b>Training Results</b></td>
-    <td>
-      <a href="https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing"><img src="https://img.shields.io/badge/Google_Drive-Original_Model-4285F4?style=flat-square&logo=googledrive&logoColor=white" /></a>
-      <a href="https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing"><img src="https://img.shields.io/badge/Google_Drive-Custom_Model-4285F4?style=flat-square&logo=googledrive&logoColor=white" /></a>
-    </td>
-  </tr>
-</table>
+- 🎯 **Multi-class Detection** — Covers 4 classes: `knife`, `pistol`, `long_gun`, and `no_weapon`
+- 🎬 **Diverse Sources** — Extracted from **~1,200 YouTube videos** with varied content and scenarios
+- 📐 **Resolution Variety** — Includes multiple resolutions and aspect ratios for robust training
+- 🌓 **Scene Diversity** — Contains day/night footage, CCTV recordings, and handheld camera shots
+- 💨 **Real-world Challenges** — Features occlusions, motion blur, and cluttered backgrounds
+
+</details>
 
 ---
 
-### 🗂️ Dataset Structure
+<details>
+<summary><b>🏷️ Class Descriptions</b></summary>
+
+<br>
+
+- 🗡️ **`knife`** — Bladed weapons including knives and similar sharp objects
+- 🔫 **`pistol`** — Handguns and short firearms
+- 🎯 **`long_gun`** — Rifles, shotguns, and other long-barreled firearms
+- 🚫 **`no_weapon`** — Hard negatives such as phones, tools, umbrellas, and camera equipment
+
+### ❓ Why Include `no_weapon`?
+
+The `no_weapon` class serves as **hard negatives** — visually similar objects that are frequently misclassified as weapons. Including these examples:
+
+- ✅ **Reduces false positives** in production environments
+- ✅ **Improves precision** in crowded and complex scenes
+- ✅ **Teaches the model to distinguish** weapons from everyday objects like 📱 phones, 🔧 tools, ☂️ umbrellas, and 📷 camera equipment
+
+</details>
+
+---
+
+<details>
+<summary><b>📁 Dataset Structure & Distribution</b></summary>
+
+<br>
+
+### 🗂️ Folder Structure
 
 <pre>
 NewWeaponDataset/
@@ -238,43 +190,39 @@ NewWeaponDataset/
 
 ### 📊 Class Distribution per Split
 
-| Split | Images | % of Images | Instances | 🗡️ knife | 🎯 long_gun | 🚫 no_weapon | 🔫 pistol |
-|-------|-------:|------------:|----------:|---------:|------------:|-------------:|----------:|
-| Train | 49,079 | 82.76% | 63,452 | 10,511 **(16.57%)** | 19,273 **(30.37%)** | 10,161 **(16.01%)** | 23,507 **(37.05%)** |
-| Valid | 7,552 | 12.73% | 9,730 | 1,813 **(18.63%)** | 2,750 **(28.26%)** | 1,324 **(13.61%)** | 3,843 **(39.50%)** |
-| Test | 2,674 | 4.51% | 3,523 | 686 **(19.47%)** | 941 **(26.71%)** | 656 **(18.62%)** | 1,240 **(35.20%)** |
-| **Total** | **59,305** | **100%** | **76,705** | **13,010 (16.96%)** | **22,964 (29.94%)** | **12,141 (15.83%)** | **28,590 (37.27%)** |
-
----
-
-### 📐 Annotation Size Analysis
-
-Objects categorized by **normalized bounding box area** (`w × h`):
-
-| Size | Threshold | Description |
-|------|-----------|-------------|
-| 🔍 **Small** | ≤ 0.02 | Tiny objects, hardest to detect |
-| 📦 **Medium** | 0.02 – 0.20 | Standard-sized objects |
-| 🟫 **Large** | > 0.20 | Large, easy to detect |
-
-#### 📈 Size Distribution per Split
-
-| Split | Total Boxes | 🔍 Small | 📦 Medium | 🟫 Large | % Small | % Medium | % Large |
-|-------|------------:|---------:|----------:|---------:|--------:|---------:|--------:|
-| **Train** | 63,452 | 15,548 | 33,032 | 14,872 | 24.5% | 52.1% | 23.4% |
-| **Valid** | 9,730 | 2,821 | 5,135 | 1,774 | 29.0% | 52.8% | 18.2% |
-| **Test** | 3,523 | 966 | 1,869 | 688 | 27.4% | 53.1% | 19.5% |
-| **TOTAL** | 76,705 | 19,335 | 40,036 | 17,334 | **25.2%** | **52.2%** | **22.6%** |
-
----
-
-### 📌 Key Observations
-
-| Observation | Details |
-|-------------|---------|
-| 📦 **Medium dominates** | ~52% across all splits |
-| 🔍 **Small well-represented** | ~25% ensures sufficient small-object training data |
-| 🟫 **Large less frequent** | ~22% but important for scale robustness |
-| ⚖️ **Balanced splits** | Proportions consistent across train/valid/test |
+| Split | Images | % | Instances | 🗡️ knife | 🎯 long_gun | 🚫 no_weapon | 🔫 pistol |
+|-------|-------:|--:|----------:|---------:|------------:|-------------:|----------:|
+| Train | 49,079 | 82.76% | 63,452 | 10,511 **(16.6%)** | 19,273 **(30.4%)** | 10,161 **(16.0%)** | 23,507 **(37.1%)** |
+| Valid | 7,552 | 12.73% | 9,730 | 1,813 **(18.6%)** | 2,750 **(28.3%)** | 1,324 **(13.6%)** | 3,843 **(39.5%)** |
+| Test | 2,674 | 4.51% | 3,523 | 686 **(19.5%)** | 941 **(26.7%)** | 656 **(18.6%)** | 1,240 **(35.2%)** |
+| **Total** | **59,305** | **100%** | **76,705** | **13,010** | **22,964** | **12,141** | **28,590** |
 
 </details>
+
+---
+
+<details>
+<summary><b>📐 Annotation Size Analysis</b></summary>
+
+<br>
+
+To better understand the dataset composition, we analyzed the **normalized bounding box areas** (`width × height` in YOLO format) and categorized objects into three size groups:
+
+- 🔍 **Small** — area ≤ `0.02` (tiny objects, hardest to detect)
+- 📦 **Medium** — `0.02 < area ≤ 0.20` (standard-sized objects)
+- 🟫 **Large** — area > `0.20` (large, easier to detect)
+
+### 📈 Key Findings
+
+**Medium-sized objects dominate** the dataset, making up approximately **52%** of all annotations across all splits. This provides a solid foundation for general object detection.
+
+**Small objects represent ~25%** of the dataset (**19,335 instances**), ensuring sufficient representation for small-object detection — the primary focus of this research. The **Train split** contains **15,548 small objects (24.5%)**, while **Valid** and **Test** splits have slightly higher proportions (**29.0%** and **27.4%** respectively).
+
+**Large objects are less frequent** at around **22%** (**17,334 instances**), but remain important for maintaining scale robustness and preventing the model from overfitting to small targets only.
+
+### ⚖️ Balance & Consistency
+
+The proportions are **remarkably consistent across train/valid/test splits**, indicating a well-balanced dataset that should generalize effectively. The slightly higher percentage of small objects in the validation and test sets provides a more challenging evaluation scenario, which is ideal for assessing real-world performance.
+
+</details>
+
