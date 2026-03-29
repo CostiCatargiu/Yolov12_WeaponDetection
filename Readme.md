@@ -142,9 +142,9 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
   <tr>
     <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
     <td><code>Alpha (α)</code></td>
-    <td>0.25, 0.5, 0.75, 1.0</td>
-    <td rowspan="3" align="center"><b>51</b> / 0 / 51</td>
-    <td rowspan="3" align="center">~1.2h / ~60h</td>
+    <td>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</td>
+    <td rowspan="3" align="center"><b>51</b> / 0 / 48</td>
+    <td rowspan="3" align="center">~1.2h / ~58h</td>
     <td><code>Alpha = 1</code></td>
   </tr>
   <tr>
@@ -169,9 +169,8 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
 
 ### 📌 Key Takeaways
 
-- ⏱️ **Total Training Time:** ~219 hours (**~9.1 days**) across **195 experiments**
-- ✅ **Valid Configurations:** 183 out of 195 (**93.8% success rate**)
-- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **51 experiments** showed significant impact on small-object recall
+- ⏱️ **Total Training Time:** ~217 hours (**~9 days**) across **192 experiments**
+- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
 - 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
 
