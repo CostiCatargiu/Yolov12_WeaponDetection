@@ -61,6 +61,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 
 ---
+
 ## 🔬 Ablation Study Results
 
 <details>
@@ -83,78 +84,78 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
   </tr>
   <tr>
     <td rowspan="3"><b>1. Alpha Scheduling</b></td>
-    <td><sub><code>α_start</code></sub></td>
+    <td><code>α_start</code></td>
     <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
-    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
     <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
-    <td><sub><code>0.9</code></sub></td>
+    <td><code>0.9</code></td>
   </tr>
   <tr>
-    <td><sub><code>α_end</code></sub></td>
+    <td><code>α_end</code></td>
     <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
-    <td><sub><code>0.4</code></sub></td>
+    <td><code>0.4</code></td>
   </tr>
   <tr>
-    <td><sub><code>small_obj_px</code></sub></td>
+    <td><code>small_obj_px</code></td>
     <td><sub>32</sub></td>
-    <td><sub><code>32</code></sub></td>
+    <td><code>32</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>2. Center Loss Weight</b></td>
-    <td><sub><code>Loss_min</code></sub></td>
+    <td><code>Loss_min</code></td>
     <td><sub>0.00, 0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
-    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
+    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: min &lt; init</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~39h</sub></td>
-    <td><sub><code>0.01</code></sub></td>
+    <td><code>0.01</code></td>
   </tr>
   <tr>
-    <td><sub><code>Loss_init</code></sub></td>
+    <td><code>Loss_init</code></td>
     <td><sub>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
-    <td><sub><code>0.05</code></sub></td>
+    <td><code>0.05</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>3. IoU Clipping</b></td>
-    <td><sub><code>IoU_start</code></sub></td>
+    <td><code>IoU_start</code></td>
     <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><sub><code>6</code></sub></td>
+    <td><code>6</code></td>
   </tr>
   <tr>
-    <td><sub><code>IoU_end</code></sub></td>
+    <td><code>IoU_end</code></td>
     <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td><sub><code>2</code></sub></td>
+    <td><code>2</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>4. DFL Clipping</b></td>
-    <td><sub><code>DFL_start</code></sub></td>
+    <td><code>DFL_start</code></td>
     <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><sub><code>8</code></sub></td>
+    <td><code>8</code></td>
   </tr>
   <tr>
-    <td><sub><code>DFL_end</code></sub></td>
+    <td><code>DFL_end</code></td>
     <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td><sub><code>5</code></sub></td>
+    <td><code>5</code></td>
   </tr>
   <tr>
     <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
-    <td><sub><code>Alpha (α)</code></sub></td>
+    <td><code>Alpha (α)</code></td>
     <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
     <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
     <td rowspan="3" align="center"><sub>~1.2h / ~58h</sub></td>
-    <td><sub><code>1</code></sub></td>
+    <td><code>1</code></td>
   </tr>
   <tr>
-    <td><sub><code>Beta</code></sub></td>
+    <td><code>Beta</code></td>
     <td><sub>4, 5, 6, 7, 8, 10</sub></td>
-    <td><sub><code>7</code></sub></td>
+    <td><code>7</code></td>
   </tr>
   <tr>
-    <td><sub><code>Topk</code></sub></td>
+    <td><code>Topk</code></td>
     <td><sub>4, 5, 6, 8, 10, 12, 15, 20, 25</sub></td>
-    <td><sub><code>20</code></sub></td>
+    <td><code>20</code></td>
   </tr>
   <tr>
     <td><b>📊 Overall</b></td>
