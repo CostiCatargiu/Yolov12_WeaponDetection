@@ -1,4 +1,4 @@
-<h1 align="center">🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s</h1>
+<h1 align="center">🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO11s</h1>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
@@ -17,7 +17,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Model-YOLOv12s_Custom-red?style=flat-square" />
-  <img src="https://img.shields.io/badge/Model-YOLOv11s-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Model-YOLO11s-red?style=flat-square" />
   <img src="https://img.shields.io/badge/Focus-Small_Object_Detection-purple?style=flat-square" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
@@ -33,7 +33,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 - 🏗️ A **modified YOLOv12s architecture** with **P2–P5 detection heads** optimized for **small object detection**
 - 📉 A **custom loss function** with **size-aware weighting** and **tuned TaskAligned assigner**
 - 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
-- 📊 **Transfer validation** to **YOLO26s** using the best-performing configurations from YOLOv12s
+- 📊 **Transfer validation** to **YOLO11s** using the best-performing configurations from YOLOv12s
 
 ### 📑 What You'll Find Below
 
@@ -45,10 +45,10 @@ This repository accompanies our **research paper** on **small-object weapon dete
 | 📉 **Loss Function Ablation** | Custom loss components and tuning results |
 | 🧪 **Experiment Results** | Performance metrics, confusion matrices, training curves |
 | 🔍 **Prediction Examples** | Side-by-side comparisons (Original vs Custom model) |
-| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLO26s |
-
+| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLO11s |
 
 ---
+
 ## 💡 Applications
 
 | Domain | Use Cases |
@@ -61,201 +61,12 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
-## 🔬 Ablation Study Results
+## 🖥️ Hardware & Software Configuration
 
 <details>
-<summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
+<summary><b>⚙️ Click to expand System Specifications</b></summary>
 
 <br>
-
-### 🧪 Grid Search Experiments Summary
-
-We conducted a **comprehensive ablation study** across **192 experiments** over approximately **9 days** of training time to identify optimal hyperparameters for small-object weapon detection.
-
-<table>
-  <tr>
-    <th align="left">🧪 Experiment</th>
-    <th align="left">⚙️ Parameter</th>
-    <th align="left">🔢 Values Tested</th>
-    <th align="center">📈 Combinations<br><sub>(Valid / Invalid / Total)</sub></th>
-    <th align="center">⏱️ Time<br><sub>(Per Run / Total)</sub></th>
-    <th align="left">✅ Optimal</th>
-  </tr>
-  <tr>
-    <td rowspan="3"><b>1. Alpha Scheduling</b></td>
-    <td><code>α_start</code></td>
-    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
-    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
-    <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
-    <td><code>0.9</code></td>
-  </tr>
-  <tr>
-    <td><code>α_end</code></td>
-    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
-    <td><code>0.4</code></td>
-  </tr>
-  <tr>
-    <td><code>small_obj_px</code></td>
-    <td><sub>32</sub></td>
-    <td><code>32</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>2. Center Loss Weight</b></td>
-    <td><code>Loss_min</code></td>
-    <td><sub>0.00, 0.005, 0.010, 0.015, 0.020, 0.025</sub></td>
-    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~39h</sub></td>
-    <td><code>0.01</code></td>
-  </tr>
-  <tr>
-    <td><code>Loss_init</code></td>
-    <td><sub>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
-    <td><code>0.05</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>3. IoU Clipping</b></td>
-    <td><code>IoU_start</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><code>6</code></td>
-  </tr>
-  <tr>
-    <td><code>IoU_end</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td><code>2</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>4. DFL Clipping</b></td>
-    <td><code>DFL_start</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><code>8</code></td>
-  </tr>
-  <tr>
-    <td><code>DFL_end</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td><code>5</code></td>
-  </tr>
-  <tr>
-    <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
-    <td><code>Alpha (α)</code></td>
-    <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
-    <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
-    <td rowspan="3" align="center"><sub>~1.2h / ~58h</sub></td>
-    <td><code>1</code></td>
-  </tr>
-  <tr>
-    <td><code>Beta</code></td>
-    <td><sub>4, 5, 6, 7, 8, 10</sub></td>
-    <td><code>7</code></td>
-  </tr>
-  <tr>
-    <td><code>Topk</code></td>
-    <td><sub>4, 5, 6, 8, 10, 12, 15, 20, 25</sub></td>
-    <td><code>20</code></td>
-  </tr>
-  <tr>
-    <td><b>📊 Overall</b></td>
-    <td align="center">—</td>
-    <td align="center">—</td>
-    <td align="center"><b>180 / 12 / 192</b></td>
-    <td align="center"><b>~1.2h / ~217h</b><br><sub>(~9 days)</sub></td>
-    <td align="center">—</td>
-  </tr>
-</table>
-
-
----
-
-### 🔗 Phase Combination Experiments
-
-After identifying the **optimal parameters** for each individual phase, we conducted **26 additional experiments** to find the **best combination**:
-
-| Phases | Combinations Tested |
-|--------|---------------------|
-| **2 phases** | A+B, A+C1, A+C2, A+D, B+C1, B+C2, B+D, C1+C2, C1+D, C2+D |
-| **3 phases** | A+B+C1, A+B+C2, A+B+D, A+C1+C2, A+C1+D, A+C2+D, B+C1+C2, B+C1+D, B+C2+D, C1+C2+D |
-| **4 phases** | A+B+C1+C2, **A+B+C1+D 🏆**, A+B+C2+D, A+C1+C2+D, B+C1+C2+D |
-| **5 phases** | A+B+C1+C2+D |
-
-<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, C2 = DFL Clipping, D = TAL Alpha-Beta</sub>
-
-> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance.
-
-<details>
-<summary><b>📊 Click to view Combination Experiment Results</b></summary>
-
-<br>
-
-### 📈 All Combinations Performance Comparison
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/e19006d3-229f-4b72-b2c5-5c89ab1abbc8" alt="Combination Results" width="100%" />
-</p>
-
----
-
-### 🏆 Winner (A + B + C1 + D) — Full Dataset Training Results
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
-</p>
-
-</details>
-
----
-
-### ✅ Final Optimal Configuration
-
-The best performing combination was **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL Alpha-Beta):
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🏆 Best Configuration: A + B + C1 + D
-# ═══════════════════════════════════════════════════════════════
-
-# Phase A: Alpha Scheduling ✅
-alpha_start: 0.9
-alpha_end: 0.4
-small_obj_px: 32
-
-# Phase B: Center Loss ✅
-center_loss_weight_init: 0.05
-center_loss_weight_min: 0.01
-
-# Phase C1: IoU Clipping ✅
-iou_clip_start: 6
-iou_clip_end: 2
-
-# Phase C2: DFL Clipping ❌ (Disabled)
-dfl_clip_start: 100.0
-dfl_clip_end: 100.0
-
-# Phase D: TAL Alpha-Beta ✅
-tal_topk: 20
-tal_alpha: 1
-tal_beta: 7
-</pre>
-
-
-### 📌 Key Takeaways
-
-- ⏱️ **Total Training Time:** ~248 hours (**~10.3 days**) across **206 experiments**
-  - 🔬 **Phase tuning:** ~216 hours (180 valid experiments)
-  - 🔗 **Combination testing:** ~31 hours (26 combination experiments)
-- ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
-- ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `min < init`
-- 🔗 **Combination Experiments:** 26 additional runs to find optimal phase combinations
-- 🏆 **Best Combination:** **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL)
-- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
-- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
-- 🔧 **Loss Clipping:** IoU clipping stabilizes training on dense small-object scenes (DFL clipping provided diminishing returns)
-
----
-
-### 🖥️ Hardware & Software Configuration
 
 | Component | Specification |
 |-----------|---------------|
@@ -268,95 +79,7 @@ tal_beta: 7
 | 🔥 **PyTorch** | 2.1.2 |
 | ⚡ **CUDA** | 12.1 |
 
----
-
-### 📊 Ablation Dataset Split (17% Subset)
-
-| Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🚫 other | 🔫 pistol |
-|-------|--------|-----------|----------|-------------|----------|-----------|
-| **Train** | 8,343 (82.8%) | 10,927 (83.0%) | 1,779 (16.3%) | 3,315 (30.3%) | 1,815 (16.6%) | 4,018 (36.8%) |
-| **Valid** | 1,283 (12.7%) | 1,643 (12.5%) | 307 (18.7%) | 493 (30.0%) | 206 (12.5%) | 637 (38.8%) |
-| **Test** | 454 (4.5%) | 598 (4.5%) | 121 (20.2%) | 156 (26.1%) | 114 (19.1%) | 207 (34.6%) |
-| **TOTAL** | **10,080** | **13,168** | 2,207 (16.8%) | 3,964 (30.1%) | 2,135 (16.2%) | 4,862 (36.9%) |
-
----
-
-### 📐 Size Distribution (Ablation Dataset)
-
-Objects categorized by **bounding box dimensions** in pixels:
-
-| Size | Threshold | Description |
-|------|-----------|-------------|
-| 🔍 **Small** | < 32px | Tiny objects, hardest to detect |
-| 📦 **Medium** | 32px – 96px | Standard-sized objects |
-| 🟫 **Large** | > 96px | Large, easier to detect |
-
-| Class | Total | 🔍 Small | 📦 Medium | 🟫 Large |
-|-------|------:|----------|-----------|----------|
-| 🗡️ **knife** | 2,207 | 239 (10.8%) | 284 (12.9%) | 1,684 (76.3%) |
-| 🎯 **long_gun** | 3,964 | 264 (6.7%) | 412 (10.4%) | 3,288 (82.9%) |
-| 🚫 **other** | 2,135 | 235 (11.0%) | 359 (16.8%) | 1,541 (72.2%) |
-| 🔫 **pistol** | 4,862 | 1,053 (21.7%) | 826 (17.0%) | 2,983 (61.4%) |
-| **TOTAL** | **13,168** | **1,791 (13.6%)** | **1,881 (14.3%)** | **9,496 (72.1%)** |
-
-> 📌 **Note:** Pistols have the highest proportion of small objects (**21.7%**), making them the most challenging class for small-object detection.
-
----
-
-### 📄 Reproducibility Config
-
-To reproduce the ablation experiments, use the following default configuration:
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🔬 Ablation Study - Default Configuration
-# ═══════════════════════════════════════════════════════════════
-
-# Training Settings
-epochs: 70
-batch: 64
-imgsz: 640
-dataset: "weapon_dataset_17pct"  # 17% subset for grid search
-
-# ───────────────────────────────────────────────────────────────
-# Phase A: Alpha Scheduling (DISABLED)
-# ───────────────────────────────────────────────────────────────
-alpha_start: 1.0          # No area weighting
-alpha_end: 1.0            # No area weighting
-small_obj_boost: 1.0      # No boost (multiplier = 1)
-small_obj_px: 32          # Default small object threshold
-
-# ───────────────────────────────────────────────────────────────
-# Phase B: Center Loss (DISABLED)
-# ───────────────────────────────────────────────────────────────
-center_loss_weight_init: 0.0    # No center loss
-center_loss_weight_min: 0.0     # No center loss
-center_loss_decay_epochs: 1     # Irrelevant when weight=0
-
-# ───────────────────────────────────────────────────────────────
-# Phase C: Adaptive Clipping (DISABLED)
-# ───────────────────────────────────────────────────────────────
-iou_clip_start: 100.0     # No clipping (very high)
-iou_clip_end: 100.0       # No clipping (very high)
-dfl_clip_start: 100.0     # No clipping (very high)
-dfl_clip_end: 100.0       # No clipping (very high)
-
-# ───────────────────────────────────────────────────────────────
-# Phase D: TAL Alpha-Beta (DEFAULT)
-# ───────────────────────────────────────────────────────────────
-tal_topk: 10
-tal_alpha: 0.5
-tal_beta: 6.0
-</pre>
-
-> 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
-
-> ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
-
-
 </details>
-
-
 
 ---
 
@@ -449,8 +172,10 @@ The `no_weapon` class serves as **hard negatives** — visually similar objects 
 
 ---
 
+## 📊 Dataset Details
+
 <details>
-<summary><b>📁 Dataset Structure & Distribution</b></summary>
+<summary><b>📁 Full Dataset (100%)</b></summary>
 
 <br>
 
@@ -483,32 +208,61 @@ NewWeaponDataset/
 | Test | 2,674 | 4.51% | 3,523 | 686 **(19.5%)** | 941 **(26.7%)** | 656 **(18.6%)** | 1,240 **(35.2%)** |
 | **Total** | **59,305** | **100%** | **76,705** | **13,010** | **22,964** | **12,141** | **28,590** |
 
+---
+
+### 📐 Size Distribution (Full Dataset)
+
+Objects categorized by **bounding box dimensions** in pixels:
+
+| Size | Threshold | Description |
+|------|-----------|-------------|
+| 🔍 **Small** | < 32px | Tiny objects, hardest to detect |
+| 📦 **Medium** | 32px – 96px | Standard-sized objects |
+| 🟫 **Large** | > 96px | Large, easier to detect |
+
+| Class | Total | 🔍 Small | 📦 Medium | 🟫 Large |
+|-------|------:|----------|-----------|----------|
+| 🗡️ **knife** | 13,009 | 1,271 (9.8%) | 1,776 (13.7%) | 9,962 (76.6%) |
+| 🎯 **long_gun** | 22,960 | 1,494 (6.5%) | 2,556 (11.1%) | 18,910 (82.4%) |
+| 🚫 **other** | 12,141 | 1,220 (10.0%) | 1,852 (15.3%) | 9,069 (74.7%) |
+| 🔫 **pistol** | 28,590 | 6,163 (21.6%) | 4,862 (17.0%) | 17,565 (61.4%) |
+| **TOTAL** | **76,700** | **10,148 (13.2%)** | **11,046 (14.4%)** | **55,506 (72.4%)** |
+
+> 📌 **Note:** Pistols have the highest proportion of small objects (**21.6%**), making them the most challenging class for small-object detection.
+
 </details>
 
 ---
 
 <details>
-<summary><b>📐 Annotation Size Analysis</b></summary>
+<summary><b>📁 Ablation Dataset (17% Subset)</b></summary>
 
 <br>
 
-To better understand the dataset composition, we analyzed the **normalized bounding box areas** (`width × height` in YOLO format) and categorized objects into three size groups:
+A **17% stratified subset** of the full dataset was used for **grid search experiments** to enable faster iteration while maintaining representative class distributions.
 
-- 🔍 **Small** — area ≤ `0.02` (tiny objects, hardest to detect)
-- 📦 **Medium** — `0.02 < area ≤ 0.20` (standard-sized objects)
-- 🟫 **Large** — area > `0.20` (large, easier to detect)
+### 📊 Ablation Dataset Split
 
-### 📈 Key Findings
+| Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🚫 other | 🔫 pistol |
+|-------|--------|-----------|----------|-------------|----------|-----------|
+| **Train** | 8,343 (82.8%) | 10,927 (83.0%) | 1,779 (16.3%) | 3,315 (30.3%) | 1,815 (16.6%) | 4,018 (36.8%) |
+| **Valid** | 1,283 (12.7%) | 1,643 (12.5%) | 307 (18.7%) | 493 (30.0%) | 206 (12.5%) | 637 (38.8%) |
+| **Test** | 454 (4.5%) | 598 (4.5%) | 121 (20.2%) | 156 (26.1%) | 114 (19.1%) | 207 (34.6%) |
+| **TOTAL** | **10,080** | **13,168** | 2,207 (16.8%) | 3,964 (30.1%) | 2,135 (16.2%) | 4,862 (36.9%) |
 
-**Medium-sized objects dominate** the dataset, making up approximately **52%** of all annotations across all splits. This provides a solid foundation for general object detection.
+---
 
-**Small objects represent ~25%** of the dataset (**19,335 instances**), ensuring sufficient representation for small-object detection — the primary focus of this research. The **Train split** contains **15,548 small objects (24.5%)**, while **Valid** and **Test** splits have slightly higher proportions (**29.0%** and **27.4%** respectively).
+### 📐 Size Distribution (Ablation Dataset)
 
-**Large objects are less frequent** at around **22%** (**17,334 instances**), but remain important for maintaining scale robustness and preventing the model from overfitting to small targets only.
+| Class | Total | 🔍 Small | 📦 Medium | 🟫 Large |
+|-------|------:|----------|-----------|----------|
+| 🗡️ **knife** | 2,207 | 239 (10.8%) | 284 (12.9%) | 1,684 (76.3%) |
+| 🎯 **long_gun** | 3,964 | 264 (6.7%) | 412 (10.4%) | 3,288 (82.9%) |
+| 🚫 **other** | 2,135 | 235 (11.0%) | 359 (16.8%) | 1,541 (72.2%) |
+| 🔫 **pistol** | 4,862 | 1,053 (21.7%) | 826 (17.0%) | 2,983 (61.4%) |
+| **TOTAL** | **13,168** | **1,791 (13.6%)** | **1,881 (14.3%)** | **9,496 (72.1%)** |
 
-### ⚖️ Balance & Consistency
-
-The proportions are **remarkably consistent across train/valid/test splits**, indicating a well-balanced dataset that should generalize effectively. The slightly higher percentage of small objects in the validation and test sets provides a more challenging evaluation scenario, which is ideal for assessing real-world performance.
+> 📌 Class proportions are **consistent with the full dataset**, ensuring ablation results transfer effectively.
 
 </details>
 
@@ -559,3 +313,263 @@ The proportions are **remarkably consistent across train/valid/test splits**, in
 
 </details>
 
+---
+
+## 🔬 Ablation Study Results
+
+<details>
+<summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
+
+<br>
+
+### ⚙️ Experimental Setup
+
+| Setting | Value |
+|---------|-------|
+| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
+| 🔄 **Epochs per Run** | **70 epochs** |
+| 📦 **Batch Size** | **64** |
+| 🖼️ **Image Size** | **640×640** |
+| ⏱️ **Time per Run** | ~1.2 hours |
+| 🔬 **Methodology** | Grid search with **isolated phases** |
+
+---
+
+### 🧪 Grid Search Experiments Summary
+
+We conducted a **comprehensive ablation study** across **180 valid experiments** to identify optimal hyperparameters for small-object weapon detection.
+
+<table>
+  <tr>
+    <th align="left">🧪 Experiment</th>
+    <th align="left">⚙️ Parameter</th>
+    <th align="left">🔢 Values Tested</th>
+    <th align="center">📈 Combinations<br><sub>(Valid / Invalid / Total)</sub></th>
+    <th align="center">⏱️ Time<br><sub>(Per Run / Total)</sub></th>
+    <th align="left">✅ Optimal</th>
+  </tr>
+  <tr>
+    <td rowspan="3"><b>1. Alpha Scheduling</b></td>
+    <td><code>α_start</code></td>
+    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
+    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
+    <td><code>0.9</code></td>
+  </tr>
+  <tr>
+    <td><code>α_end</code></td>
+    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
+    <td><code>0.4</code></td>
+  </tr>
+  <tr>
+    <td><code>small_obj_px</code></td>
+    <td><sub>32</sub></td>
+    <td><code>32</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>2. Center Loss Weight</b></td>
+    <td><code>Loss_min</code></td>
+    <td><sub>0.00, 0.005, 0.010, 0.015, 0.020, 0.025</sub></td>
+    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~38h</sub></td>
+    <td><code>0.01</code></td>
+  </tr>
+  <tr>
+    <td><code>Loss_init</code></td>
+    <td><sub>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
+    <td><code>0.05</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>3. IoU Clipping</b></td>
+    <td><code>IoU_start</code></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
+    <td><code>6</code></td>
+  </tr>
+  <tr>
+    <td><code>IoU_end</code></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
+    <td><code>2</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>4. DFL Clipping</b></td>
+    <td><code>DFL_start</code></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
+    <td><code>8</code></td>
+  </tr>
+  <tr>
+    <td><code>DFL_end</code></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
+    <td><code>5</code></td>
+  </tr>
+  <tr>
+    <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
+    <td><code>Alpha (α)</code></td>
+    <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
+    <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
+    <td rowspan="3" align="center"><sub>~1.2h / ~58h</sub></td>
+    <td><code>1</code></td>
+  </tr>
+  <tr>
+    <td><code>Beta</code></td>
+    <td><sub>4, 5, 6, 7, 8, 10</sub></td>
+    <td><code>7</code></td>
+  </tr>
+  <tr>
+    <td><code>Topk</code></td>
+    <td><sub>4, 5, 6, 8, 10, 12, 15, 20, 25</sub></td>
+    <td><code>20</code></td>
+  </tr>
+  <tr>
+    <td><b>📊 Overall</b></td>
+    <td align="center">—</td>
+    <td align="center">—</td>
+    <td align="center"><b>180 / 12 / 192</b></td>
+    <td align="center"><b>~1.2h / ~216h</b><br><sub>(~9 days)</sub></td>
+    <td align="center">—</td>
+  </tr>
+</table>
+
+---
+
+### 🔗 Phase Combination Experiments
+
+After identifying the **optimal parameters** for each individual phase, we conducted **26 additional experiments** to find the **best combination**:
+
+| Phases | Combinations Tested |
+|--------|---------------------|
+| **2 phases** | A+B, A+C1, A+C2, A+D, B+C1, B+C2, B+D, C1+C2, C1+D, C2+D |
+| **3 phases** | A+B+C1, A+B+C2, A+B+D, A+C1+C2, A+C1+D, A+C2+D, B+C1+C2, B+C1+D, B+C2+D, C1+C2+D |
+| **4 phases** | A+B+C1+C2, **A+B+C1+D 🏆**, A+B+C2+D, A+C1+C2+D, B+C1+C2+D |
+| **5 phases** | A+B+C1+C2+D |
+
+<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, C2 = DFL Clipping, D = TAL Alpha-Beta</sub>
+
+> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance.
+
+<details>
+<summary><b>📊 Click to view Combination Experiment Results</b></summary>
+
+<br>
+
+### 📈 All Combinations Performance Comparison
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e19006d3-229f-4b72-b2c5-5c89ab1abbc8" alt="Combination Results" width="100%" />
+</p>
+
+---
+
+### 🏆 Winner (A + B + C1 + D) — Full Dataset Training Results
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
+</p>
+
+</details>
+
+---
+
+### ✅ Final Optimal Configuration
+
+The best performing combination was **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL Alpha-Beta):
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🏆 Best Configuration: A + B + C1 + D
+# ═══════════════════════════════════════════════════════════════
+
+# Phase A: Alpha Scheduling ✅
+alpha_start: 0.9
+alpha_end: 0.4
+small_obj_px: 32
+
+# Phase B: Center Loss ✅
+center_loss_weight_init: 0.05
+center_loss_weight_min: 0.01
+
+# Phase C1: IoU Clipping ✅
+iou_clip_start: 6
+iou_clip_end: 2
+
+# Phase C2: DFL Clipping ❌ (Disabled)
+dfl_clip_start: 100.0
+dfl_clip_end: 100.0
+
+# Phase D: TAL Alpha-Beta ✅
+tal_topk: 20
+tal_alpha: 1
+tal_beta: 7
+</pre>
+
+---
+
+### 📌 Key Takeaways
+
+- ⏱️ **Total Training Time:** ~248 hours (**~10.3 days**) across **206 experiments**
+  - 🔬 **Phase tuning:** ~216 hours (180 valid experiments)
+  - 🔗 **Combination testing:** ~31 hours (26 combination experiments)
+- ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
+- ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
+- 🔗 **Combination Experiments:** 26 additional runs to find optimal phase combinations
+- 🏆 **Best Combination:** **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL)
+- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
+- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
+- 🔧 **Loss Clipping:** IoU clipping stabilizes training on dense small-object scenes (DFL clipping provided diminishing returns)
+
+---
+
+### 📄 Reproducibility Config
+
+To reproduce the ablation experiments, use the following default configuration:
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🔬 Ablation Study - Default Configuration
+# ═══════════════════════════════════════════════════════════════
+
+# Training Settings
+epochs: 70
+batch: 64
+imgsz: 640
+dataset: "weapon_dataset_17pct"  # 17% subset for grid search
+
+# ───────────────────────────────────────────────────────────────
+# Phase A: Alpha Scheduling (DISABLED)
+# ───────────────────────────────────────────────────────────────
+alpha_start: 1.0          # No area weighting
+alpha_end: 1.0            # No area weighting
+small_obj_boost: 1.0      # No boost (multiplier = 1)
+small_obj_px: 32          # Default small object threshold
+
+# ───────────────────────────────────────────────────────────────
+# Phase B: Center Loss (DISABLED)
+# ───────────────────────────────────────────────────────────────
+center_loss_weight_init: 0.0    # No center loss
+center_loss_weight_min: 0.0     # No center loss
+center_loss_decay_epochs: 1     # Irrelevant when weight=0
+
+# ───────────────────────────────────────────────────────────────
+# Phase C: Adaptive Clipping (DISABLED)
+# ───────────────────────────────────────────────────────────────
+iou_clip_start: 100.0     # No clipping (very high)
+iou_clip_end: 100.0       # No clipping (very high)
+dfl_clip_start: 100.0     # No clipping (very high)
+dfl_clip_end: 100.0       # No clipping (very high)
+
+# ───────────────────────────────────────────────────────────────
+# Phase D: TAL Alpha-Beta (DEFAULT)
+# ───────────────────────────────────────────────────────────────
+tal_topk: 10
+tal_alpha: 0.5
+tal_beta: 6.0
+</pre>
+
+> 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
+
+> ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
+
+</details>
