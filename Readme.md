@@ -62,6 +62,121 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
+## 🔬 Ablation Study Results
+
+<details>
+<summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
+
+<br>
+
+### 🧪 Experiment Summary
+
+We conducted a **comprehensive ablation study** across **195 experiments** over approximately **9.1 days** of training time to identify optimal hyperparameters for small-object weapon detection.
+
+<table>
+  <tr>
+    <th align="left">🧪 Experiment</th>
+    <th align="left">⚙️ Parameter</th>
+    <th align="left">🔢 Values Tested</th>
+    <th align="center">📈 Combinations<br><sub>(Valid / Invalid / Total)</sub></th>
+    <th align="center">⏱️ Time<br><sub>(Per Run / Total)</sub></th>
+    <th align="left">✅ Optimal Values</th>
+  </tr>
+  <tr>
+    <td rowspan="3"><b>1. Alpha Scheduling</b></td>
+    <td><code>α_start</code></td>
+    <td>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</td>
+    <td rowspan="3" align="center"><b>30</b> / 6 / 36</td>
+    <td rowspan="3" align="center">~1.2h / ~36h</td>
+    <td><code>α_start = 0.9</code></td>
+  </tr>
+  <tr>
+    <td><code>α_end</code></td>
+    <td>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</td>
+    <td><code>α_end = 0.4</code></td>
+  </tr>
+  <tr>
+    <td><code>small_obj_ps</code></td>
+    <td>0, 5</td>
+    <td><code>small_obj_ps = 32</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>2. Center Loss Weight</b></td>
+    <td><code>Loss_min</code></td>
+    <td>0.00, 0.01, 0.02, 0.03, 0.05, 0.07, 0.10</td>
+    <td rowspan="2" align="center"><b>32</b> / 4 / 36</td>
+    <td rowspan="2" align="center">~1.2h / ~39h</td>
+    <td><code>Loss_min = 0.01</code></td>
+  </tr>
+  <tr>
+    <td><code>Loss_max</code></td>
+    <td>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</td>
+    <td><code>Loss_max = 0.05</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>3. IoU Clipping</b></td>
+    <td><code>IoU_start</code></td>
+    <td>2, 3, 4, 5, 6, 8</td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36</td>
+    <td rowspan="2" align="center">~1.2h / ~42h</td>
+    <td><code>IoU_start = 6</code></td>
+  </tr>
+  <tr>
+    <td><code>IoU_end</code></td>
+    <td>6, 8, 10, 12, 15, 20</td>
+    <td><code>IoU_end = 2</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><b>4. DFL Clipping</b></td>
+    <td><code>DFL_start</code></td>
+    <td>2, 3, 4, 5, 6, 8</td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36</td>
+    <td rowspan="2" align="center">~1.2h / ~42h</td>
+    <td><code>DFL_start = 8</code></td>
+  </tr>
+  <tr>
+    <td><code>DFL_end</code></td>
+    <td>6, 8, 10, 12, 15, 20</td>
+    <td><code>DFL_end = 5</code></td>
+  </tr>
+  <tr>
+    <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
+    <td><code>Alpha (α)</code></td>
+    <td>0.25, 0.5, 0.75, 1.0</td>
+    <td rowspan="3" align="center"><b>51</b> / 0 / 51</td>
+    <td rowspan="3" align="center">~1.2h / ~60h</td>
+    <td><code>Alpha = 1</code></td>
+  </tr>
+  <tr>
+    <td><code>Beta</code></td>
+    <td>—</td>
+    <td><code>Beta = 7</code></td>
+  </tr>
+  <tr>
+    <td><code>Topk</code></td>
+    <td>4, 5, 6, 8, 10, 12, 15, 20, 25</td>
+    <td><code>Topk = 20</code></td>
+  </tr>
+  <tr style="background-color: #f0f0f0;">
+    <td><b>📊 Overall Summary</b></td>
+    <td>—</td>
+    <td>—</td>
+    <td align="center"><b>183 / 12 / 195</b></td>
+    <td align="center"><b>~1.2h / ~219h</b><br><sub>(~9.1 days)</sub></td>
+    <td>—</td>
+  </tr>
+</table>
+
+### 📌 Key Takeaways
+
+- ⏱️ **Total Training Time:** ~219 hours (**~9.1 days**) across **195 experiments**
+- ✅ **Valid Configurations:** 183 out of 195 (**93.8% success rate**)
+- 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **51 experiments** showed significant impact on small-object recall
+- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
+- 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
+
+</details>
+
 ### 🔬 Research Contributions
 
 | Contribution | Description |
