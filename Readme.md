@@ -150,7 +150,7 @@ The `no_weapon` class serves as **hard negatives** — visually similar objects 
 
 ---
 
-## 📁 Dataset Structure
+## 📁 Dataset Structure and Distribution
 
 <pre>
 NewWeaponDataset/
@@ -168,10 +168,6 @@ NewWeaponDataset/
 <b>Total:</b>                          <b>100%</b>    │  <b>59,305 images</b>  │  <b>76,705 instances</b>
 </pre>
 
-
----
-
-## 📁 Dataset Distribution
 
 | Split   | Images | % of images | Instances | knife                | long_gun             | no_weapon            | pistol               |
 |-------- | -----: | ----------: | --------: | -------------------: | -------------------: | -------------------: | -------------------: |
