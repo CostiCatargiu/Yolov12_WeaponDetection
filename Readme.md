@@ -71,7 +71,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ### 🧪 Experiment Summary
 
-We conducted a **comprehensive ablation study** across **195 experiments** over approximately **9.1 days** of training time to identify optimal hyperparameters for small-object weapon detection.
+We conducted a **comprehensive ablation study** across **192 experiments** over approximately **9 days** of training time to identify optimal hyperparameters for small-object weapon detection.
 
 <table>
   <tr>
@@ -80,101 +80,103 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
     <th align="left">🔢 Values Tested</th>
     <th align="center">📈 Combinations<br><sub>(Valid / Invalid / Total)</sub></th>
     <th align="center">⏱️ Time<br><sub>(Per Run / Total)</sub></th>
-    <th align="left">✅ Optimal Values</th>
+    <th align="left">✅ Optimal</th>
   </tr>
   <tr>
     <td rowspan="3"><b>1. Alpha Scheduling</b></td>
-    <td><code>α_start</code></td>
-    <td>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</td>
-    <td rowspan="3" align="center"><b>30</b> / 6 / 36</td>
-    <td rowspan="3" align="center">~1.2h / ~36h</td>
-    <td><code>α_start = 0.9</code></td>
+    <td><sub><code>α_start</code></sub></td>
+    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
+    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
+    <td><sub><code>0.9</code></sub></td>
   </tr>
   <tr>
-    <td><code>α_end</code></td>
-    <td>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</td>
-    <td><code>α_end = 0.4</code></td>
+    <td><sub><code>α_end</code></sub></td>
+    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
+    <td><sub><code>0.4</code></sub></td>
   </tr>
   <tr>
-    <td><code>small_obj_px</code></td>
-    <td>32</td>
-    <td><code>small_obj_px = 32</code></td>
+    <td><sub><code>small_obj_px</code></sub></td>
+    <td><sub>32</sub></td>
+    <td><sub><code>32</code></sub></td>
   </tr>
   <tr>
     <td rowspan="2"><b>2. Center Loss Weight</b></td>
-    <td><code>Loss_min</code></td>
-    <td>0.00, 0.01, 0.02, 0.03, 0.05, 0.07, 0.10</td>
-    <td rowspan="2" align="center"><b>32</b> / 4 / 36</td>
-    <td rowspan="2" align="center">~1.2h / ~39h</td>
-    <td><code>Loss_min = 0.01</code></td>
+    <td><sub><code>Loss_min</code></sub></td>
+    <td><sub>0.00, 0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
+    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~39h</sub></td>
+    <td><sub><code>0.01</code></sub></td>
   </tr>
   <tr>
-    <td><code>Loss_init</code></td>
-    <td>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</td>
-    <td><code>Loss_init = 0.05</code></td>
+    <td><sub><code>Loss_init</code></sub></td>
+    <td><sub>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
+    <td><sub><code>0.05</code></sub></td>
   </tr>
   <tr>
     <td rowspan="2"><b>3. IoU Clipping</b></td>
-    <td><code>IoU_start</code></td>
-    <td>2, 3, 4, 5, 6, 8</td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36</td>
-    <td rowspan="2" align="center">~1.2h / ~42h</td>
-    <td><code>IoU_start = 6</code></td>
+    <td><sub><code>IoU_start</code></sub></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
+    <td><sub><code>6</code></sub></td>
   </tr>
   <tr>
-    <td><code>IoU_end</code></td>
-    <td>6, 8, 10, 12, 15, 20</td>
-    <td><code>IoU_end = 2</code></td>
+    <td><sub><code>IoU_end</code></sub></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td><sub><code>2</code></sub></td>
   </tr>
   <tr>
     <td rowspan="2"><b>4. DFL Clipping</b></td>
-    <td><code>DFL_start</code></td>
-    <td>2, 3, 4, 5, 6, 8</td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36</td>
-    <td rowspan="2" align="center">~1.2h / ~42h</td>
-    <td><code>DFL_start = 8</code></td>
+    <td><sub><code>DFL_start</code></sub></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
+    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
+    <td><sub><code>8</code></sub></td>
   </tr>
   <tr>
-    <td><code>DFL_end</code></td>
-    <td>6, 8, 10, 12, 15, 20</td>
-    <td><code>DFL_end = 5</code></td>
+    <td><sub><code>DFL_end</code></sub></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td><sub><code>5</code></sub></td>
   </tr>
   <tr>
     <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
-    <td><code>Alpha (α)</code></td>
-    <td>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</td>
-    <td rowspan="3" align="center"><b>51</b> / 0 / 48</td>
-    <td rowspan="3" align="center">~1.2h / ~58h</td>
-    <td><code>Alpha = 1</code></td>
+    <td><sub><code>Alpha (α)</code></sub></td>
+    <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
+    <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
+    <td rowspan="3" align="center"><sub>~1.2h / ~58h</sub></td>
+    <td><sub><code>1</code></sub></td>
   </tr>
   <tr>
-    <td><code>Beta</code></td>
-    <td>4, 5, 6, 7, 8, 10</td>
-    <td><code>Beta = 7</code></td>
+    <td><sub><code>Beta</code></sub></td>
+    <td><sub>4, 5, 6, 7, 8, 10</sub></td>
+    <td><sub><code>7</code></sub></td>
   </tr>
   <tr>
-    <td><code>Topk</code></td>
-    <td>4, 5, 6, 8, 10, 12, 15, 20, 25</td>
-    <td><code>Topk = 20</code></td>
+    <td><sub><code>Topk</code></sub></td>
+    <td><sub>4, 5, 6, 8, 10, 12, 15, 20, 25</sub></td>
+    <td><sub><code>20</code></sub></td>
   </tr>
-  <tr style="background-color: #f0f0f0;">
-    <td><b>📊 Overall Summary</b></td>
-    <td>—</td>
-    <td>—</td>
-    <td align="center"><b>183 / 12 / 195</b></td>
-    <td align="center"><b>~1.2h / ~219h</b><br><sub>(~9.1 days)</sub></td>
-    <td>—</td>
+  <tr>
+    <td><b>📊 Overall</b></td>
+    <td align="center">—</td>
+    <td align="center">—</td>
+    <td align="center"><b>180 / 12 / 192</b></td>
+    <td align="center"><b>~1.2h / ~217h</b><br><sub>(~9 days)</sub></td>
+    <td align="center">—</td>
   </tr>
 </table>
 
 ### 📌 Key Takeaways
 
 - ⏱️ **Total Training Time:** ~217 hours (**~9 days**) across **192 experiments**
+- ✅ **Valid Configurations:** 180 out of 192 (**93.75% success rate**)
 - 🎯 **Most Impactful:** TAL Alpha-Beta tuning with **48 experiments** showed significant impact on small-object recall
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early in training
 - 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
 
 </details>
+
 
 ### 🔬 Research Contributions
 
