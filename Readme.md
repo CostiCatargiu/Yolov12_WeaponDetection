@@ -274,6 +274,54 @@ tal_beta: 6.0
 
 > ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
+---
+
+### 🔗 Phase Combination Experiments
+
+After identifying the **optimal parameters** for each individual phase, we conducted additional experiments to find the **best combination** of phases:
+
+| Combination | Description | Result |
+|-------------|-------------|--------|
+| A | Alpha Scheduling only | ✓ Baseline improvement |
+| A + B | Alpha + Center Loss | ✓ Better than A alone |
+| A + B + C1 | Alpha + Center Loss + IoU Clipping | ✓ Further improvement |
+| A + B + C2 | Alpha + Center Loss + DFL Clipping | ✓ Moderate improvement |
+| A + B + C1 + C2 | Alpha + Center Loss + Both Clipping | ✗ Diminishing returns |
+| **A + B + C1 + D** | **Alpha + Center Loss + IoU Clipping + TAL** | **🏆 Best combination** |
+| A + B + C2 + D | Alpha + Center Loss + DFL Clipping + TAL | ✓ Close second |
+| A + B + C1 + C2 + D | All phases enabled | ✗ Overfitting observed |
+
+### ✅ Final Optimal Configuration
+
+The best performing combination was **A + B + C1 + D** (Alpha Scheduling + Center Loss + IoU Clipping + TAL Alpha-Beta):
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🏆 Best Configuration: A + B + C1 + D
+# ═══════════════════════════════════════════════════════════════
+
+# Phase A: Alpha Scheduling ✅
+alpha_start: 0.9
+alpha_end: 0.4
+small_obj_px: 32
+
+# Phase B: Center Loss ✅
+center_loss_weight_init: 0.05
+center_loss_weight_min: 0.01
+
+# Phase C1: IoU Clipping ✅
+iou_clip_start: 6
+iou_clip_end: 2
+
+# Phase C2: DFL Clipping ❌ (Disabled)
+dfl_clip_start: 100.0
+dfl_clip_end: 100.0
+
+# Phase D: TAL Alpha-Beta ✅
+tal_topk: 20
+tal_alpha: 1
+tal_beta: 7
+</pre>
 
 
 </details>
