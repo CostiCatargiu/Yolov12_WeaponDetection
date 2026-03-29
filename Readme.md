@@ -493,7 +493,7 @@ Using the optimal parameters discovered from YOLOv12s, we tested the following c
 
 <sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
 
-> 🏆 **Winner:** Combination **A + B + C1 + D** also achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
+> 🏆 **Winner:** Combination **A + B + C1** also achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
 
 <details>
 <summary><b>📊 Click to view YOLO26s Combination Results</b></summary>
@@ -511,7 +511,7 @@ Using the optimal parameters discovered from YOLOv12s, we tested the following c
 
 ### 🏆 Winner (A + B + C1) — Full Dataset Training Results
 
-After identifying the best combination, we trained on the **full dataset (100%)** for **~11 hours**:
+After identifying the best combination, we trained on the **full dataset (100%)** for **~9 hours**:
 
 <p align="center">
 <img width="1921" height="783" alt="image" src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" />
