@@ -103,8 +103,8 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
   <tr>
     <td rowspan="2"><b>2. Center Loss Weight</b></td>
     <td><code>Loss_min</code></td>
-    <td><sub>0.00, 0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
-    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: min &lt; init</sub></td>
+    <td><sub>0.00, 0.005, 0.010, 0.015, 0.020, 0.025</sub></td>
+    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~39h</sub></td>
     <td><code>0.01</code></td>
   </tr>
@@ -116,27 +116,27 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
   <tr>
     <td rowspan="2"><b>3. IoU Clipping</b></td>
     <td><code>IoU_start</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
     <td><code>6</code></td>
   </tr>
   <tr>
     <td><code>IoU_end</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
     <td><code>2</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>4. DFL Clipping</b></td>
     <td><code>DFL_start</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
+    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: start &lt; end</sub></td>
     <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
     <td><code>8</code></td>
   </tr>
   <tr>
     <td><code>DFL_end</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
+    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
     <td><code>5</code></td>
   </tr>
   <tr>
