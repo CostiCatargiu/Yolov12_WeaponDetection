@@ -189,34 +189,49 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 
 To reproduce the ablation experiments, use the following default configuration:
 
-```yaml
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🔬 Ablation Study - Default Configuration
+# ═══════════════════════════════════════════════════════════════
+
 # Training Settings
 epochs: 70
 batch: 64
 imgsz: 640
 dataset: "weapon_dataset_17pct"  # 17% subset for grid search
 
+# ───────────────────────────────────────────────────────────────
 # Phase A: Alpha Scheduling (DISABLED)
-alpha_start: 1.0
-alpha_end: 1.0
-small_obj_boost: 1.0
-small_obj_px: 32
+# ───────────────────────────────────────────────────────────────
+alpha_start: 1.0          # No area weighting
+alpha_end: 1.0            # No area weighting
+small_obj_boost: 1.0      # No boost (multiplier = 1)
+small_obj_px: 32          # Default small object threshold
 
+# ───────────────────────────────────────────────────────────────
 # Phase B: Center Loss (DISABLED)
-center_loss_weight_init: 0.0
-center_loss_weight_min: 0.0
-center_loss_decay_epochs: 1
+# ───────────────────────────────────────────────────────────────
+center_loss_weight_init: 0.0    # No center loss
+center_loss_weight_min: 0.0     # No center loss
+center_loss_decay_epochs: 1     # Irrelevant when weight=0
 
+# ───────────────────────────────────────────────────────────────
 # Phase C: Adaptive Clipping (DISABLED)
-iou_clip_start: 100.0
-iou_clip_end: 100.0
-dfl_clip_start: 100.0
-dfl_clip_end: 100.0
+# ───────────────────────────────────────────────────────────────
+iou_clip_start: 100.0     # No clipping (very high)
+iou_clip_end: 100.0       # No clipping (very high)
+dfl_clip_start: 100.0     # No clipping (very high)
+dfl_clip_end: 100.0       # No clipping (very high)
 
+# ───────────────────────────────────────────────────────────────
 # Phase D: TAL Alpha-Beta (DEFAULT)
+# ───────────────────────────────────────────────────────────────
 tal_topk: 10
 tal_alpha: 0.5
 tal_beta: 6.0
+</pre>
+
+> 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
 
 
 </details>
