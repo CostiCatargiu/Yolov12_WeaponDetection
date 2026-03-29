@@ -61,7 +61,6 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 
 ---
-
 ## 🔬 Ablation Study Results
 
 <details>
@@ -176,6 +175,9 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 - 🔧 **Loss Clipping:** IoU and DFL clipping stabilizes training on dense small-object scenes
 
 </details>
+
+
+---
 
 
 ### 🔬 Research Contributions
