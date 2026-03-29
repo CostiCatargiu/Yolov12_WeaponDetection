@@ -688,9 +688,11 @@ tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
 
 | Model | Phase | Dataset | Experiments | Time per Run | Total Time |
 |-------|-------|---------|-------------|--------------|------------|
+| **YOLOv12s** | Baseline | **100%** | 1 | — | **~11h** |
 | **YOLOv12s** | Grid Search | 17% | 180 | ~1.2h | ~216h |
 | **YOLOv12s** | Combinations | 17% | 26 | ~1.2h | ~31h |
 | **YOLOv12s** | 🏆 Final Training | **100%** | 1 | — | **~11h** |
+| **YOLO11s** | Baseline | **100%** | 1 | — | **~9h** |
 | **YOLO11s** | Individual Phases | 17% | 4 | ~1.0h | ~4h |
 | **YOLO11s** | Combinations | 17% | 11 | ~1.0h | ~11h |
 | **YOLO11s** | 🏆 Final Training | **100%** | 1 | — | **~9h** |
@@ -701,10 +703,11 @@ tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
 
 | Metric | Value |
 |--------|-------|
-| 🧪 **Total Experiments** | **224** (180 + 26 + 4 + 11 + 2 full + 1 baseline) |
+| 🧪 **Total Experiments** | **225** (2 baselines + 180 grid + 26 combos + 4 phases + 11 combos + 2 final) |
+| ⏱️ **Baseline Training** | ~20 hours (11h + 9h) |
 | ⏱️ **Ablation Time (17% dataset)** | ~262 hours (~10.9 days) |
-| ⏱️ **Full Dataset Training** | ~20 hours (11h + 9h) |
-| ⏱️ **Grand Total** | **~282 hours (~11.75 days)** |
+| ⏱️ **Full Dataset Training (Custom)** | ~20 hours (11h + 9h) |
+| ⏱️ **Grand Total** | **~302 hours (~12.6 days)** |
 
 ---
 
