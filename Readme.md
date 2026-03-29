@@ -109,9 +109,9 @@ We conducted a **comprehensive ablation study** across **195 experiments** over 
     <td><code>Loss_min = 0.01</code></td>
   </tr>
   <tr>
-    <td><code>Loss_max</code></td>
+    <td><code>Loss_init</code></td>
     <td>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</td>
-    <td><code>Loss_max = 0.05</code></td>
+    <td><code>Loss_init = 0.05</code></td>
   </tr>
   <tr>
     <td rowspan="2"><b>3. IoU Clipping</b></td>
