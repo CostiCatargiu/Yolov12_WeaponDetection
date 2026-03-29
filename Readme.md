@@ -25,6 +25,8 @@
 
 <div align="center">
 
+<div align="center">
+
 ## 🏆 Research Highlights
 
 <table>
@@ -33,8 +35,8 @@
     <th align="center">⏱️ Total Training Time</th>
   </tr>
   <tr>
-    <td align="center"><code>219</code></td>
-    <td align="center"><code>~278 hours (~11.6 days)</code></td>
+    <td align="center"><code>225</code></td>
+    <td align="center"><code>~302 hours (~12.6 days)</code></td>
   </tr>
 </table>
 
@@ -127,6 +129,8 @@
 </div>
 
 ---
+
+
 
 ---
 
@@ -713,17 +717,20 @@ tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
 
 ### 📌 Key Takeaways
 
-- ⏱️ **Total Training Time:** ~282 hours (**~11.75 days**) across **224 experiments**
+- ⏱️ **Total Training Time:** ~302 hours (**~12.6 days**) across **225 experiments**
+  - 🔷 **YOLOv12s:** ~269 hours (1 baseline + 180 grid search + 26 combinations + 1 final)
+  - 🔶 **YOLO11s:** ~33 hours (1 baseline + 4 individual phases + 11 combinations + 1 final)
 - ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
 - ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
 - 🏆 **YOLOv12s Best:** **A + B + C1 + D** (Alpha + Center Loss + IoU Clipping + TAL)
 - 🏆 **YOLO11s Best:** **A + B + C1** (Alpha + Center Loss + IoU Clipping)
 - 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO11s
-- ⚡ **YOLO11s Efficiency:** ~17% faster per experiment compared to YOLOv12s
+- ⚡ **YOLO11s Efficiency:** ~17% faster per experiment compared to YOLOv12s (~1.0h vs ~1.2h)
 - 🚫 **DFL Clipping (C2):** Not applicable to YOLO11s, excluded from transfer experiments
 - 🎯 **Most Impactful:** TAL Alpha-Beta tuning showed significant impact on small-object recall (YOLOv12s)
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early
 - 🔧 **Loss Clipping:** IoU clipping stabilizes training (DFL clipping provided diminishing returns)
+- 📈 **Best Improvements:** Up to **+14.55%** on small objects (mAP50-95) for YOLO11s, **+13.10%** for YOLOv12s
 
 ---
 
