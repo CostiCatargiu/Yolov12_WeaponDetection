@@ -488,7 +488,7 @@ Using the optimal parameters discovered from YOLOv12s, we tested the following c
 | Phases | Combinations Tested |
 |--------|---------------------|
 | **2 phases** | A+B, A+C1, A+D, B+C1, B+D, C1+D |
-| **3 phases** | ** A+B+C1 🏆**, A+B+D, A+C1+D, B+C1+D |
+| **3 phases** | **A+B+C1🏆**, A+B+D, A+C1+D, B+C1+D |
 | **4 phases** | A+B+C1+D |
 
 <sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
