@@ -25,8 +25,6 @@
 
 <div align="center">
 
-<div align="center">
-
 ## 🏆 Research Highlights
 
 <table>
