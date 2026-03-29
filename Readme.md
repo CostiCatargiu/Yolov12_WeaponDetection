@@ -35,6 +35,19 @@ This repository accompanies our **research paper** on **small-object weapon dete
 - 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
 - 📊 **Transfer validation** to **YOLOv11s** using the best-performing configurations from YOLOv12s
 
+### 📑 What You'll Find Below
+
+| Section | Description |
+|---------|-------------|
+| 📊 **Dataset Statistics** | Class distribution, size analysis, split percentages |
+| 🖼️ **Dataset Examples** | Sample images with annotations across different scenarios |
+| 🏗️ **Architecture Details** | P2–P5 head modifications and comparisons |
+| 📉 **Loss Function Ablation** | Custom loss components and tuning results |
+| 🧪 **Experiment Results** | Performance metrics, confusion matrices, training curves |
+| 🔍 **Prediction Examples** | Side-by-side comparisons (Original vs Custom model) |
+| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLOv11s |
+
+
 ---
 ## 💡 Applications
 
