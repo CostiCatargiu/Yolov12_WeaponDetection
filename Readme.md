@@ -185,6 +185,41 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 | ⏱️ **Time per Run** | ~1.2 hours |
 | 🔬 **Methodology** | Grid search with **isolated phases** |
 
+---
+
+### 📊 Ablation Dataset Split (17% Subset)
+
+| Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🚫 other | 🔫 pistol |
+|-------|--------|-----------|----------|-------------|----------|-----------|
+| **Train** | 8,343 (82.8%) | 10,927 (83.0%) | 1,779 (16.3%) | 3,315 (30.3%) | 1,815 (16.6%) | 4,018 (36.8%) |
+| **Valid** | 1,283 (12.7%) | 1,643 (12.5%) | 307 (18.7%) | 493 (30.0%) | 206 (12.5%) | 637 (38.8%) |
+| **Test** | 454 (4.5%) | 598 (4.5%) | 121 (20.2%) | 156 (26.1%) | 114 (19.1%) | 207 (34.6%) |
+| **TOTAL** | **10,080** | **13,168** | 2,207 (16.8%) | 3,964 (30.1%) | 2,135 (16.2%) | 4,862 (36.9%) |
+
+---
+
+### 📐 Size Distribution (Ablation Dataset)
+
+Objects categorized by **bounding box dimensions** in pixels:
+
+| Size | Threshold | Description |
+|------|-----------|-------------|
+| 🔍 **Small** | < 32px | Tiny objects, hardest to detect |
+| 📦 **Medium** | 32px – 96px | Standard-sized objects |
+| 🟫 **Large** | > 96px | Large, easier to detect |
+
+| Class | Total | 🔍 Small | 📦 Medium | 🟫 Large |
+|-------|------:|----------|-----------|----------|
+| 🗡️ **knife** | 2,207 | 239 (10.8%) | 284 (12.9%) | 1,684 (76.3%) |
+| 🎯 **long_gun** | 3,964 | 264 (6.7%) | 412 (10.4%) | 3,288 (82.9%) |
+| 🚫 **other** | 2,135 | 235 (11.0%) | 359 (16.8%) | 1,541 (72.2%) |
+| 🔫 **pistol** | 4,862 | 1,053 (21.7%) | 826 (17.0%) | 2,983 (61.4%) |
+| **TOTAL** | **13,168** | **1,791 (13.6%)** | **1,881 (14.3%)** | **9,496 (72.1%)** |
+
+> 📌 **Note:** Pistols have the highest proportion of small objects (**21.7%**), making them the most challenging class for small-object detection.
+
+---
+
 ### 📄 Reproducibility Config
 
 To reproduce the ablation experiments, use the following default configuration:
@@ -232,7 +267,6 @@ tal_beta: 6.0
 </pre>
 
 > 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
-
 
 </details>
 
