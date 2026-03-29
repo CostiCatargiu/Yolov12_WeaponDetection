@@ -23,6 +23,86 @@
   <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
 </p>
 
+<div align="center">
+
+## 🏆 Research Highlights
+
+<table>
+  <tr>
+    <th align="center" colspan="3">📊 Ablation Study Overview</th>
+  </tr>
+  <tr>
+    <td align="center"><b>🧪 Total Experiments</b></td>
+    <td align="center"><b>⏱️ Total Training Time</b></td>
+    <td align="center"><b>🏆 Best Configuration</b></td>
+  </tr>
+  <tr>
+    <td align="center"><code>219</code></td>
+    <td align="center"><code>~278 hours (~11.6 days)</code></td>
+    <td align="center"><code>A + B + C1 + D</code></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th align="center" colspan="4">📈 Performance Improvements (Custom vs Baseline)</th>
+  </tr>
+  <tr>
+    <th align="center">Metric</th>
+    <th align="center">🔷 YOLOv12s</th>
+    <th align="center">🔶 YOLO11s</th>
+    <th align="center">Best Gain</th>
+  </tr>
+  <tr>
+    <td align="left"><b>mAP50</b></td>
+    <td align="center">0.816 → <b>0.857</b> <sub>(+5.04%)</sub></td>
+    <td align="center">0.782 → <b>0.828</b> <sub>(+5.88%)</sub></td>
+    <td align="center">🔶 +5.88%</td>
+  </tr>
+  <tr>
+    <td align="left"><b>mAP50-95</b></td>
+    <td align="center">0.525 → <b>0.574</b> <sub>(+9.32%)</sub></td>
+    <td align="center">0.502 → <b>0.555</b> <sub>(+10.53%)</sub></td>
+    <td align="center">🔶 +10.53%</td>
+  </tr>
+  <tr>
+    <td align="left"><b>Precision</b></td>
+    <td align="center">0.831 → <b>0.889</b> <sub>(+6.94%)</sub></td>
+    <td align="center">0.792 → <b>0.863</b> <sub>(+8.94%)</sub></td>
+    <td align="center">🔶 +8.94%</td>
+  </tr>
+  <tr>
+    <td align="left"><b>Recall</b></td>
+    <td align="center">0.746 → <b>0.811</b> <sub>(+8.79%)</sub></td>
+    <td align="center">0.698 → <b>0.776</b> <sub>(+11.14%)</sub></td>
+    <td align="center">🔶 +11.14%</td>
+  </tr>
+  <tr>
+    <td align="left"><b>F1 Score</b></td>
+    <td align="center">0.786 → <b>0.848</b> <sub>(+7.91%)</sub></td>
+    <td align="center">0.742 → <b>0.817</b> <sub>(+10.10%)</sub></td>
+    <td align="center">🔶 +10.10%</td>
+  </tr>
+  <tr>
+    <td align="left">🔍 <b>mAP50 (Small)</b></td>
+    <td align="center">0.530 → <b>0.574</b> <sub>(+8.22%)</sub></td>
+    <td align="center">0.498 → <b>0.542</b> <sub>(+8.98%)</sub></td>
+    <td align="center">🔶 +8.98%</td>
+  </tr>
+  <tr>
+    <td align="left">🔍 <b>mAP50-95 (Small)</b></td>
+    <td align="center">0.297 → <b>0.336</b> <sub>(+13.10%)</sub></td>
+    <td align="center">0.276 → <b>0.316</b> <sub>(+14.55%)</sub></td>
+    <td align="center">🔶 <b>+14.55%</b></td>
+  </tr>
+</table>
+
+<sub>🔍 <b>Key Finding:</b> Custom loss function achieves up to <b>+14.55% improvement</b> on small objects (mAP50-95) — the primary focus of this research.</sub>
+
+</div>
+
+---
+
 ---
 
 ## 📖 Overview
