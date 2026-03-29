@@ -171,38 +171,18 @@ We conducted a **comprehensive ablation study** across **192 experiments** over 
 
 ### 🔗 Phase Combination Experiments
 
-After identifying the **optimal parameters** for each individual phase, we conducted additional experiments to find the **best combination** of phases:
+After identifying the **optimal parameters** for each individual phase, we conducted **26 additional experiments** to find the **best combination**:
 
-| # | Combination | Phases Enabled |
-|---|-------------|----------------|
-| 1 | A + B | Alpha + Center Loss |
-| 2 | A + C1 | Alpha + IoU Clipping |
-| 3 | A + C2 | Alpha + DFL Clipping |
-| 4 | A + D | Alpha + TAL |
-| 5 | B + C1 | Center Loss + IoU Clipping |
-| 6 | B + C2 | Center Loss + DFL Clipping |
-| 7 | B + D | Center Loss + TAL |
-| 8 | C1 + C2 | IoU + DFL Clipping |
-| 9 | C1 + D | IoU Clipping + TAL |
-| 10 | C2 + D | DFL Clipping + TAL |
-| 11 | A + B + C1 | Alpha + Center Loss + IoU Clipping |
-| 12 | A + B + C2 | Alpha + Center Loss + DFL Clipping |
-| 13 | A + B + D | Alpha + Center Loss + TAL |
-| 14 | A + C1 + C2 | Alpha + IoU + DFL Clipping |
-| 15 | A + C1 + D | Alpha + IoU Clipping + TAL |
-| 16 | A + C2 + D | Alpha + DFL Clipping + TAL |
-| 17 | B + C1 + C2 | Center Loss + IoU + DFL Clipping |
-| 18 | B + C1 + D | Center Loss + IoU Clipping + TAL |
-| 19 | B + C2 + D | Center Loss + DFL Clipping + TAL |
-| 20 | C1 + C2 + D | IoU + DFL Clipping + TAL |
-| 21 | A + B + C1 + C2 | Alpha + Center Loss + Both Clipping |
-| 22 | **A + B + C1 + D** | **Alpha + Center Loss + IoU Clipping + TAL** 🏆 |
-| 23 | A + B + C2 + D | Alpha + Center Loss + DFL Clipping + TAL |
-| 24 | A + C1 + C2 + D | Alpha + Both Clipping + TAL |
-| 25 | B + C1 + C2 + D | Center Loss + Both Clipping + TAL |
-| 26 | A + B + C1 + C2 + D | All phases enabled |
+| Phases | Combinations Tested |
+|--------|---------------------|
+| **2 phases** | A+B, A+C1, A+C2, A+D, B+C1, B+C2, B+D, C1+C2, C1+D, C2+D |
+| **3 phases** | A+B+C1, A+B+C2, A+B+D, A+C1+C2, A+C1+D, A+C2+D, B+C1+C2, B+C1+D, B+C2+D, C1+C2+D |
+| **4 phases** | A+B+C1+C2, **A+B+C1+D 🏆**, A+B+C2+D, A+C1+C2+D, B+C1+C2+D |
+| **5 phases** | A+B+C1+C2+D |
 
-> 🏆 **Winner:** Combination **#22 (A + B + C1 + D)** achieved the best overall performance.
+<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, C2 = DFL Clipping, D = TAL Alpha-Beta</sub>
+
+> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance.
 
 <details>
 <summary><b>📊 Click to view Combination Experiment Results</b></summary>
