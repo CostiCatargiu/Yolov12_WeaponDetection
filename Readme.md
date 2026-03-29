@@ -59,6 +59,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 | 🚔 **Law Enforcement** | Real-time threat assessment, evidence analysis, situational awareness |
 | 🤖 **Research & AI** | Benchmark dataset, model training, small-object detection research |
 
+<img width="1394" height="1102" alt="image" src="https://github.com/user-attachments/assets/dcea6994-b1ef-48af-becd-801b695df3b5" />
 
 ---
 
@@ -69,7 +70,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 <br>
 
-### 🧪 Experiment Summary
+### 🧪 Grid Search Experiments Summary
 
 We conducted a **comprehensive ablation study** across **192 experiments** over approximately **9 days** of training time to identify optimal hyperparameters for small-object weapon detection.
 
