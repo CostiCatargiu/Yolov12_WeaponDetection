@@ -45,8 +45,8 @@
   <tr>
     <th align="center">Metric</th>
     <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom</sub></th>
-    <th align="center">🔶 YOLO11s<br><sub>Baseline → Custom</sub></th>
-    <th align="center">⚔️ Custom vs Custom<br><sub>YOLO11s → YOLOv12s</sub></th>
+    <th align="center">🔶 YOLO26s<br><sub>Baseline → Custom</sub></th>
+    <th align="center">⚔️ Custom vs Custom<br><sub>YOLO26s → YOLOv12s</sub></th>
   </tr>
   <tr>
     <td align="left"><b>mAP50</b></td>
@@ -122,7 +122,7 @@
   </tr>
 </table>
 
-<sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+14.55%</b> improvement on small objects | YOLOv12s outperforms YOLO11s by <b>+6.32%</b> on small objects (mAP50-95)</sub>
+<sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+14.55%</b> improvement on small objects | YOLOv12s outperforms YOLO26s by <b>+6.32%</b> on small objects (mAP50-95)</sub>
 
 </div>
 
@@ -422,7 +422,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 
 ---
 
-## 🔬 Ablation Study Results
+## 🔬Loss Fcuntion Ablation Study Results (YoloV12s/Yolo26s)
 
 <details>
 <summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
@@ -438,7 +438,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 | 📦 **Batch Size** | **64** |
 | 🖼️ **Image Size** | **640×640** |
 | ⏱️ **Time per Run (YOLOv12s)** | ~1.2 hours |
-| ⏱️ **Time per Run (YOLO11s)** | ~1.0 hours |
+| ⏱️ **Time per Run (YOLO26s)** | ~1.0 hours |
 | 🔬 **Methodology** | Grid search with **isolated phases** |
 
 ---
@@ -583,15 +583,15 @@ After identifying the best combination, we trained on the **full dataset (100%)*
 
 ---
 
-### 🚀 YOLO11s Transfer Experiments
+### 🚀 YOLO26s Transfer Experiments
 
-After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO11s** to validate cross-architecture generalization.
+After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO26s** to validate cross-architecture generalization.
 
-> ⚠️ **Note:** Phase C2 (DFL Clipping) is **not applicable** to YOLO11s architecture and was excluded from all experiments.
+> ⚠️ **Note:** Phase C2 (DFL Clipping) is **not applicable** to YOLO26s architecture and was excluded from all experiments.
 
-### 🧪 YOLO11s Individual Phase Validation
+### 🧪 YOLO26s Individual Phase Validation
 
-First, we validated each phase **individually** on YOLO11s using the optimal parameters from YOLOv12s:
+First, we validated each phase **individually** on YOLO26s using the optimal parameters from YOLOv12s:
 
 | # | Phase | Description | Experiments |
 |---|-------|-------------|-------------|
@@ -600,7 +600,7 @@ First, we validated each phase **individually** on YOLO11s using the optimal par
 | 3 | C1 | IoU Clipping only | 1 |
 | 4 | D | TAL Alpha-Beta only | 1 |
 
-### 🔗 YOLO11s Combination Experiments
+### 🔗 YOLO26s Combination Experiments
 
 After validating individual phases, we tested the following **11 combinations**:
 
@@ -612,17 +612,17 @@ After validating individual phases, we tested the following **11 combinations**:
 
 <sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
 
-> 🏆 **Winner:** Combination **A + B + C1** achieved the best performance on YOLO11s, confirming successful cross-architecture transfer.
+> 🏆 **Winner:** Combination **A + B + C1** achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
 
 <details>
-<summary><b>📊 Click to view YOLO11s Combination Results</b></summary>
+<summary><b>📊 Click to view YOLO26s Combination Results</b></summary>
 
 <br>
 
 ### 📈 All Combinations Performance Comparison
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/2d6045d6-c412-4a11-bd78-8f41b95fb52e" alt="YOLO11s Combination Results" width="100%" />
+  <img src="https://github.com/user-attachments/assets/2d6045d6-c412-4a11-bd78-8f41b95fb52e" alt="YOLO26s Combination Results" width="100%" />
 </p>
 
 ---
@@ -632,7 +632,7 @@ After validating individual phases, we tested the following **11 combinations**:
 After identifying the best combination, we trained on the **full dataset (100%)** for **~9 hours**:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" alt="YOLO11s Winner Full Dataset Results" width="100%" />
+  <img src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" alt="YOLO26s Winner Full Dataset Results" width="100%" />
 </p>
 
 </details>
@@ -644,7 +644,7 @@ After identifying the best combination, we trained on the **full dataset (100%)*
 <table>
   <tr>
     <th align="center">🔷 YOLOv12s Best Config</th>
-    <th align="center">🔶 YOLO11s Best Config</th>
+    <th align="center">🔶 YOLO26s Best Config</th>
   </tr>
   <tr>
     <td><b>A + B + C1 + D</b></td>
@@ -674,14 +674,14 @@ center_loss_weight_min: 0.01
 iou_clip_start: 6
 iou_clip_end: 2
 
-# Phase C2: DFL Clipping ❌ (Disabled / Not applicable to YOLO11s)
+# Phase C2: DFL Clipping ❌ (Disabled / Not applicable to YOLO26s)
 dfl_clip_start: 100.0
 dfl_clip_end: 100.0
 
-# Phase D: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO11s)
-tal_topk: 20        # YOLOv12s: 20, YOLO11s: 10 (default)
-tal_alpha: 1        # YOLOv12s: 1, YOLO11s: 0.5 (default)
-tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
+# Phase D: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO26s)
+tal_topk: 20        # YOLOv12s: 20, YOLO26s: 10 (default)
+tal_alpha: 1        # YOLOv12s: 1, YOLO26s: 0.5 (default)
+tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
 </pre>
 
 ---
@@ -694,10 +694,10 @@ tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
 | **YOLOv12s** | Grid Search | 17% | 180 | ~1.2h | ~216h |
 | **YOLOv12s** | Combinations | 17% | 26 | ~1.2h | ~31h |
 | **YOLOv12s** | 🏆 Final Training | **100%** | 1 | — | **~11h** |
-| **YOLO11s** | Baseline | **100%** | 1 | — | **~9h** |
-| **YOLO11s** | Individual Phases | 17% | 4 | ~1.0h | ~4h |
-| **YOLO11s** | Combinations | 17% | 11 | ~1.0h | ~11h |
-| **YOLO11s** | 🏆 Final Training | **100%** | 1 | — | **~9h** |
+| **YOLO26s** | Baseline | **100%** | 1 | — | **~9h** |
+| **YOLO26s** | Individual Phases | 17% | 4 | ~1.0h | ~4h |
+| **YOLO26s** | Combinations | 17% | 11 | ~1.0h | ~11h |
+| **YOLO26s** | 🏆 Final Training | **100%** | 1 | — | **~9h** |
 
 ---
 
@@ -717,18 +717,18 @@ tal_beta: 7         # YOLOv12s: 7, YOLO11s: 6.0 (default)
 
 - ⏱️ **Total Training Time:** ~302 hours (**~12.6 days**) across **225 experiments**
   - 🔷 **YOLOv12s:** ~269 hours (1 baseline + 180 grid search + 26 combinations + 1 final)
-  - 🔶 **YOLO11s:** ~33 hours (1 baseline + 4 individual phases + 11 combinations + 1 final)
+  - 🔶 **YOLO26s:** ~33 hours (1 baseline + 4 individual phases + 11 combinations + 1 final)
 - ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
 - ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
 - 🏆 **YOLOv12s Best:** **A + B + C1 + D** (Alpha + Center Loss + IoU Clipping + TAL)
-- 🏆 **YOLO11s Best:** **A + B + C1** (Alpha + Center Loss + IoU Clipping)
-- 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO11s
-- ⚡ **YOLO11s Efficiency:** ~17% faster per experiment compared to YOLOv12s (~1.0h vs ~1.2h)
-- 🚫 **DFL Clipping (C2):** Not applicable to YOLO11s, excluded from transfer experiments
+- 🏆 **YOLO26s Best:** **A + B + C1** (Alpha + Center Loss + IoU Clipping)
+- 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO26s
+- ⚡ **YOLO26s Efficiency:** ~17% faster per experiment compared to YOLOv12s (~1.0h vs ~1.2h)
+- 🚫 **DFL Clipping (C2):** Not applicable to YOLO26s, excluded from transfer experiments
 - 🎯 **Most Impactful:** TAL Alpha-Beta tuning showed significant impact on small-object recall (YOLOv12s)
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early
 - 🔧 **Loss Clipping:** IoU clipping stabilizes training (DFL clipping provided diminishing returns)
-- 📈 **Best Improvements:** Up to **+14.55%** on small objects (mAP50-95) for YOLO11s, **+13.10%** for YOLOv12s
+- 📈 **Best Improvements:** Up to **+14.55%** on small objects (mAP50-95) for YOLO26s, **+13.10%** for YOLOv12s
 
 ---
 
@@ -767,8 +767,8 @@ center_loss_decay_epochs: 1     # Irrelevant when weight=0
 # ───────────────────────────────────────────────────────────────
 iou_clip_start: 100.0     # No clipping (very high)
 iou_clip_end: 100.0       # No clipping (very high)
-dfl_clip_start: 100.0     # No clipping (very high) — N/A for YOLO11s
-dfl_clip_end: 100.0       # No clipping (very high) — N/A for YOLO11s
+dfl_clip_start: 100.0     # No clipping (very high) — N/A for YOLO26s
+dfl_clip_end: 100.0       # No clipping (very high) — N/A for YOLO26s
 
 # ───────────────────────────────────────────────────────────────
 # Phase D: TAL Alpha-Beta (DEFAULT)
