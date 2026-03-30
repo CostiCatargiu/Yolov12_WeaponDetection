@@ -566,7 +566,7 @@ After identifying the **optimal parameters** for each individual phase, we condu
 ### 📈 All Combinations Performance Comparison
 
 <p align="center">
-<img width="3587" height="4119" alt="v12_gridsearch" src="https://github.com/user-attachments/assets/4c93e320-169b-467a-a6b8-67a9d9a0d523" />
+<img width="1426" height="1073" alt="image" src="https://github.com/user-attachments/assets/e73654bd-d49d-4c58-96c2-12e2e3024641" />
 </p>
 
 ---
@@ -629,7 +629,7 @@ After validating individual phases, we tested the following **11 combinations**:
 ### 📈 All Combinations Performance Comparison
 
 <p align="center">
-<img width="3595" height="2336" alt="v26_gridsearch" src="https://github.com/user-attachments/assets/2c5a91fa-6d8f-4c31-a67c-5962779e5ff2" />
+<img width="1426" height="1073" alt="image" src="https://github.com/user-attachments/assets/5d1e0b60-5dea-404d-b532-0c35585e2b07" />
 </p>
 
 ---
