@@ -796,4 +796,185 @@ tal_beta: 6.0
 
 > ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
+---
+
+## 📊 Model Comparison: YOLOv12s vs YOLO26s
+
+<details>
+<summary><b>📈 Click to expand Full Model Comparison Results</b></summary>
+
+<br>
+
+### 🏆 Custom Models — Test Dataset Results
+
+Comparison of **custom-trained models** (with optimal loss configurations) evaluated on the test dataset:
+
+<p align="center">
+<img width="1901" height="769" alt="YOLOv12s vs YOLO26s Custom Models Test Results" src="https://github.com/user-attachments/assets/5d7ed5c5-ebf3-47e5-94d1-6606cce8a35e" />
+</p>
+
+<table>
+  <tr>
+    <th align="center">Model</th>
+    <th align="center">Configuration</th>
+    <th align="center">mAP50</th>
+    <th align="center">mAP50-95</th>
+  </tr>
+  <tr>
+    <td>🔷 <b>YOLOv12s Custom</b></td>
+    <td>A1 + A2 + A3.1 + A4</td>
+    <td><b>0.857</b></td>
+    <td><b>0.574</b></td>
+  </tr>
+  <tr>
+    <td>🔶 <b>YOLO26s Custom</b></td>
+    <td>A1 + A2 + A3.1</td>
+    <td>0.828</td>
+    <td>0.555</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="right"><b>Δ Difference</b></td>
+    <td align="center"><b>+3.43%</b></td>
+    <td align="center"><b>+3.29%</b></td>
+  </tr>
+</table>
+
+---
+
+### 📋 Original Models — Test Dataset Results
+
+Comparison of **baseline models** (default Ultralytics configuration) evaluated on the test dataset:
+
+<p align="center">
+<img width="1979" height="805" alt="YOLOv12s vs YOLO26s Original Models Test Results" src="https://github.com/user-attachments/assets/b236ee4a-d276-4ef2-a7b5-f9c011eeac16" />
+</p>
+
+<table>
+  <tr>
+    <th align="center">Model</th>
+    <th align="center">Configuration</th>
+    <th align="center">mAP50</th>
+    <th align="center">mAP50-95</th>
+  </tr>
+  <tr>
+    <td>🔷 <b>YOLOv12s Original</b></td>
+    <td>Default</td>
+    <td><b>0.816</b></td>
+    <td><b>0.525</b></td>
+  </tr>
+  <tr>
+    <td>🔶 <b>YOLO26s Original</b></td>
+    <td>Default</td>
+    <td>0.782</td>
+    <td>0.502</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="right"><b>Δ Difference</b></td>
+    <td align="center"><b>+4.35%</b></td>
+    <td align="center"><b>+4.58%</b></td>
+  </tr>
+</table>
+
+---
+
+### 🔬 Grid Search Comparison — YOLOv12s vs YOLO26s
+
+Side-by-side comparison of **ablation study results** across both architectures:
+
+<p align="center">
+<img width="1972" height="700" alt="YOLOv12s vs YOLO26s Grid Search Comparison" src="https://github.com/user-attachments/assets/87dd4a14-ae42-4cdb-afc4-df0bac47d61f" />
+</p>
+
+<table>
+  <tr>
+    <th align="center">Aspect</th>
+    <th align="center">🔷 YOLOv12s</th>
+    <th align="center">🔶 YOLO26s</th>
+  </tr>
+  <tr>
+    <td><b>Grid Search Experiments</b></td>
+    <td>180</td>
+    <td>4 (transfer validation)</td>
+  </tr>
+  <tr>
+    <td><b>Combination Experiments</b></td>
+    <td>26</td>
+    <td>11</td>
+  </tr>
+  <tr>
+    <td><b>Best Configuration</b></td>
+    <td>A1 + A2 + A3.1 + A4</td>
+    <td>A1 + A2 + A3.1</td>
+  </tr>
+  <tr>
+    <td><b>Time per Experiment</b></td>
+    <td>~1.2h</td>
+    <td>~1.0h</td>
+  </tr>
+  <tr>
+    <td><b>DFL Clipping (A3.2)</b></td>
+    <td>✅ Supported</td>
+    <td>❌ Not Applicable</td>
+  </tr>
+</table>
+
+---
+
+### 📉 Training Metrics — Original Models
+
+Training curves comparison between **YOLOv12s** and **YOLO26s** using **default configurations**:
+
+<p align="center">
+<img width="2000" height="977" alt="Training Metrics YOLOv12s vs YOLO26s Original" src="https://github.com/user-attachments/assets/66ea361e-0c27-4396-bab1-fd76d6721e69" />
+</p>
+
+---
+
+### 📉 Training Metrics — Custom Models
+
+Training curves comparison between **YOLOv12s** and **YOLO26s** using **optimal custom configurations**:
+
+<p align="center">
+<img width="2000" height="977" alt="Training Metrics YOLOv12s vs YOLO26s Custom" src="https://github.com/user-attachments/assets/dddcfa7b-3be4-40a7-8dd9-2fe37b93477d" />
+</p>
+
+---
+
+### 📌 Key Observations
+
+<table>
+  <tr>
+    <th align="left" width="50%">🔷 YOLOv12s Advantages</th>
+    <th align="left" width="50%">🔶 YOLO26s Advantages</th>
+  </tr>
+  <tr>
+    <td>
+      <ul>
+        <li>✅ Higher overall accuracy (mAP50: <b>0.857</b>)</li>
+        <li>✅ Better small object detection (+6.32% mAP50-95)</li>
+        <li>✅ Supports DFL Clipping (A3.2)</li>
+        <li>✅ TAL tuning provides additional gains</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>✅ Faster training (~17% per experiment)</li>
+        <li>✅ Simpler optimal config (3 phases vs 4)</li>
+        <li>✅ Good transfer from YOLOv12s settings</li>
+        <li>✅ Competitive results with less tuning</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+| Comparison | Winner | Margin |
+|------------|--------|--------|
+| 🏆 **Overall Accuracy** | YOLOv12s Custom | +3.43% mAP50 |
+| 🔍 **Small Object Detection** | YOLOv12s Custom | +5.76% mAP50, +6.32% mAP50-95 |
+| ⚡ **Training Speed** | YOLO26s | ~17% faster |
+| 🔧 **Configuration Simplicity** | YOLO26s | 3 phases vs 4 phases |
+
+</details>
+
+
 </details>
