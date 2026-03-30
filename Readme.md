@@ -579,6 +579,13 @@ After identifying the best combination, we trained on the **full dataset (100%)*
   <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
 </p>
 
+Training results for **100** epochs on the full dataset.
+
+<p align="center">
+    <img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/fcaeafe8-87e6-4576-85ea-e0f1efe5e136" />
+</p>
+
+
 </details>
 
 ---
@@ -634,6 +641,13 @@ After identifying the best combination, we trained on the **full dataset (100%)*
 <p align="center">
   <img src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" alt="YOLO26s Winner Full Dataset Results" width="100%" />
 </p>
+
+Training results for **100** epochs on the full dataset.
+
+<p align="center">
+  <img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/63d94a6a-b205-4988-b0c6-7bffa7222de9" />
+</p>
+
 
 </details>
 
@@ -732,7 +746,7 @@ tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
 
 ---
 
-### 📄 Reproducibility Config
+### 📄 Training Config
 
 To reproduce the ablation experiments, use the following default configuration:
 
