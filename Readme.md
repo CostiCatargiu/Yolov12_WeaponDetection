@@ -422,7 +422,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 
 ---
 
-## 🔬Loss Function Ablation Study Results (YoloV12s/Yolo26s)
+## 🔬 Loss Function Ablation Study Results (YOLOv12s/YOLO26s)
 
 <details>
 <summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
@@ -457,7 +457,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <th align="left">✅ Optimal</th>
   </tr>
   <tr>
-    <td rowspan="3"><b>1. Alpha Scheduling</b></td>
+    <td rowspan="3"><b>A1. Alpha Scheduling</b></td>
     <td><code>α_start</code></td>
     <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
     <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
@@ -475,7 +475,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <td><code>32</code></td>
   </tr>
   <tr>
-    <td rowspan="2"><b>2. Center Loss Weight</b></td>
+    <td rowspan="2"><b>A2. Center Loss Weight</b></td>
     <td><code>Loss_min</code></td>
     <td><sub>0.00, 0.005, 0.010, 0.015, 0.020, 0.025</sub></td>
     <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
@@ -488,7 +488,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <td><code>0.05</code></td>
   </tr>
   <tr>
-    <td rowspan="2"><b>3. IoU Clipping</b></td>
+    <td rowspan="2"><b>A3.1. IoU Clipping</b></td>
     <td><code>IoU_start</code></td>
     <td><sub>6, 8, 10, 12, 15, 20</sub></td>
     <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
@@ -501,7 +501,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <td><code>2</code></td>
   </tr>
   <tr>
-    <td rowspan="2"><b>4. DFL Clipping</b></td>
+    <td rowspan="2"><b>A3.2. DFL Clipping</b></td>
     <td><code>DFL_start</code></td>
     <td><sub>6, 8, 10, 12, 15, 20</sub></td>
     <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
@@ -514,7 +514,7 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
     <td><code>5</code></td>
   </tr>
   <tr>
-    <td rowspan="3"><b>5. TAL Alpha-Beta</b></td>
+    <td rowspan="3"><b>A4. TAL Alpha-Beta</b></td>
     <td><code>Alpha (α)</code></td>
     <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
     <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
@@ -549,14 +549,14 @@ After identifying the **optimal parameters** for each individual phase, we condu
 
 | Phases | Combinations Tested |
 |--------|---------------------|
-| **2 phases** | A+B, A+C1, A+C2, A+D, B+C1, B+C2, B+D, C1+C2, C1+D, C2+D |
-| **3 phases** | A+B+C1, A+B+C2, A+B+D, A+C1+C2, A+C1+D, A+C2+D, B+C1+C2, B+C1+D, B+C2+D, C1+C2+D |
-| **4 phases** | A+B+C1+C2, **A+B+C1+D 🏆**, A+B+C2+D, A+C1+C2+D, B+C1+C2+D |
-| **5 phases** | A+B+C1+C2+D |
+| **2 phases** | A1+A2, A1+A3.1, A1+A3.2, A1+A4, A2+A3.1, A2+A3.2, A2+A4, A3.1+A3.2, A3.1+A4, A3.2+A4 |
+| **3 phases** | A1+A2+A3.1, A1+A2+A3.2, A1+A2+A4, A1+A3.1+A3.2, A1+A3.1+A4, A1+A3.2+A4, A2+A3.1+A3.2, A2+A3.1+A4, A2+A3.2+A4, A3.1+A3.2+A4 |
+| **4 phases** | A1+A2+A3.1+A3.2, **A1+A2+A3.1+A4 🏆**, A1+A2+A3.2+A4, A1+A3.1+A3.2+A4, A2+A3.1+A3.2+A4 |
+| **5 phases** | A1+A2+A3.1+A3.2+A4 |
 
-<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, C2 = DFL Clipping, D = TAL Alpha-Beta</sub>
+<sub>**Legend:** A1 = Alpha Scheduling, A2 = Center Loss, A3.1 = IoU Clipping, A3.2 = DFL Clipping, A4 = TAL Alpha-Beta</sub>
 
-> 🏆 **Winner:** Combination **A + B + C1 + D** achieved the best overall performance on YOLOv12s.
+> 🏆 **Winner:** Combination **A1 + A2 + A3.1 + A4** achieved the best overall performance on YOLOv12s.
 
 <details>
 <summary><b>📊 Click to view YOLOv12s Combination Results</b></summary>
@@ -571,7 +571,7 @@ After identifying the **optimal parameters** for each individual phase, we condu
 
 ---
 
-### 🏆 Winner (A + B + C1 + D) — Full Dataset Training Results
+### 🏆 Winner (A1 + A2 + A3.1 + A4) — Full Dataset Training Results
 
 After identifying the best combination, we trained on the **full dataset (100%)** for **~11 hours**:
 
@@ -594,7 +594,7 @@ Training results for **100** epochs on the full dataset.
 
 After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO26s** to validate cross-architecture generalization.
 
-> ⚠️ **Note:** Phase C2 (DFL Clipping) is **not applicable** to YOLO26s architecture and was excluded from all experiments.
+> ⚠️ **Note:** Phase A3.2 (DFL Clipping) is **not applicable** to YOLO26s architecture and was excluded from all experiments.
 
 ### 🧪 YOLO26s Individual Phase Validation
 
@@ -602,10 +602,10 @@ First, we validated each phase **individually** on YOLO26s using the optimal par
 
 | # | Phase | Description | Experiments |
 |---|-------|-------------|-------------|
-| 1 | A | Alpha Scheduling only | 1 |
-| 2 | B | Center Loss only | 1 |
-| 3 | C1 | IoU Clipping only | 1 |
-| 4 | D | TAL Alpha-Beta only | 1 |
+| 1 | A1 | Alpha Scheduling only | 1 |
+| 2 | A2 | Center Loss only | 1 |
+| 3 | A3.1 | IoU Clipping only | 1 |
+| 4 | A4 | TAL Alpha-Beta only | 1 |
 
 ### 🔗 YOLO26s Combination Experiments
 
@@ -613,13 +613,13 @@ After validating individual phases, we tested the following **11 combinations**:
 
 | Phases | Combinations Tested |
 |--------|---------------------|
-| **2 phases** | A+B, A+C1, A+D, B+C1, B+D, C1+D |
-| **3 phases** | **A+B+C1 🏆**, A+B+D, A+C1+D, B+C1+D |
-| **4 phases** | A+B+C1+D |
+| **2 phases** | A1+A2, A1+A3.1, A1+A4, A2+A3.1, A2+A4, A3.1+A4 |
+| **3 phases** | **A1+A2+A3.1 🏆**, A1+A2+A4, A1+A3.1+A4, A2+A3.1+A4 |
+| **4 phases** | A1+A2+A3.1+A4 |
 
-<sub>**Legend:** A = Alpha Scheduling, B = Center Loss, C1 = IoU Clipping, D = TAL Alpha-Beta</sub>
+<sub>**Legend:** A1 = Alpha Scheduling, A2 = Center Loss, A3.1 = IoU Clipping, A4 = TAL Alpha-Beta</sub>
 
-> 🏆 **Winner:** Combination **A + B + C1** achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
+> 🏆 **Winner:** Combination **A1 + A2 + A3.1** achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
 
 <details>
 <summary><b>📊 Click to view YOLO26s Combination Results</b></summary>
@@ -634,7 +634,7 @@ After validating individual phases, we tested the following **11 combinations**:
 
 ---
 
-### 🏆 Winner (A + B + C1) — Full Dataset Training Results
+### 🏆 Winner (A1 + A2 + A3.1) — Full Dataset Training Results
 
 After identifying the best combination, we trained on the **full dataset (100%)** for **~9 hours**:
 
@@ -661,8 +661,8 @@ Training results for **100** epochs on the full dataset.
     <th align="center">🔶 YOLO26s Best Config</th>
   </tr>
   <tr>
-    <td><b>A + B + C1 + D</b></td>
-    <td><b>A + B + C1</b></td>
+    <td><b>A1 + A2 + A3.1 + A4</b></td>
+    <td><b>A1 + A2 + A3.1</b></td>
   </tr>
   <tr>
     <td>Alpha + Center Loss + IoU Clipping + TAL</td>
@@ -672,27 +672,27 @@ Training results for **100** epochs on the full dataset.
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# 🏆 Best Configuration: A + B + C1 (+ D for YOLOv12s)
+# 🏆 Best Configuration: A1 + A2 + A3.1 (+ A4 for YOLOv12s)
 # ═══════════════════════════════════════════════════════════════
 
-# Phase A: Alpha Scheduling ✅
+# Phase A1: Alpha Scheduling ✅
 alpha_start: 0.9
 alpha_end: 0.4
 small_obj_px: 32
 
-# Phase B: Center Loss ✅
+# Phase A2: Center Loss ✅
 center_loss_weight_init: 0.05
 center_loss_weight_min: 0.01
 
-# Phase C1: IoU Clipping ✅
+# Phase A3.1: IoU Clipping ✅
 iou_clip_start: 6
 iou_clip_end: 2
 
-# Phase C2: DFL Clipping ❌ (Disabled / Not applicable to YOLO26s)
+# Phase A3.2: DFL Clipping ❌ (Disabled / Not applicable to YOLO26s)
 dfl_clip_start: 100.0
 dfl_clip_end: 100.0
 
-# Phase D: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO26s)
+# Phase A4: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO26s)
 tal_topk: 20        # YOLOv12s: 20, YOLO26s: 10 (default)
 tal_alpha: 1        # YOLOv12s: 1, YOLO26s: 0.5 (default)
 tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
@@ -734,11 +734,11 @@ tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
   - 🔶 **YOLO26s:** ~33 hours (1 baseline + 4 individual phases + 11 combinations + 1 final)
 - ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
 - ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
-- 🏆 **YOLOv12s Best:** **A + B + C1 + D** (Alpha + Center Loss + IoU Clipping + TAL)
-- 🏆 **YOLO26s Best:** **A + B + C1** (Alpha + Center Loss + IoU Clipping)
+- 🏆 **YOLOv12s Best:** **A1 + A2 + A3.1 + A4** (Alpha + Center Loss + IoU Clipping + TAL)
+- 🏆 **YOLO26s Best:** **A1 + A2 + A3.1** (Alpha + Center Loss + IoU Clipping)
 - 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO26s
 - ⚡ **YOLO26s Efficiency:** ~17% faster per experiment compared to YOLOv12s (~1.0h vs ~1.2h)
-- 🚫 **DFL Clipping (C2):** Not applicable to YOLO26s, excluded from transfer experiments
+- 🚫 **DFL Clipping (A3.2):** Not applicable to YOLO26s, excluded from transfer experiments
 - 🎯 **Most Impactful:** TAL Alpha-Beta tuning showed significant impact on small-object recall (YOLOv12s)
 - 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early
 - 🔧 **Loss Clipping:** IoU clipping stabilizes training (DFL clipping provided diminishing returns)
@@ -762,7 +762,7 @@ imgsz: 640
 dataset: "weapon_dataset_17pct"  # 17% subset for grid search
 
 # ───────────────────────────────────────────────────────────────
-# Phase A: Alpha Scheduling (DISABLED)
+# Phase A1: Alpha Scheduling (DISABLED)
 # ───────────────────────────────────────────────────────────────
 alpha_start: 1.0          # No area weighting
 alpha_end: 1.0            # No area weighting
@@ -770,14 +770,14 @@ small_obj_boost: 1.0      # No boost (multiplier = 1)
 small_obj_px: 32          # Default small object threshold
 
 # ───────────────────────────────────────────────────────────────
-# Phase B: Center Loss (DISABLED)
+# Phase A2: Center Loss (DISABLED)
 # ───────────────────────────────────────────────────────────────
 center_loss_weight_init: 0.0    # No center loss
 center_loss_weight_min: 0.0     # No center loss
 center_loss_decay_epochs: 1     # Irrelevant when weight=0
 
 # ───────────────────────────────────────────────────────────────
-# Phase C: Adaptive Clipping (DISABLED)
+# Phase A3: Adaptive Clipping (DISABLED)
 # ───────────────────────────────────────────────────────────────
 iou_clip_start: 100.0     # No clipping (very high)
 iou_clip_end: 100.0       # No clipping (very high)
@@ -785,7 +785,7 @@ dfl_clip_start: 100.0     # No clipping (very high) — N/A for YOLO26s
 dfl_clip_end: 100.0       # No clipping (very high) — N/A for YOLO26s
 
 # ───────────────────────────────────────────────────────────────
-# Phase D: TAL Alpha-Beta (DEFAULT)
+# Phase A4: TAL Alpha-Beta (DEFAULT)
 # ───────────────────────────────────────────────────────────────
 tal_topk: 10
 tal_alpha: 0.5
@@ -794,7 +794,6 @@ tal_beta: 6.0
 
 > 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
 
-> ⚠️ **Important:** Parameters from **Phase A** (Alpha Scheduling), **Phase B** (Center Loss), and **Phase C** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase D (TAL Alpha-Beta) uses the standard Ultralytics parameters.
+> ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
 </details>
-
