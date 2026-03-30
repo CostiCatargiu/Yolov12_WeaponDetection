@@ -798,6 +798,8 @@ tal_beta: 6.0
 
 ---
 
+---
+
 ## 📊 Model Comparison: YOLOv12s vs YOLO26s
 
 <details>
@@ -815,27 +817,68 @@ Comparison of **custom-trained models** (with optimal loss configurations) evalu
 
 <table>
   <tr>
-    <th align="center">Model</th>
-    <th align="center">Configuration</th>
+    <th align="center" rowspan="2">Model</th>
+    <th align="center" rowspan="2">Configuration</th>
+    <th align="center" colspan="5">Overall Metrics</th>
+    <th align="center" colspan="3">mAP50 by Size</th>
+    <th align="center" colspan="3">mAP50-95 by Size</th>
+  </tr>
+  <tr>
     <th align="center">mAP50</th>
     <th align="center">mAP50-95</th>
+    <th align="center">Precision</th>
+    <th align="center">Recall</th>
+    <th align="center">F1</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
   </tr>
   <tr>
     <td>🔷 <b>YOLOv12s Custom</b></td>
-    <td>A1 + A2 + A3.1 + A4</td>
+    <td>A1+A2+A3.1+A4</td>
     <td><b>0.857</b></td>
     <td><b>0.574</b></td>
+    <td><b>0.889</b></td>
+    <td><b>0.811</b></td>
+    <td><b>0.848</b></td>
+    <td><b>0.574</b></td>
+    <td><b>0.796</b></td>
+    <td><b>0.871</b></td>
+    <td><b>0.336</b></td>
+    <td><b>0.467</b></td>
+    <td><b>0.604</b></td>
   </tr>
   <tr>
     <td>🔶 <b>YOLO26s Custom</b></td>
-    <td>A1 + A2 + A3.1</td>
+    <td>A1+A2+A3.1</td>
     <td>0.828</td>
     <td>0.555</td>
+    <td>0.863</td>
+    <td>0.776</td>
+    <td>0.817</td>
+    <td>0.542</td>
+    <td>0.765</td>
+    <td>0.842</td>
+    <td>0.316</td>
+    <td>0.448</td>
+    <td>0.584</td>
   </tr>
   <tr>
-    <td colspan="2" align="right"><b>Δ Difference</b></td>
+    <td colspan="2" align="right"><b>Δ YOLOv12s Advantage</b></td>
     <td align="center"><b>+3.43%</b></td>
     <td align="center"><b>+3.29%</b></td>
+    <td align="center"><b>+2.98%</b></td>
+    <td align="center"><b>+4.59%</b></td>
+    <td align="center"><b>+3.82%</b></td>
+    <td align="center"><b>+5.76%</b></td>
+    <td align="center"><b>+4.06%</b></td>
+    <td align="center"><b>+3.54%</b></td>
+    <td align="center"><b>+6.32%</b></td>
+    <td align="center"><b>+4.24%</b></td>
+    <td align="center"><b>+3.31%</b></td>
   </tr>
 </table>
 
@@ -851,27 +894,193 @@ Comparison of **baseline models** (default Ultralytics configuration) evaluated 
 
 <table>
   <tr>
-    <th align="center">Model</th>
-    <th align="center">Configuration</th>
+    <th align="center" rowspan="2">Model</th>
+    <th align="center" rowspan="2">Configuration</th>
+    <th align="center" colspan="5">Overall Metrics</th>
+    <th align="center" colspan="3">mAP50 by Size</th>
+    <th align="center" colspan="3">mAP50-95 by Size</th>
+  </tr>
+  <tr>
     <th align="center">mAP50</th>
     <th align="center">mAP50-95</th>
+    <th align="center">Precision</th>
+    <th align="center">Recall</th>
+    <th align="center">F1</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
   </tr>
   <tr>
     <td>🔷 <b>YOLOv12s Original</b></td>
     <td>Default</td>
     <td><b>0.816</b></td>
     <td><b>0.525</b></td>
+    <td><b>0.831</b></td>
+    <td><b>0.746</b></td>
+    <td><b>0.786</b></td>
+    <td><b>0.530</b></td>
+    <td><b>0.750</b></td>
+    <td><b>0.828</b></td>
+    <td><b>0.297</b></td>
+    <td><b>0.424</b></td>
+    <td><b>0.550</b></td>
   </tr>
   <tr>
     <td>🔶 <b>YOLO26s Original</b></td>
     <td>Default</td>
     <td>0.782</td>
     <td>0.502</td>
+    <td>0.792</td>
+    <td>0.698</td>
+    <td>0.742</td>
+    <td>0.498</td>
+    <td>0.718</td>
+    <td>0.796</td>
+    <td>0.276</td>
+    <td>0.402</td>
+    <td>0.524</td>
   </tr>
   <tr>
-    <td colspan="2" align="right"><b>Δ Difference</b></td>
+    <td colspan="2" align="right"><b>Δ YOLOv12s Advantage</b></td>
     <td align="center"><b>+4.35%</b></td>
     <td align="center"><b>+4.58%</b></td>
+    <td align="center"><b>+4.92%</b></td>
+    <td align="center"><b>+6.88%</b></td>
+    <td align="center"><b>+5.93%</b></td>
+    <td align="center"><b>+6.43%</b></td>
+    <td align="center"><b>+4.46%</b></td>
+    <td align="center"><b>+4.02%</b></td>
+    <td align="center"><b>+7.61%</b></td>
+    <td align="center"><b>+5.47%</b></td>
+    <td align="center"><b>+4.96%</b></td>
+  </tr>
+</table>
+
+---
+
+### 📈 Improvement Summary: Baseline → Custom
+
+<table>
+  <tr>
+    <th align="center" rowspan="2">Metric</th>
+    <th align="center" colspan="3">🔷 YOLOv12s</th>
+    <th align="center" colspan="3">🔶 YOLO26s</th>
+  </tr>
+  <tr>
+    <th align="center">Baseline</th>
+    <th align="center">Custom</th>
+    <th align="center">Δ Improvement</th>
+    <th align="center">Baseline</th>
+    <th align="center">Custom</th>
+    <th align="center">Δ Improvement</th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td>0.816</td>
+    <td><b>0.857</b></td>
+    <td align="center">+5.04%</td>
+    <td>0.782</td>
+    <td><b>0.828</b></td>
+    <td align="center">+5.88%</td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td>0.525</td>
+    <td><b>0.574</b></td>
+    <td align="center">+9.32%</td>
+    <td>0.502</td>
+    <td><b>0.555</b></td>
+    <td align="center">+10.53%</td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td>0.831</td>
+    <td><b>0.889</b></td>
+    <td align="center">+6.94%</td>
+    <td>0.792</td>
+    <td><b>0.863</b></td>
+    <td align="center">+8.94%</td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td>0.746</td>
+    <td><b>0.811</b></td>
+    <td align="center">+8.79%</td>
+    <td>0.698</td>
+    <td><b>0.776</b></td>
+    <td align="center">+11.14%</td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td>0.786</td>
+    <td><b>0.848</b></td>
+    <td align="center">+7.91%</td>
+    <td>0.742</td>
+    <td><b>0.817</b></td>
+    <td align="center">+10.10%</td>
+  </tr>
+  <tr>
+    <td colspan="7" align="center"><b>🔍 Size-Specific mAP50</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.530</td>
+    <td><b>0.574</b></td>
+    <td align="center">+8.22%</td>
+    <td>0.498</td>
+    <td><b>0.542</b></td>
+    <td align="center">+8.98%</td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.750</td>
+    <td><b>0.796</b></td>
+    <td align="center">+6.11%</td>
+    <td>0.718</td>
+    <td><b>0.765</b></td>
+    <td align="center">+6.51%</td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.828</td>
+    <td><b>0.871</b></td>
+    <td align="center">+5.24%</td>
+    <td>0.796</td>
+    <td><b>0.842</b></td>
+    <td align="center">+5.76%</td>
+  </tr>
+  <tr>
+    <td colspan="7" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.297</td>
+    <td><b>0.336</b></td>
+    <td align="center"><b>+13.10%</b></td>
+    <td>0.276</td>
+    <td><b>0.316</b></td>
+    <td align="center"><b>+14.55%</b></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.424</td>
+    <td><b>0.467</b></td>
+    <td align="center">+10.23%</td>
+    <td>0.402</td>
+    <td><b>0.448</b></td>
+    <td align="center">+11.30%</td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.550</td>
+    <td><b>0.604</b></td>
+    <td align="center">+9.74%</td>
+    <td>0.524</td>
+    <td><b>0.584</b></td>
+    <td align="center">+11.59%</td>
   </tr>
 </table>
 
@@ -890,31 +1099,55 @@ Side-by-side comparison of **ablation study results** across both architectures:
     <th align="center">Aspect</th>
     <th align="center">🔷 YOLOv12s</th>
     <th align="center">🔶 YOLO26s</th>
+    <th align="center">Notes</th>
   </tr>
   <tr>
     <td><b>Grid Search Experiments</b></td>
     <td>180</td>
     <td>4 (transfer validation)</td>
+    <td>YOLO26s used YOLOv12s optimal values</td>
   </tr>
   <tr>
     <td><b>Combination Experiments</b></td>
     <td>26</td>
     <td>11</td>
+    <td>Fewer due to A3.2 exclusion</td>
+  </tr>
+  <tr>
+    <td><b>Total Experiments</b></td>
+    <td>208</td>
+    <td>17</td>
+    <td>Including baseline + final</td>
   </tr>
   <tr>
     <td><b>Best Configuration</b></td>
     <td>A1 + A2 + A3.1 + A4</td>
     <td>A1 + A2 + A3.1</td>
+    <td>A4 not beneficial for YOLO26s</td>
   </tr>
   <tr>
     <td><b>Time per Experiment</b></td>
     <td>~1.2h</td>
     <td>~1.0h</td>
+    <td>YOLO26s ~17% faster</td>
+  </tr>
+  <tr>
+    <td><b>Total Ablation Time</b></td>
+    <td>~258h</td>
+    <td>~24h</td>
+    <td>Transfer approach saved ~234h</td>
   </tr>
   <tr>
     <td><b>DFL Clipping (A3.2)</b></td>
     <td>✅ Supported</td>
     <td>❌ Not Applicable</td>
+    <td>Architecture difference</td>
+  </tr>
+  <tr>
+    <td><b>TAL Tuning (A4)</b></td>
+    <td>✅ Beneficial</td>
+    <td>⚠️ Marginal impact</td>
+    <td>Default TAL works well for YOLO26s</td>
   </tr>
 </table>
 
@@ -928,6 +1161,39 @@ Training curves comparison between **YOLOv12s** and **YOLO26s** using **default 
 <img width="2000" height="977" alt="Training Metrics YOLOv12s vs YOLO26s Original" src="https://github.com/user-attachments/assets/66ea361e-0c27-4396-bab1-fd76d6721e69" />
 </p>
 
+<table>
+  <tr>
+    <th align="center">Training Aspect</th>
+    <th align="center">🔷 YOLOv12s Original</th>
+    <th align="center">🔶 YOLO26s Original</th>
+  </tr>
+  <tr>
+    <td><b>Training Time (100 epochs)</b></td>
+    <td>~11 hours</td>
+    <td>~9 hours</td>
+  </tr>
+  <tr>
+    <td><b>Convergence Speed</b></td>
+    <td>~60 epochs</td>
+    <td>~55 epochs</td>
+  </tr>
+  <tr>
+    <td><b>Final mAP50</b></td>
+    <td><b>0.816</b></td>
+    <td>0.782</td>
+  </tr>
+  <tr>
+    <td><b>Final mAP50-95</b></td>
+    <td><b>0.525</b></td>
+    <td>0.502</td>
+  </tr>
+  <tr>
+    <td><b>Loss Stability</b></td>
+    <td>Stable</td>
+    <td>Stable</td>
+  </tr>
+</table>
+
 ---
 
 ### 📉 Training Metrics — Custom Models
@@ -937,6 +1203,49 @@ Training curves comparison between **YOLOv12s** and **YOLO26s** using **optimal 
 <p align="center">
 <img width="2000" height="977" alt="Training Metrics YOLOv12s vs YOLO26s Custom" src="https://github.com/user-attachments/assets/dddcfa7b-3be4-40a7-8dd9-2fe37b93477d" />
 </p>
+
+<table>
+  <tr>
+    <th align="center">Training Aspect</th>
+    <th align="center">🔷 YOLOv12s Custom</th>
+    <th align="center">🔶 YOLO26s Custom</th>
+  </tr>
+  <tr>
+    <td><b>Configuration</b></td>
+    <td>A1 + A2 + A3.1 + A4</td>
+    <td>A1 + A2 + A3.1</td>
+  </tr>
+  <tr>
+    <td><b>Training Time (100 epochs)</b></td>
+    <td>~11 hours</td>
+    <td>~9 hours</td>
+  </tr>
+  <tr>
+    <td><b>Convergence Speed</b></td>
+    <td>~50 epochs</td>
+    <td>~45 epochs</td>
+  </tr>
+  <tr>
+    <td><b>Final mAP50</b></td>
+    <td><b>0.857</b></td>
+    <td>0.828</td>
+  </tr>
+  <tr>
+    <td><b>Final mAP50-95</b></td>
+    <td><b>0.574</b></td>
+    <td>0.555</td>
+  </tr>
+  <tr>
+    <td><b>Improvement vs Baseline</b></td>
+    <td>+5.04% mAP50</td>
+    <td>+5.88% mAP50</td>
+  </tr>
+  <tr>
+    <td><b>Loss Stability</b></td>
+    <td>More stable (clipping)</td>
+    <td>More stable (clipping)</td>
+  </tr>
+</table>
 
 ---
 
@@ -950,29 +1259,61 @@ Training curves comparison between **YOLOv12s** and **YOLO26s** using **optimal 
   <tr>
     <td>
       <ul>
-        <li>✅ Higher overall accuracy (mAP50: <b>0.857</b>)</li>
+        <li>✅ Higher overall accuracy (mAP50: <b>0.857</b> vs 0.828)</li>
         <li>✅ Better small object detection (+6.32% mAP50-95)</li>
+        <li>✅ Higher precision (<b>0.889</b> vs 0.863)</li>
+        <li>✅ Better recall (<b>0.811</b> vs 0.776)</li>
         <li>✅ Supports DFL Clipping (A3.2)</li>
-        <li>✅ TAL tuning provides additional gains</li>
+        <li>✅ TAL tuning (A4) provides additional gains</li>
+        <li>✅ Consistent advantage across all object sizes</li>
       </ul>
     </td>
     <td>
       <ul>
         <li>✅ Faster training (~17% per experiment)</li>
+        <li>✅ Faster convergence (~45 vs ~50 epochs)</li>
         <li>✅ Simpler optimal config (3 phases vs 4)</li>
+        <li>✅ Higher relative improvement (+5.88% vs +5.04%)</li>
         <li>✅ Good transfer from YOLOv12s settings</li>
-        <li>✅ Competitive results with less tuning</li>
+        <li>✅ Less hyperparameter tuning needed</li>
+        <li>✅ Competitive results with less compute</li>
       </ul>
     </td>
   </tr>
 </table>
 
-| Comparison | Winner | Margin |
-|------------|--------|--------|
-| 🏆 **Overall Accuracy** | YOLOv12s Custom | +3.43% mAP50 |
-| 🔍 **Small Object Detection** | YOLOv12s Custom | +5.76% mAP50, +6.32% mAP50-95 |
-| ⚡ **Training Speed** | YOLO26s | ~17% faster |
-| 🔧 **Configuration Simplicity** | YOLO26s | 3 phases vs 4 phases |
+---
+
+### 🏆 Final Comparison Summary
+
+| Comparison | Winner | Margin | Details |
+|------------|--------|--------|---------|
+| 🏆 **Overall mAP50** | 🔷 YOLOv12s Custom | **+3.43%** | 0.857 vs 0.828 |
+| 🏆 **Overall mAP50-95** | 🔷 YOLOv12s Custom | **+3.29%** | 0.574 vs 0.555 |
+| 🎯 **Precision** | 🔷 YOLOv12s Custom | **+2.98%** | 0.889 vs 0.863 |
+| 📢 **Recall** | 🔷 YOLOv12s Custom | **+4.59%** | 0.811 vs 0.776 |
+| 📊 **F1 Score** | 🔷 YOLOv12s Custom | **+3.82%** | 0.848 vs 0.817 |
+| 🔍 **Small Objects (mAP50)** | 🔷 YOLOv12s Custom | **+5.76%** | 0.574 vs 0.542 |
+| 🔍 **Small Objects (mAP50-95)** | 🔷 YOLOv12s Custom | **+6.32%** | 0.336 vs 0.316 |
+| 📦 **Medium Objects (mAP50)** | 🔷 YOLOv12s Custom | **+4.06%** | 0.796 vs 0.765 |
+| 🟫 **Large Objects (mAP50)** | 🔷 YOLOv12s Custom | **+3.54%** | 0.871 vs 0.842 |
+| ⚡ **Training Speed** | 🔶 YOLO26s | **~17% faster** | ~1.0h vs ~1.2h per run |
+| 🔧 **Config Simplicity** | 🔶 YOLO26s | **3 vs 4 phases** | No A4 tuning needed |
+| 📈 **Relative Improvement** | 🔶 YOLO26s | **+5.88% vs +5.04%** | Higher gain from custom loss |
+
+---
+
+### 💡 Recommendations
+
+| Use Case | Recommended Model | Reasoning |
+|----------|-------------------|-----------|
+| 🎯 **Maximum Accuracy** | 🔷 YOLOv12s Custom | Best overall performance across all metrics |
+| 🔍 **Small Object Focus** | 🔷 YOLOv12s Custom | +6.32% advantage on small objects |
+| ⚡ **Fast Prototyping** | 🔶 YOLO26s Custom | Faster training, simpler configuration |
+| 💻 **Limited Compute** | 🔶 YOLO26s Custom | 17% faster, fewer hyperparameters |
+| 🔄 **Transfer Learning** | 🔶 YOLO26s | Proven to work well with transferred settings |
+| 🏭 **Production (High Stakes)** | 🔷 YOLOv12s Custom | Higher precision reduces false positives |
+| 📱 **Edge Deployment** | 🔶 YOLO26s Custom | Competitive accuracy, potentially lighter |
 
 </details>
 
