@@ -422,7 +422,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 
 ---
 
-## 🔬Loss Fcuntion Ablation Study Results (YoloV12s/Yolo26s)
+## 🔬Loss Function Ablation Study Results (YoloV12s/Yolo26s)
 
 <details>
 <summary><b>📊 Click to expand Hyperparameter Search Results</b></summary>
