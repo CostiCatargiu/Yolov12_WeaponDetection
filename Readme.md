@@ -44,10 +44,10 @@
   </tr>
   <tr>
     <th align="center">Metric</th>
-    <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom</sub></th>
-    <th align="center">🧪 YOLOv12s<br><sub>Baseline → Loss+Arch</sub></th>
-    <th align="center">🔶 YOLO26s<br><sub>Baseline → Custom</sub></th>
-    <th align="center">⚔️ Custom vs Custom<br><sub>YOLO26s → YOLOv12s</sub></th>
+    <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom Loss</sub></th>
+    <th align="center">🧪 YOLOv12s<br><sub>Baseline → Custom Loss+Arch</sub></th>
+    <th align="center">🔶 YOLO26s<br><sub>Baseline → Custom Loss</sub></th>
+    <th align="center">⚔️ Custom Loss<br><sub>YOLO26s → YOLOv12s</sub></th>
   </tr>
 
   <tr>
