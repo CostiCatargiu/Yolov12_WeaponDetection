@@ -45,7 +45,7 @@
       <br><sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★)<br>5-head detection with auxiliary P2 branch at stride 4</sub>
     </td>
     <td align="center" width="55%">
-      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/1b2bbd82-b34b-4eee-8b73-0b2f5a0d2632" />
+      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/0bf3f8f9-70cc-4d75-8f33-11362a91d23d" />" />
       <br><sub>📈 Training metrics — Baseline vs Custom Loss vs Custom Arch vs Combined</sub>
     </td>
   </tr>
