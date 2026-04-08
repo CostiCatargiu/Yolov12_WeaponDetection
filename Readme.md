@@ -449,7 +449,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 ## 🔬 Loss Function Ablation Study Results (YOLOv12s/YOLO26s)
 
 <details>
-<summary><b>⚙️ 1</b></summary>
+<summary><b>⚙️ 1. Experimental Setup</b></summary>
 
 <br>
 
@@ -829,10 +829,10 @@ pretrained: yolov12s.pt                # Pre-trained weights
 # ───────────────────────────────────────────────────────────────
 # Training Schedule
 # ───────────────────────────────────────────────────────────────
-epochs: 70 or 100
+epochs: 120
 time: null
 patience: 20
-batch: 64
+batch: 44
 imgsz: 640
 close_mosaic: 15
 
@@ -1306,6 +1306,12 @@ tal_beta: 6.0             # Default value
 
 > ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters. All other parameters follow Ultralytics defaults — see the expandable full YAML above for the complete list.
 
+</details>
+
+---
+
+## 🏗️ Architecture Ablation Study Results (YOLOv12s)
+
 <details>
 <summary><b>⚙️ 1. Experimental Setup</b></summary>
 
@@ -1328,7 +1334,6 @@ tal_beta: 6.0             # Default value
 > ⚠️ **Batch size note:** Larger architectures (e.g., wider channels, more heads, deeper backbones) require more GPU memory. Batch size was adjusted per architecture to maximize GPU utilization while fitting within **24GB VRAM** (RTX 4090): smaller architectures used up to **72**, while the largest variants ran at **48**.
 
 </details>
-
 
 ---
 
@@ -2167,9 +2172,6 @@ We designed **20 architectural variants** exploring different strategies for imp
 - 🏋️ **Diminishing Returns on Depth:** Arch-4's much deeper backbone (3/5/6/7) did not proportionally improve results
 - 🔧 **BiFPN-style Neck:** Mixed results — beneficial when combined with auxiliary branches (Arch-9) but not alone (Arch-2)
 - ⚡ **A2C2f at P2:** Using attention at the highest resolution (Arch-15) adds compute without significant gains over C3k2
-- 🧪 **20 experiments** × ~1.2h = **~24 hours** of architecture search
-
-</details>
-
+- 🧪 **20 experiments** × ~3.2h = **~64 hours** of architecture search
 
 </details>
