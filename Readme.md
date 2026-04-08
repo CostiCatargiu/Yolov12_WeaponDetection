@@ -1308,7 +1308,6 @@ tal_beta: 6.0             # Default value
 
 </details>
 
-
 ## 🏗️ Architecture Ablation Study Results (YOLOv12s)
 
 <details>
@@ -1324,7 +1323,7 @@ tal_beta: 6.0             # Default value
 | 🖼️ **Image Size** | **640×640** |
 | ⏱️ **Time per Run** | ~1.2 hours |
 | 🔬 **Methodology** | Grid search across **20 architectural variants** |
-| 🏛️ **Base Architecture** | YOLOv12s (P3–P5 default heads) |
+| 🏛️ **Base Architecture** | YOLOv12s (P3–P5 default, 3 detection heads) |
 | 🎯 **Goal** | Identify the best detection head configuration for small-object weapon detection |
 
 > 📌 All architecture experiments use the **default loss function** (no custom loss phases enabled) to isolate the effect of architectural changes.
@@ -1476,63 +1475,8 @@ We designed **20 architectural variants** exploring different strategies for imp
 ### 📈 All Architectures Performance Comparison
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_IMAGE_HASH" alt="Architecture Grid Search Results" width="100%" />
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_RESULTS_IMAGE_HASH" alt="Architecture Grid Search Results" width="100%" />
 </p>
-
-<table>
-  <tr>
-    <th align="center" rowspan="2">Architecture</th>
-    <th align="center" rowspan="2">Heads</th>
-    <th align="center" colspan="5">Overall Metrics</th>
-    <th align="center" colspan="3">mAP50 by Size</th>
-    <th align="center" colspan="3">mAP50-95 by Size</th>
-  </tr>
-  <tr>
-    <th align="center">mAP50</th>
-    <th align="center">mAP50-95</th>
-    <th align="center">Precision</th>
-    <th align="center">Recall</th>
-    <th align="center">F1</th>
-    <th align="center">🔍 Small</th>
-    <th align="center">📦 Medium</th>
-    <th align="center">🟫 Large</th>
-    <th align="center">🔍 Small</th>
-    <th align="center">📦 Medium</th>
-    <th align="center">🟫 Large</th>
-  </tr>
-  <tr style="background-color: #f0f0f0;">
-    <td><b>Baseline</b></td>
-    <td>3 (P3–P5)</td>
-    <td>0.816</td>
-    <td>0.525</td>
-    <td>0.831</td>
-    <td>0.746</td>
-    <td>0.786</td>
-    <td>0.530</td>
-    <td>0.750</td>
-    <td>0.828</td>
-    <td>0.297</td>
-    <td>0.424</td>
-    <td>0.550</td>
-  </tr>
-  <tr style="background-color: #fff3cd; border: 2px solid #dc3545;">
-    <td><b>Arch-6 ★ 🏆</b></td>
-    <td>5 (P2×2+P3–P5)</td>
-    <td><b>0.865</b></td>
-    <td><b>0.585</b></td>
-    <td><b>0.902</b></td>
-    <td><b>0.825</b></td>
-    <td><b>0.862</b></td>
-    <td><b>0.590</b></td>
-    <td><b>0.812</b></td>
-    <td><b>0.885</b></td>
-    <td><b>0.355</b></td>
-    <td><b>0.485</b></td>
-    <td><b>0.628</b></td>
-  </tr>
-</table>
-
-> 📌 **Full results for all 20 architectures** are shown in the image above. The table highlights the **Baseline** and the **winning architecture (Arch-6)** for quick reference.
 
 ---
 
@@ -1619,16 +1563,28 @@ We designed **20 architectural variants** exploring different strategies for imp
   </tr>
 </table>
 
+> 📌 **Full results for all 20 architectures** are shown in the image above. The table highlights the **Baseline** and the **winning architecture (Arch-6)**.
+
 </details>
 
 ---
 
 <details>
-<summary><b>🏆 4. Winner: Arch-6 — Design Rationale</b></summary>
+<summary><b>🏆 4. Winner: Arch-6 — Architecture Deep Dive</b></summary>
 
 <br>
 
-### 🧬 Arch-6 Key Design Elements
+### 🧬 Architecture Diagram
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_DIAGRAM_IMAGE_HASH" alt="Arch-6 Architecture Diagram" width="100%" />
+</p>
+
+<p align="center"><sub>Arch-6 (P2 Auxiliary ★): 5-head detection architecture with auxiliary P2 branch at stride 4.<br>🟦 New P2 layers | 🟧 Auxiliary split branch | 🔶 Modified layers vs original YOLOv12s.</sub></p>
+
+---
+
+### 🎯 Design Highlights
 
 <table>
   <tr>
@@ -1638,34 +1594,433 @@ We designed **20 architectural variants** exploring different strategies for imp
   </tr>
   <tr>
     <td><b>🔍 P2 Detection Head</b></td>
-    <td>Added high-resolution head at stride 4</td>
+    <td>Added high-resolution head at stride 4 (160×160)</td>
     <td>Captures fine-grained details for small objects</td>
   </tr>
   <tr>
     <td><b>🔀 Auxiliary P2 Branch</b></td>
-    <td>C3k2(True) + Conv split → 2 separate P2 outputs</td>
-    <td>Dual feature extraction improves small-object recall</td>
+    <td>C3k2(True) + Conv split → 2 separate P2 outputs to Detect</td>
+    <td>Extra gradient supervision forces stronger P2 features</td>
   </tr>
   <tr>
     <td><b>📏 Width Scale 0.50</b></td>
     <td>Doubled channel width (vs default 0.25)</td>
-    <td>Richer feature representations at all scales</td>
+    <td>2× more representational capacity everywhere</td>
   </tr>
   <tr>
     <td><b>🏋️ Deeper Backbone</b></td>
-    <td>P5 increased to 5 repeats, P3 to 3 repeats</td>
-    <td>Better feature extraction capacity</td>
+    <td>P3: ×2→×3 repeats, P5: ×4→×5 repeats</td>
+    <td>Richer feature extraction at critical scales</td>
   </tr>
   <tr>
-    <td><b>🔧 C3k2 Bottom-up</b></td>
-    <td>P3/P4 bottom-up use C3k2 instead of A2C2f</td>
-    <td>Efficient multi-scale aggregation</td>
+    <td><b>🔧 C3k2 in Bottom-up</b></td>
+    <td>P3 bottom-up uses C3k2 instead of A2C2f</td>
+    <td>Saves compute at mid-resolution where attention is less critical</td>
+  </tr>
+  <tr>
+    <td><b>🎯 5 Detection Heads</b></td>
+    <td>P2×2 (aux+main) + P3 + P4 + P5</td>
+    <td>+2 heads at stride 4 dramatically improve small-object recall</td>
   </tr>
 </table>
 
 ---
 
-### 🔍 Why Arch-6 Won
+<details>
+<summary><b>📐 Layer-by-Layer Comparison (Original vs Arch-6)</b></summary>
+
+<br>
+
+#### 🏛️ Backbone (L0–L8)
+
+<table>
+  <tr>
+    <th align="center">Layer</th>
+    <th align="left">Original YOLOv12s</th>
+    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
+    <th align="center">Change</th>
+    <th align="left">Rationale</th>
+  </tr>
+  <tr>
+    <td align="center"><b>L0</b></td>
+    <td>Conv [64, 3, 2]</td>
+    <td>Conv [64, 3, 2]</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L1</b></td>
+    <td>Conv [128, 3, 2, 1, 2]</td>
+    <td>Conv [128, 3, 2, 1, 2]</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L2</b></td>
+    <td>C3k2 [256, False, 0.25] ×2</td>
+    <td>C3k2 [256, False, 0.25] ×2</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L3</b></td>
+    <td>Conv [256, 3, 2, 1, 4]</td>
+    <td>Conv [256, 3, 2, 1, 4]</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L4</b></td>
+    <td>C3k2 [512, False, 0.25] ×2</td>
+    <td>C3k2 [512, False, 0.25] <b>×3</b></td>
+    <td align="center">🔶 ×2→×3</td>
+    <td>Extra repeat enriches P3-level features, providing stronger mid-scale representations before entering the attention stages.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L5</b></td>
+    <td>Conv [512, 3, 2]</td>
+    <td>Conv [512, 3, 2]</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L6</b></td>
+    <td>A2C2f [512, True, 4] ×4</td>
+    <td>A2C2f [512, True, 4] ×4</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L7</b></td>
+    <td>Conv [1024, 3, 2]</td>
+    <td>Conv [1024, 3, 2]</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L8</b></td>
+    <td>A2C2f [1024, True, 1] ×4</td>
+    <td>A2C2f [1024, True, 1] <b>×5</b></td>
+    <td align="center">🔶 ×4→×5</td>
+    <td>Extra repeat at the deepest stage captures richer semantic features before entering the top-down path.</td>
+  </tr>
+</table>
+
+---
+
+#### 🔽 Neck — Top-Down FPN (L9–L19)
+
+<table>
+  <tr>
+    <th align="center">Layer</th>
+    <th align="left">Original YOLOv12s</th>
+    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
+    <th align="center">Change</th>
+    <th align="left">Rationale</th>
+  </tr>
+  <tr>
+    <td align="center"><b>L9</b></td>
+    <td>Upsample ×2</td>
+    <td>Upsample ×2</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L10</b></td>
+    <td>Concat (L8_up + L6_bb)</td>
+    <td>Concat (L8_up + L6_bb)</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L11</b></td>
+    <td>A2C2f [512, False, -1] ×2</td>
+    <td>A2C2f [512, False, -1] ×2</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L12</b></td>
+    <td>Upsample ×2</td>
+    <td>Upsample ×2</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L13</b></td>
+    <td>Concat (L11_up + L4_bb)</td>
+    <td>Concat (L11_up + L4_bb)</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td align="center"><b>L14</b></td>
+    <td>A2C2f [256, False, -1] ×2</td>
+    <td>A2C2f [256, False, -1] ×2</td>
+    <td align="center">✅ Same</td>
+    <td>—</td>
+  </tr>
+  <tr style="background-color: #d4edda;">
+    <td align="center"><b>L15</b></td>
+    <td>Conv [256, 3, 2] <sub>(start bottom-up)</sub></td>
+    <td>🟦 Upsample ×2 <sub>(NEW — extends to P2)</sub></td>
+    <td align="center">🆕 Added</td>
+    <td>Extends the top-down path one scale further to reach stride-4 resolution for small-object detection.</td>
+  </tr>
+  <tr style="background-color: #d4edda;">
+    <td align="center"><b>L16</b></td>
+    <td>—</td>
+    <td>🟦 Concat (L15_up + L2_bb)</td>
+    <td align="center">🆕 Added</td>
+    <td>Fuses upsampled P3 features with high-resolution P2 backbone features, combining semantic depth with spatial detail.</td>
+  </tr>
+  <tr style="background-color: #d4edda;">
+    <td align="center"><b>L17</b></td>
+    <td>—</td>
+    <td>🟦 C3k2 [128, False, 0.25] ×2</td>
+    <td align="center">🆕 Added</td>
+    <td>Processes fused P2 features with a lightweight block. Uses C3k2 instead of A2C2f to keep compute manageable at the highest resolution (160×160).</td>
+  </tr>
+  <tr style="background-color: #fce4d6;">
+    <td align="center"><b>L18</b></td>
+    <td>—</td>
+    <td>🟧 C3k2 [128, True] ×1 <sub>(AUX)</sub></td>
+    <td align="center">🆕 Added</td>
+    <td>Auxiliary branch with full 3×3 kernels. Dead-end path directly to Detect. Provides extra gradient supervision at P2, forcing the network to learn strong high-resolution features.</td>
+  </tr>
+  <tr style="background-color: #fce4d6;">
+    <td align="center"><b>L19</b></td>
+    <td>—</td>
+    <td>🟧 Conv [128, 3, 1] <sub>(MAIN P2)</sub></td>
+    <td align="center">🆕 Added</td>
+    <td>Main P2 branch with stride-1 Conv (no downsampling). Projects channels before continuing into the bottom-up PAN path. Also feeds into Detect.</td>
+  </tr>
+</table>
+
+---
+
+#### 🔼 Head — Bottom-Up PAN (L20–L28 + Detect)
+
+<table>
+  <tr>
+    <th align="center">Layer</th>
+    <th align="left">Original YOLOv12s</th>
+    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
+    <th align="center">Change</th>
+    <th align="left">Rationale</th>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L20</b><br><sub>(was L15)</sub></td>
+    <td>Conv [256, 3, 2]</td>
+    <td>Conv [<b>128</b>, 3, 2]</td>
+    <td align="center">🔶 256→128ch</td>
+    <td>Starts bottom-up from P2 (128ch) instead of P3 (256ch). Lower channel count matches the finer P2 scale.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L21</b><br><sub>(was L16)</sub></td>
+    <td>Concat (L15 + L11)</td>
+    <td>Concat (L20 + <b>L14</b>)</td>
+    <td align="center">🔶 Sources shifted</td>
+    <td>Concatenates P2 downsampled with P3 from neck (L14) instead of original P3 with P4. One extra fusion step in the path.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L22</b><br><sub>(was L17)</sub></td>
+    <td>A2C2f [512, False, -1] ×2</td>
+    <td><b>C3k2</b> [<b>256</b>, False, 0.25] ×2</td>
+    <td align="center">🔶 A2C2f→C3k2<br>512→256ch</td>
+    <td>Replaced attention block with lightweight C3k2 at P3 scale. Saves compute at mid-resolution where attention is less critical.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L23</b><br><sub>(was L18)</sub></td>
+    <td>Conv [512, 3, 2]</td>
+    <td>Conv [<b>256</b>, 3, 2]</td>
+    <td align="center">🔶 512→256ch</td>
+    <td>Channel count adjusted to match the new P3→P4 transition (256→512 happens at concat).</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L24</b><br><sub>(was L19)</sub></td>
+    <td>Concat (L18 + L8)</td>
+    <td>Concat (L23 + <b>L11</b>)</td>
+    <td align="center">🔶 Sources shifted</td>
+    <td>Fuses with P4 from neck (L11) instead of P5 from backbone. Extended path adds one more fusion opportunity.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L25</b></td>
+    <td>—</td>
+    <td>A2C2f [512, False, -1] ×2</td>
+    <td align="center">🔶 New position</td>
+    <td>A2C2f at P4 in the bottom-up path. Attention applied here where feature maps are smaller (40×40) and attention cost is reasonable.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L26</b></td>
+    <td>—</td>
+    <td>Conv [512, 3, 2]</td>
+    <td align="center">🔶 New position</td>
+    <td>Downsamples P4 to P5 resolution for the final concat.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L27</b></td>
+    <td>—</td>
+    <td>Concat (L26 + L8_bb)</td>
+    <td align="center">🔶 New position</td>
+    <td>Final fusion: bottom-up P4 features + P5 backbone features.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>L28</b><br><sub>(was L20)</sub></td>
+    <td>C3k2 [1024, True] ×2</td>
+    <td>C3k2 [1024, True] <b>×3</b></td>
+    <td align="center">🔶 ×2→×3</td>
+    <td>Extra repeat at P5 for stronger final feature refinement before detection.</td>
+  </tr>
+</table>
+
+---
+
+#### 🎯 Detection Head
+
+<table>
+  <tr>
+    <th align="center">Component</th>
+    <th align="left">Original YOLOv12s</th>
+    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
+    <th align="center">Change</th>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>Detect</b></td>
+    <td>Detect [L14, L17, L20] — <b>3 heads</b></td>
+    <td>Detect [L18, L19, L22, L25, L28] — <b>5 heads</b></td>
+    <td align="center">🔶 3→5 heads</td>
+  </tr>
+</table>
+
+<sub>Two additional detection heads at stride 4 (aux + main P2) dramatically improve small-object recall.</sub>
+
+</details>
+
+---
+
+<details>
+<summary><b>📊 Summary of Changes</b></summary>
+
+<br>
+
+<table>
+  <tr>
+    <th align="center">Change Type</th>
+    <th align="center">Count</th>
+    <th align="left">Details</th>
+  </tr>
+  <tr>
+    <td align="center">🆕 <b>New layers added</b></td>
+    <td align="center"><b>5</b></td>
+    <td>L15 (Upsample), L16 (Concat), L17 (C3k2), L18 (C3k2 aux), L19 (Conv main)</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Backbone repeats increased</b></td>
+    <td align="center"><b>2</b></td>
+    <td>L4: ×2→×3, L8: ×4→×5</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Head repeats increased</b></td>
+    <td align="center"><b>1</b></td>
+    <td>L28: ×2→×3</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Block type changed</b></td>
+    <td align="center"><b>1</b></td>
+    <td>L22: A2C2f→C3k2 (lighter at P3 scale)</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Channel widths adjusted</b></td>
+    <td align="center"><b>2</b></td>
+    <td>L20: 256→128, L23: 512→256 (to accommodate P2 scale)</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Detection heads added</b></td>
+    <td align="center"><b>2</b></td>
+    <td>Aux P2 (L18) + Main P2 (L19) at stride 4</td>
+  </tr>
+  <tr>
+    <td align="center">🔶 <b>Width scale changed</b></td>
+    <td align="center"><b>1</b></td>
+    <td>0.25→0.50 (doubles effective channel widths across entire network)</td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>⚡ Impact Comparison: Original vs Arch-6</b></summary>
+
+<br>
+
+<table>
+  <tr>
+    <th align="left">Metric</th>
+    <th align="center">Original YOLOv12s</th>
+    <th align="center">Arch-6 ★</th>
+    <th align="left">Impact</th>
+  </tr>
+  <tr>
+    <td><b>Detection heads</b></td>
+    <td align="center">3 (P3, P4, P5)</td>
+    <td align="center"><b>5 (P2×2, P3, P4, P5)</b></td>
+    <td>+2 heads at stride 4 for small-object coverage</td>
+  </tr>
+  <tr>
+    <td><b>Smallest stride</b></td>
+    <td align="center">8 (P3)</td>
+    <td align="center"><b>4 (P2)</b></td>
+    <td>2× higher resolution detection — catches objects missed at stride 8</td>
+  </tr>
+  <tr>
+    <td><b>Feature map at finest head</b></td>
+    <td align="center">80×80</td>
+    <td align="center"><b>160×160</b></td>
+    <td>4× more spatial anchors at the finest scale</td>
+  </tr>
+  <tr>
+    <td><b>Backbone depth</b></td>
+    <td align="center">×2/×2/×4/×4</td>
+    <td align="center"><b>×2/×3/×4/×5</b></td>
+    <td>Deeper P3 and P5 for richer features</td>
+  </tr>
+  <tr>
+    <td><b>Auxiliary supervision</b></td>
+    <td align="center">None</td>
+    <td align="center"><b>L18 dead-end to Detect</b></td>
+    <td>Extra gradient signal forces stronger P2 features during training</td>
+  </tr>
+  <tr>
+    <td><b>Width multiplier</b></td>
+    <td align="center">0.25</td>
+    <td align="center"><b>0.50</b></td>
+    <td>2× wider channels — more representational capacity everywhere</td>
+  </tr>
+  <tr>
+    <td><b>Neck fusion depth</b></td>
+    <td align="center">P5→P3 (2 upsample steps)</td>
+    <td align="center"><b>P5→P2 (3 upsample steps)</b></td>
+    <td>One extra fusion level brings semantic info to highest resolution</td>
+  </tr>
+  <tr>
+    <td><b>Compute cost</b></td>
+    <td align="center">Lower</td>
+    <td align="center">Higher</td>
+    <td>Trade-off: more compute for significantly better small-object detection</td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>🔍 Why Arch-6 Won</b></summary>
+
+<br>
 
 | Aspect | Explanation |
 |--------|-------------|
@@ -1673,13 +2028,133 @@ We designed **20 architectural variants** exploring different strategies for imp
 | 📐 **Width Scaling** | The 0.50 width scale gives the model enough capacity to learn discriminative features without excessive compute |
 | ⚖️ **Balanced Design** | Unlike deeper variants (Arch-4) or wider P2 variants (Arch-19), Arch-6 balances depth, width, and auxiliary branching |
 | 🏗️ **C3k2 in Bottom-up** | Using C3k2 instead of A2C2f in the bottom-up path reduces attention overhead at higher resolution while maintaining performance |
+| 🔀 **Auxiliary Supervision** | The dead-end L18 branch forces the network to develop strong P2 features during training, acting as a regularizer |
+| 📏 **Resolution Coverage** | Stride-4 detection at 160×160 provides 4× more spatial positions than P3 (80×80), crucial for detecting small weapons |
+
+</details>
 
 </details>
 
 ---
 
 <details>
-<summary><b>📌 5. Key Takeaways</b></summary>
+<summary><b>📖 5. Architecture Legend & Terminology</b></summary>
+
+<br>
+
+<details>
+<summary><b>🔧 Operations</b></summary>
+
+<br>
+
+| Item | Meaning |
+|------|---------|
+| **Conv** | Standard Convolution + BatchNorm + SiLU activation. Used for downsampling (stride 2) or channel projection (stride 1). Learnable filter that extracts local features. |
+| **C3k2** | Cross-Stage Partial Bottleneck with 2 Convolutions. Lightweight block that splits input channels, processes one half through bottleneck convolutions, then concatenates both halves. Efficient and fast. |
+| **A2C2f** | Area-Attention Cross-stage 2-conv Fusion. Advanced block with built-in multi-head area attention that captures long-range spatial dependencies. Heavier than C3k2 but more powerful. |
+| **Upsample** | Nearest Neighbor Upsampling. Doubles spatial resolution (H×2, W×2) without learnable parameters. Used in top-down path to match feature map sizes. |
+| **Concat [1]** | Channel-wise Concatenation along dim=1. Joins two or more feature maps by stacking their channels. Spatial dimensions must match. No learnable parameters. |
+| **Detect** | Final Detection Head. Takes multi-scale feature maps and outputs bounding box coordinates + class probability scores. |
+
+</details>
+
+<details>
+<summary><b>📐 Parameters</b></summary>
+
+<br>
+
+| Item | Meaning |
+|------|---------|
+| **[channels]** | Output channel count after the operation. Example: `[512]` → 512 output channels. |
+| **[ch, kernel, stride]** | Conv specification. Example: `[128, 3, 2]` → 128 channels, 3×3 kernel, stride 2 (halves resolution). |
+| **[ch, k, s, pad, groups]** | Extended Conv specification with padding and grouped convolution. Example: `[128, 3, 2, 1, 2]` → 2-group conv. |
+| **True / False** | Kernel size toggle. `True` = full 3×3 kernels (stronger, heavier). `False` = compact 1×1 mix (lighter, faster). |
+| **0.25** | Bottleneck width ratio (C3k2 only). 0.25 = only 25% of channels pass through the bottleneck path. |
+| **4 / 1** | Number of area-attention heads (A2C2f only). `4` = 4-head attention at P4. `1` = single-head at P5. |
+| **-1** | Attention disabled (A2C2f only). Used in neck/head for lightweight fusion mode without attention overhead. |
+| **×N** | Number of sequential block repeats. Example: `×3` = the block is stacked 3 times in series. |
+| **[None, 2, "nearest"]** | Upsample config: scale factor 2, nearest interpolation (no smoothing). |
+| **nc** | Number of object classes. `nc=4` → 4 detection categories. |
+
+</details>
+
+<details>
+<summary><b>🏛️ Architecture Sections</b></summary>
+
+<br>
+
+| Section | Layers | Description |
+|---------|--------|-------------|
+| **BACKBONE** | L0–L8 | Feature Extraction. Progressively downsamples the input image across 5 scales (P1→P5). Uses Conv for downsampling, C3k2 at early stages, A2C2f with attention at deep stages. |
+| **NECK** | L9–L19 | Top-Down Fusion (FPN). Upsamples deep features and fuses them with backbone skip connections, propagating rich semantic information from P5 down to P2. Contains the auxiliary split at L18/L19. |
+| **HEAD** | L20–L28 + Detect | Bottom-Up Fusion (PAN) + Detection. Downsamples fused features back from P2 to P5, re-fusing with neck outputs. Feeds 5 multi-scale outputs into the Detect layer. |
+
+</details>
+
+<details>
+<summary><b>🟦🟧 New & Modified Layers</b></summary>
+
+<br>
+
+| Category | Item | Meaning |
+|----------|------|---------|
+| 🟦 **P2 Head** | L15, L16, L17 | Added to original YOLOv12s. Upsample + Concat + C3k2 that extends detection down to stride 4 for small-object coverage. Present in all P2 architectures. |
+| 🟧 **Auxiliary Split** | L18, L19 | Exclusive to Arch-6. L17 forks into two parallel branches: L18 (C3k2 True → Detect directly) provides auxiliary supervision, L19 (Conv stride 1) continues into bottom-up PAN path. |
+
+</details>
+
+<details>
+<summary><b>🔗 Concat Labels</b></summary>
+
+<br>
+
+| Label | Layer | Description |
+|-------|-------|-------------|
+| (P5 upsampled + P4 backbone) | L10 | Upsampled P5 features concatenated with P4 skip from backbone (L6). |
+| (P4 upsampled + P3 backbone) | L13 | Upsampled P4 features concatenated with P3 skip from backbone (L4). |
+| (P3 upsampled + P2 backbone) | L16 | Upsampled P3 features concatenated with P2 skip from backbone (L2). |
+| (P2 downsampled + P3 neck) | L21 | Main P2 branch downsampled and concatenated with P3 from neck (L14). |
+| (P3 downsampled + P4 neck) | L24 | P3 downsampled and concatenated with P4 from neck (L11). |
+| (P4 downsampled + P5 backbone) | L27 | P4 downsampled and concatenated with P5 from backbone (L8). |
+
+</details>
+
+<details>
+<summary><b>📏 Stride / Resolution Map</b></summary>
+
+<br>
+
+| Stride | Scale | Resolution <sub>(640×640 input)</sub> | Usage |
+|--------|-------|---------------------------------------|-------|
+| 2 | P1 | 320 × 320 | Initial downsampled features |
+| **4** | **P2** | **160 × 160** | **Highest-resolution detection (very small objects)** ★ |
+| 8 | P3 | 80 × 80 | Small object detection |
+| 16 | P4 | 40 × 40 | Medium object detection |
+| 32 | P5 | 20 × 20 | Large object detection |
+
+</details>
+
+<details>
+<summary><b>🎯 Detect Outputs</b></summary>
+
+<br>
+
+| Output | Layer | Stride | Description |
+|--------|-------|--------|-------------|
+| 🟧 **Aux P2** | L18 | 4 | Auxiliary head at stride 4. Dead-end branch providing extra supervision at highest resolution. |
+| 🟧 **Main P2** | L19 | 4 | Main P2 head at stride 4. Also feeds into bottom-up path before reaching Detect. |
+| 🔷 **P3** | L22 | 8 | P3 head at stride 8. |
+| 🔷 **P4** | L25 | 16 | P4 head at stride 16. |
+| 🔷 **P5** | L28 | 32 | P5 head at stride 32. |
+
+</details>
+
+</details>
+
+---
+
+<details>
+<summary><b>📌 6. Key Takeaways</b></summary>
 
 <br>
 
@@ -1695,5 +2170,6 @@ We designed **20 architectural variants** exploring different strategies for imp
 - 🧪 **20 experiments** × ~1.2h = **~24 hours** of architecture search
 
 </details>
+
 
 </details>
