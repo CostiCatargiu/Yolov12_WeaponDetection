@@ -1,0 +1,1054 @@
+# ============================================================
+# ALL 21 ARCHITECTURES
+# ============================================================
+
+# ---------------------------------------------------------------
+# Arch-1: P2 Head Light
+# Lightweight 4-head detector with reduced backbone repeats
+# for faster inference at the cost of some accuracy.
+# ---------------------------------------------------------------
+ARCH_1 = """# Arch-1: P2 Head Light — 4 det heads, fewer backbone repeats
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 1, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 3, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 3, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 1, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 1, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 1, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 1, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 1, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 2, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-2: BiFPN-style Neck
+# Replaces all A2C2f blocks in the neck with C3k2 blocks,
+# mimicking the efficient weighted feature fusion of BiFPN.
+# ---------------------------------------------------------------
+ARCH_2 = """# Arch-2: BiFPN-style Neck — 4 det heads, C3k2 neck blocks
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-3: P6 Extra Head
+# Extends the standard 4-head design with a 5th detection head
+# at stride 64 (P6) for improved large-object detection.
+# ---------------------------------------------------------------
+ARCH_3 = """# Arch-3: P6 Extra Head — 5 det heads including stride-64
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 2, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-4: Deeper Backbone
+# Increases the number of repeats at every backbone stage
+# for richer feature extraction at the cost of speed.
+# ---------------------------------------------------------------
+ARCH_4 = """# Arch-4: Deeper Backbone — 4 det heads, increased repeats throughout
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 3, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 5, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 6, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 7, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 3, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 4, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-5: Standard P2 Head
+# Baseline 4-head architecture with P2/P3/P4/P5 detection
+# heads. A2C2f attention in the backbone, C3k2 at P2.
+# ---------------------------------------------------------------
+ARCH_5 = """# Arch-5: Standard P2 Head — 4 det heads, baseline design
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-6: P2 Auxiliary ★ BEST
+# 5-head design with a dedicated auxiliary detection branch
+# at P2. The aux branch uses C3k2+Conv and feeds its own
+# head to the Detect layer alongside the main P2 output.
+# ---------------------------------------------------------------
+ARCH_6 = """# Arch-6: P2 Auxiliary ★ BEST — 5 det heads, dedicated aux at P2
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-7: P2 Deeper Auxiliary
+# Same auxiliary concept as Arch-6 but with doubled C3k2
+# repeats in the aux branch for stronger P2 representations.
+# ---------------------------------------------------------------
+ARCH_7 = """# Arch-7: P2 Deeper Auxiliary — 5 det heads, 2x C3k2 in aux branch
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 2, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-8: Auxiliary at P3
+# Moves the auxiliary detection branch from P2 up to P3,
+# testing whether mid-resolution auxiliary supervision
+# is more beneficial than high-resolution.
+# ---------------------------------------------------------------
+ARCH_8 = """# Arch-8: Auxiliary at P3 — 5 det heads, aux branch at stride-8
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, C3k2, [256, True]]
+  - [14, 1, Conv, [256, 3, 1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 16], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[15, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-9: Auxiliary + BiFPN Neck
+# Combines the P2 auxiliary branch (Arch-6 style) with a
+# BiFPN-style neck where all neck fusion blocks use C3k2
+# instead of A2C2f.
+# ---------------------------------------------------------------
+ARCH_9 = """# Arch-9: Auxiliary + BiFPN Neck — 5 det heads, C3k2 throughout neck
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-10: Auxiliary + Residual P2
+# Adds a 1x1 Conv channel-alignment layer before the P2
+# auxiliary split, enabling cleaner residual-style information
+# flow through the high-resolution branch.
+# ---------------------------------------------------------------
+ARCH_10 = """# Arch-10: Auxiliary + Residual P2 — 5 det heads, 1x1 alignment before aux
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+  - [-1, 1, Conv, [128, 1, 1]]
+
+  - [-1, 1, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[19, 20, 23, 26, 29], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-11: Auxiliary + MultiScale P2
+# Stacks two sequential C3k2 blocks at P2 before the
+# auxiliary split, processing features at multiple effective
+# receptive fields before detection.
+# ---------------------------------------------------------------
+ARCH_11 = """# Arch-11: Auxiliary + MultiScale P2 — 5 det heads, 2x C3k2 before aux
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 1, C3k2, [128, False, 0.25]]
+  - [-1, 1, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, C3k2, [128, True]]
+  - [18, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[19, 20, 23, 26, 29], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-12: Deeper P2 Branch
+# Uses 3 repeated C3k2 blocks (with full kernel) at the P2
+# level for maximum small-object feature refinement.
+# ---------------------------------------------------------------
+ARCH_12 = """# Arch-12: Deeper P2 Branch — 4 det heads, 3x C3k2(True) at P2
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 3, C3k2, [128, True]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-13: Wider P2 Branch
+# Increases P2 channel width from 128 to 192, giving the
+# highest-resolution head more representational capacity.
+# ---------------------------------------------------------------
+ARCH_13 = """# Arch-13: Wider P2 Branch — 4 det heads, 192 channels at P2
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [192, False, 0.25]]
+
+  - [-1, 1, Conv, [192, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-14: Deeper P3 Branch
+# Adds an extra A2C2f repeat at both P3 stages (top-down and
+# bottom-up) to strengthen mid-scale feature fusion.
+# ---------------------------------------------------------------
+ARCH_14 = """# Arch-14: Deeper P3 Branch — 4 det heads, 3x A2C2f at P3 stages
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 3, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-15: A2C2f Attention at P2
+# Replaces the lightweight C3k2 at P2 with an A2C2f block,
+# bringing area-attention to the highest-resolution head
+# for better small-object discrimination.
+# ---------------------------------------------------------------
+ARCH_15 = """# Arch-15: A2C2f at P2 — 4 det heads, attention-based P2 processing
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [128, False, -1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-16: Balanced Auxiliary
+# Arch-6 variant that replaces C3k2 neck blocks with A2C2f
+# for uniform attention-based processing across all scales
+# in the bottom-up path.
+# ---------------------------------------------------------------
+ARCH_16 = """# Arch-16: Balanced Auxiliary — 5 det heads, A2C2f in bottom-up path
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-17: Deeper Auxiliary Branch
+# 3 repeated C3k2 blocks in the auxiliary branch for
+# maximum auxiliary head capacity and feature depth.
+# ---------------------------------------------------------------
+ARCH_17 = """# Arch-17: Deeper Aux Branch — 5 det heads, 3x C3k2 in auxiliary
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 3, C3k2, [128, True]]
+  - [17, 1, Conv, [128, 3, 1]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-18: Wider Auxiliary Branch
+# Increases auxiliary branch channels from 128 to 192,
+# giving the aux head more capacity while keeping the
+# main P2 head at standard width.
+# ---------------------------------------------------------------
+ARCH_18 = """# Arch-18: Wider Aux Branch — 5 det heads, 192-channel auxiliary
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 2, C3k2, [192, True]]
+  - [17, 1, Conv, [192, 3, 1]]
+
+  - [-1, 1, Conv, [192, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-19: Wide P2 with A2C2f Attention
+# Uses 256-channel A2C2f attention at P2 with a Conv
+# projection after concat, providing the richest feature
+# representation at the highest resolution. Reduced backbone
+# P5 repeats (4 instead of 5) to balance compute.
+# ---------------------------------------------------------------
+ARCH_19 = """# Arch-19: Wide P2 A2C2f — 4 det heads, 256ch attention-based P2
+nc: 4
+scales:
+  n: [0.50, 0.50, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 2, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 4, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2], 1, Concat, [1]]
+  - [-1, 1, Conv, [256, 3, 1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 2, C3k2, [1024, True]]
+
+  - [[18, 21, 24, 27], 1, Detect, [nc]]
+"""
+
+# ---------------------------------------------------------------
+# Arch-20: P2 Skip Connection
+# Adds a direct skip connection from the first backbone
+# Conv (stride-2) into the P2 fusion, enriching
+# high-resolution features with raw low-level information.
+# ---------------------------------------------------------------
+ARCH_20 = """# Arch-20: P2 Skip Connection — 4 det heads, backbone-to-P2 skip
+nc: 4
+scales:
+  n: [0.50, 0.25, 1024]
+
+backbone:
+  - [-1, 1, Conv, [64, 3, 2]]
+  - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+  - [-1, 2, C3k2, [256, False, 0.25]]
+  - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+  - [-1, 3, C3k2, [512, False, 0.25]]
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [-1, 4, A2C2f, [512, True, 4]]
+  - [-1, 1, Conv, [1024, 3, 2]]
+  - [-1, 5, A2C2f, [1024, True, 1]]
+
+head:
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 6], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 4], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [[-1, 2, 0], 1, Concat, [1]]
+  - [-1, 2, C3k2, [128, False, 0.25]]
+
+  - [-1, 1, Conv, [128, 3, 2]]
+  - [[-1, 14], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [256, False, -1]]
+
+  - [-1, 1, Conv, [256, 3, 2]]
+  - [[-1, 11], 1, Concat, [1]]
+  - [-1, 2, A2C2f, [512, False, -1]]
+
+  - [-1, 1, Conv, [512, 3, 2]]
+  - [[-1, 8], 1, Concat, [1]]
+  - [-1, 3, C3k2, [1024, True]]
+
+  - [[17, 20, 23, 26], 1, Detect, [nc]]
+"""
+
+
+# ============================================================
+# ARCHITECTURE LOOKUP TABLE
+# ============================================================
+ARCHITECTURE_TABLE = {
+    "Arch-1":  {"yaml": ARCH_1,  "description": "Lightweight 4-head with reduced backbone repeats for faster inference"},
+    "Arch-2":  {"yaml": ARCH_2,  "description": "BiFPN-style neck using C3k2 blocks instead of A2C2f in all fusion stages"},
+    "Arch-3":  {"yaml": ARCH_3,  "description": "5-head design with extra P6 stride-64 head for large-object detection"},
+    "Arch-4":  {"yaml": ARCH_4,  "description": "Deeper backbone and neck with increased repeats at every stage"},
+    "Arch-5":  {"yaml": ARCH_5,  "description": "Standard 4-head P2 baseline with A2C2f backbone and C3k2 at P2"},
+    "Arch-6":  {"yaml": ARCH_6,  "description": "★ BEST — 5-head with dedicated P2 auxiliary branch (C3k2 + Conv)"},
+    "Arch-7":  {"yaml": ARCH_7,  "description": "5-head with deeper P2 auxiliary branch (2x C3k2 repeats in aux)"},
+    "Arch-8":  {"yaml": ARCH_8,  "description": "5-head with auxiliary branch shifted to P3 instead of P2"},
+    "Arch-9":  {"yaml": ARCH_9,  "description": "5-head combining P2 auxiliary with BiFPN-style C3k2 neck"},
+    "Arch-10": {"yaml": ARCH_10, "description": "5-head with 1x1 Conv channel alignment enabling residual flow at P2"},
+    "Arch-11": {"yaml": ARCH_11, "description": "5-head with two sequential C3k2 blocks before aux split (multi-scale P2)"},
+    "Arch-12": {"yaml": ARCH_12, "description": "4-head with 3x C3k2(True) at P2 for deep small-object refinement"},
+    "Arch-13": {"yaml": ARCH_13, "description": "4-head with wider P2 channels (192 instead of 128)"},
+    "Arch-14": {"yaml": ARCH_14, "description": "4-head with deeper P3 stages (3x A2C2f in both top-down and bottom-up)"},
+    "Arch-15": {"yaml": ARCH_15, "description": "4-head with A2C2f attention replacing C3k2 at P2"},
+    "Arch-16": {"yaml": ARCH_16, "description": "5-head auxiliary with A2C2f in bottom-up path for balanced attention"},
+    "Arch-17": {"yaml": ARCH_17, "description": "5-head with 3x C3k2 in auxiliary branch for maximum aux capacity"},
+    "Arch-18": {"yaml": ARCH_18, "description": "5-head with wider 192-channel auxiliary branch"},
+    "Arch-19": {"yaml": ARCH_19, "description": "4-head with 256ch A2C2f attention at P2 and Conv projection after concat"},
+    "Arch-20": {"yaml": ARCH_20, "description": "4-head with direct skip connection from first backbone Conv to P2"},
+}
