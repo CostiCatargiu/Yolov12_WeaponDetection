@@ -2218,7 +2218,7 @@ After identifying the best architecture (**Arch-6 ★**) and best loss configura
 Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN1_RESULTS" alt="Arch-6 Default Loss Results" width="100%" />
+<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/46ee119c-24e1-421f-bc80-b54f81d9cc39" />
 </p>
 
 <table>
@@ -2343,7 +2343,7 @@ Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN2_RESULTS" alt="Arch-6 Custom Loss Results" width="100%" />
+<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/f6b87e8d-f3c2-440a-8072-b33e794c2e37" />
 </p>
 
 <table>
@@ -2466,7 +2466,7 @@ Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 ### 📉 Training Metrics Comparison
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_IMAGE_HASH" alt="YOLOv12s Ablation Study Training Metrics" width="100%" />
+<img width="1477" height="1125" alt="image" src="https://github.com/user-attachments/assets/c942bae4-310a-4e1c-ac0e-d9454872bcfb" />
 </p>
 
 <p align="center"><sub>Training curves for all 4 YOLOv12s configurations across 130 epochs. Solid lines = EMA smoothed, dotted lines = raw values, ★ = best value per model.</sub></p>
