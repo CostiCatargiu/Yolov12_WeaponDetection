@@ -38,13 +38,19 @@
   </tr>
 </table>
 
-<p align="center">
-  <img width="45%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/ba924428-fd9d-4064-9026-5842fad717d6" />
-  <img width="54%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/1b2bbd82-b34b-4eee-8b73-0b2f5a0d2632" />
-</p>
-<p align="center">
-  <sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★) — 5-head detection with auxiliary P2 branch &nbsp;&nbsp;|&nbsp;&nbsp; 📈 Training metrics — Baseline vs Custom Loss vs Custom Arch vs Combined</sub>
-</p>
+<table>
+  <tr>
+    <td align="center" width="45%">
+      <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/ba924428-fd9d-4064-9026-5842fad717d6" />
+      <br><sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★)<br>5-head detection with auxiliary P2 branch at stride 4</sub>
+    </td>
+    <td align="center" width="55%">
+      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/1b2bbd82-b34b-4eee-8b73-0b2f5a0d2632" />
+      <br><sub>📈 Training metrics — Baseline vs Custom Loss vs Custom Arch vs Combined</sub>
+    </td>
+  </tr>
+</table>
+
 
 
 <table>
