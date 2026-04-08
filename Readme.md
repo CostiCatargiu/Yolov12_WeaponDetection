@@ -829,10 +829,10 @@ pretrained: yolov12s.pt                # Pre-trained weights
 # ───────────────────────────────────────────────────────────────
 # Training Schedule
 # ───────────────────────────────────────────────────────────────
-epochs: 120
+epochs: 70 or 100
 time: null
 patience: 20
-batch: 44
+batch: 64
 imgsz: 640
 close_mosaic: 15
 
