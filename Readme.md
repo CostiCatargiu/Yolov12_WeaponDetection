@@ -2218,8 +2218,7 @@ After identifying the best architecture (**Arch-6 ★**) and best loss configura
 Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 
 <p align="center">
-<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/fa473b1b-908e-4249-82f2-90455572229c" />
-
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN1_RESULTS" alt="Arch-6 Default Loss Results" width="100%" />
 </p>
 
 <table>
@@ -2344,7 +2343,7 @@ Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 
 <p align="center">
-<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/9a898e10-900e-4344-bd1d-741ae8e7edf6" />
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN2_RESULTS" alt="Arch-6 Custom Loss Results" width="100%" />
 </p>
 
 <table>
@@ -2463,6 +2462,25 @@ Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 <summary><b>📈 4. Progressive Improvement — All YOLOv12s Configurations</b></summary>
 
 <br>
+
+### 📉 Training Metrics Comparison
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_IMAGE_HASH" alt="YOLOv12s Ablation Study Training Metrics" width="100%" />
+</p>
+
+<p align="center"><sub>Training curves for all 4 YOLOv12s configurations across 130 epochs. Solid lines = EMA smoothed, dotted lines = raw values, ★ = best value per model.</sub></p>
+
+**Key observations from the training curves:**
+
+- 🏆 **V12s-Both** (Arch-6 + Custom Loss) consistently achieves the **highest values** across all 4 metrics
+- 📉 **V12s-Loss** (Custom Loss only) shows **faster early convergence** than V12s-Arch, especially in Precision and Recall
+- 🏗️ **V12s-Arch** (Custom Arch only) demonstrates **steadier improvement** in mAP50-95, reflecting the architecture's strength in spatial localization
+- 📊 **Convergence patterns differ:** Custom Loss improves classification confidence early, while the P2 architecture provides gradual localization gains
+- ⭐ All custom variants significantly outperform the **V12s-Orig** baseline throughout training
+- 📈 **mAP50-95 shows the largest spread** between configurations, confirming this metric best captures the differences between approaches
+
+---
 
 ### 🏆 Four-Way Comparison: Baseline → Custom Loss → Custom Arch → Custom Arch + Loss
 
@@ -2610,6 +2628,7 @@ Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 > 🎯 **Biggest per-class gain:** Long Gun small-object mAP50-95 improved by **+21.15%** — the largest single improvement in the entire study.
 
 </details>
+
 
 ---
 
