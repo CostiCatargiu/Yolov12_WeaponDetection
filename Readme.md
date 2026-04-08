@@ -803,20 +803,183 @@ tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
 
 <br>
 
-### 🔬 Default Configuration (All Phases Disabled)
+### 🔬 Full Training Configuration
 
-To reproduce the ablation experiments, start with this baseline where all custom phases are disabled:
+The complete YAML configuration used for all experiments, including default Ultralytics parameters and our custom loss additions.
+
+<details>
+<summary><b>📋 Click to expand full default YAML (all parameters)</b></summary>
+
+<br>
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# 🔬 Ablation Study - Default Configuration (Baseline)
+# 📋 Complete Training Configuration
 # ═══════════════════════════════════════════════════════════════
 
-# Training Settings
-epochs: 70
-batch: 64
+# ───────────────────────────────────────────────────────────────
+# Core Settings
+# ───────────────────────────────────────────────────────────────
+task: detect
+mode: train
+model: yolov12.yaml                    # Architecture definition
+data: data.yaml                        # Dataset configuration
+pretrained: yolov12s.pt                # Pre-trained weights
+
+# ───────────────────────────────────────────────────────────────
+# Training Schedule
+# ───────────────────────────────────────────────────────────────
+epochs: 120
+time: null
+patience: 20
+batch: 44
 imgsz: 640
-dataset: "weapon_dataset_17pct"  # 17% subset for grid search
+close_mosaic: 15
+
+# ───────────────────────────────────────────────────────────────
+# Optimizer
+# ───────────────────────────────────────────────────────────────
+optimizer: auto
+lr0: 0.01
+lrf: 0.01
+momentum: 0.937
+weight_decay: 0.0005
+warmup_epochs: 3.0
+warmup_momentum: 0.8
+warmup_bias_lr: 0.0
+cos_lr: false
+nbs: 64
+
+# ───────────────────────────────────────────────────────────────
+# Loss Weights (Ultralytics Defaults)
+# ───────────────────────────────────────────────────────────────
+box: 7.5
+cls: 0.5
+dfl: 1.5
+pose: 12.0
+kobj: 1.0
+
+# ───────────────────────────────────────────────────────────────
+# Data Augmentation
+# ───────────────────────────────────────────────────────────────
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 0.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+perspective: 0.0
+flipud: 0.0
+fliplr: 0.5
+bgr: 0.0
+mosaic: 1.0
+mixup: 0.0
+copy_paste: 0.1
+copy_paste_mode: flip
+auto_augment: randaugment
+erasing: 0.4
+crop_fraction: 1.0
+
+# ───────────────────────────────────────────────────────────────
+# Validation & Inference
+# ───────────────────────────────────────────────────────────────
+val: true
+split: val
+conf: null
+iou: 0.7
+max_det: 300
+half: false
+agnostic_nms: false
+
+# ───────────────────────────────────────────────────────────────
+# General Settings
+# ───────────────────────────────────────────────────────────────
+save: true
+save_period: -1
+cache: false
+device: null
+workers: 8
+project: null
+name: null
+exist_ok: false
+verbose: true
+seed: 0
+deterministic: true
+single_cls: false
+rect: false
+resume: false
+amp: true
+fraction: 1.0
+profile: false
+freeze: null
+multi_scale: false
+overlap_mask: true
+mask_ratio: 4
+dropout: 0.0
+
+# ───────────────────────────────────────────────────────────────
+# Output & Visualization
+# ───────────────────────────────────────────────────────────────
+plots: true
+save_json: false
+save_hybrid: false
+save_txt: false
+save_conf: false
+save_crop: false
+save_frames: false
+show: false
+show_labels: true
+show_conf: true
+show_boxes: true
+line_width: null
+visualize: false
+
+# ───────────────────────────────────────────────────────────────
+# Export Settings
+# ───────────────────────────────────────────────────────────────
+format: torchscript
+keras: false
+optimize: false
+int8: false
+dynamic: false
+simplify: true
+opset: null
+workspace: null
+nms: false
+
+# ───────────────────────────────────────────────────────────────
+# Misc
+# ───────────────────────────────────────────────────────────────
+source: null
+vid_stride: 1
+stream_buffer: false
+augment: false
+classes: null
+retina_masks: false
+embed: null
+cfg: null
+tracker: botsort.yaml
+</pre>
+
+</details>
+
+---
+
+### 🚫 Ablation Baseline — Custom Loss Phases Disabled
+
+For grid search experiments, we used a **17% subset** with **70 epochs** and all custom loss phases **disabled**:
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🔬 Ablation Study - Custom Loss Defaults (All Phases Disabled)
+# ═══════════════════════════════════════════════════════════════
+# 📌 Uses all Ultralytics defaults above, with these overrides:
+
+# Training Overrides (Ablation)
+epochs: 70                         # Reduced for faster iteration
+batch: 64                         # Increased for ablation
+dataset: "weapon_dataset_17pct"   # 17% stratified subset
 
 # ───────────────────────────────────────────────────────────────
 # Phase A1: Alpha Scheduling (DISABLED)
@@ -857,14 +1020,13 @@ tal_beta: 6.0
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# 🏆 YOLOv12s — Best Configuration
+# 🏆 YOLOv12s — Best Configuration (Final Training)
 # ═══════════════════════════════════════════════════════════════
+# 📌 Uses all Ultralytics defaults above, with these overrides:
 
-# Training Settings
-epochs: 100
-batch: 64
-imgsz: 640
-dataset: "weapon_dataset_full"  # 100% dataset for final training
+# Training Overrides (Final)
+epochs: 100                        # Full training
+dataset: "weapon_dataset_full"     # 100% dataset
 
 # ───────────────────────────────────────────────────────────────
 # Phase A1: Alpha Scheduling ✅ ENABLED
@@ -907,14 +1069,13 @@ tal_beta: 7               # Increased from default 6.0
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# 🏆 YOLO26s — Best Configuration
+# 🏆 YOLO26s — Best Configuration (Final Training)
 # ═══════════════════════════════════════════════════════════════
+# 📌 Uses all Ultralytics defaults above, with these overrides:
 
-# Training Settings
-epochs: 100
-batch: 64
-imgsz: 640
-dataset: "weapon_dataset_full"  # 100% dataset for final training
+# Training Overrides (Final)
+epochs: 100                        # Full training
+dataset: "weapon_dataset_full"     # 100% dataset
 
 # ───────────────────────────────────────────────────────────────
 # Phase A1: Alpha Scheduling ✅ ENABLED
@@ -960,6 +1121,44 @@ tal_beta: 6.0             # Default value
     <th align="center">🚫 Default<br><sub>(Disabled)</sub></th>
     <th align="center">🔷 YOLOv12s<br><sub>(Best)</sub></th>
     <th align="center">🔶 YOLO26s<br><sub>(Best)</sub></th>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Training Settings</b></td></tr>
+  <tr>
+    <td><code>epochs</code></td>
+    <td align="center">70 <sub>(ablation)</sub></td>
+    <td align="center"><b>100</b></td>
+    <td align="center"><b>100</b></td>
+  </tr>
+  <tr>
+    <td><code>batch</code></td>
+    <td align="center">64 <sub>(ablation)</sub></td>
+    <td align="center">44</td>
+    <td align="center">44</td>
+  </tr>
+  <tr>
+    <td><code>dataset</code></td>
+    <td align="center">17% subset</td>
+    <td align="center"><b>100% full</b></td>
+    <td align="center"><b>100% full</b></td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Ultralytics Loss Weights</b></td></tr>
+  <tr>
+    <td><code>box</code></td>
+    <td align="center">7.5</td>
+    <td align="center">7.5</td>
+    <td align="center">7.5</td>
+  </tr>
+  <tr>
+    <td><code>cls</code></td>
+    <td align="center">0.5</td>
+    <td align="center">0.5</td>
+    <td align="center">0.5</td>
+  </tr>
+  <tr>
+    <td><code>dfl</code></td>
+    <td align="center">1.5</td>
+    <td align="center">1.5</td>
+    <td align="center"><sub>N/A</sub></td>
   </tr>
   <tr><td colspan="4" align="center"><b>Phase A1: Alpha Scheduling</b></td></tr>
   <tr>
@@ -1038,22 +1237,74 @@ tal_beta: 6.0             # Default value
     <td align="center"><b>7</b></td>
     <td align="center">6.0 (default)</td>
   </tr>
-  <tr><td colspan="4" align="center"><b>Training Settings</b></td></tr>
+  <tr><td colspan="4" align="center"><b>Key Ultralytics Defaults (unchanged)</b></td></tr>
   <tr>
-    <td><code>epochs</code></td>
-    <td align="center">70</td>
-    <td align="center"><b>100</b></td>
-    <td align="center"><b>100</b></td>
+    <td><code>optimizer</code></td>
+    <td align="center" colspan="3">auto</td>
   </tr>
   <tr>
-    <td><code>dataset</code></td>
-    <td align="center">17% subset</td>
-    <td align="center"><b>100% full</b></td>
-    <td align="center"><b>100% full</b></td>
+    <td><code>lr0</code></td>
+    <td align="center" colspan="3">0.01</td>
+  </tr>
+  <tr>
+    <td><code>lrf</code></td>
+    <td align="center" colspan="3">0.01</td>
+  </tr>
+  <tr>
+    <td><code>momentum</code></td>
+    <td align="center" colspan="3">0.937</td>
+  </tr>
+  <tr>
+    <td><code>weight_decay</code></td>
+    <td align="center" colspan="3">0.0005</td>
+  </tr>
+  <tr>
+    <td><code>warmup_epochs</code></td>
+    <td align="center" colspan="3">3.0</td>
+  </tr>
+  <tr>
+    <td><code>patience</code></td>
+    <td align="center" colspan="3">20</td>
+  </tr>
+  <tr>
+    <td><code>close_mosaic</code></td>
+    <td align="center" colspan="3">15</td>
+  </tr>
+  <tr>
+    <td><code>copy_paste</code></td>
+    <td align="center" colspan="3">0.1</td>
+  </tr>
+  <tr>
+    <td><code>mosaic</code></td>
+    <td align="center" colspan="3">1.0</td>
+  </tr>
+  <tr>
+    <td><code>erasing</code></td>
+    <td align="center" colspan="3">0.4</td>
+  </tr>
+  <tr>
+    <td><code>iou</code> <sub>(NMS)</sub></td>
+    <td align="center" colspan="3">0.7</td>
+  </tr>
+  <tr>
+    <td><code>imgsz</code></td>
+    <td align="center" colspan="3">640</td>
+  </tr>
+  <tr>
+    <td><code>seed</code></td>
+    <td align="center" colspan="3">0</td>
+  </tr>
+  <tr>
+    <td><code>deterministic</code></td>
+    <td align="center" colspan="3">true</td>
+  </tr>
+  <tr>
+    <td><code>amp</code></td>
+    <td align="center" colspan="3">true</td>
   </tr>
 </table>
 
-> ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters.
+> ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters. All other parameters follow Ultralytics defaults — see the expandable full YAML above for the complete list.
 
 </details>
 
