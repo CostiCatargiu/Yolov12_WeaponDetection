@@ -803,11 +803,13 @@ tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
 
 <br>
 
-To reproduce the ablation experiments, use the following default configuration:
+### 🔬 Default Configuration (All Phases Disabled)
+
+To reproduce the ablation experiments, start with this baseline where all custom phases are disabled:
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# 🔬 Ablation Study - Default Configuration
+# 🔬 Ablation Study - Default Configuration (Baseline)
 # ═══════════════════════════════════════════════════════════════
 
 # Training Settings
@@ -849,9 +851,212 @@ tal_beta: 6.0
 
 > 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
 
+---
+
+### 🏆 Best Configuration — YOLOv12s (A1 + A2 + A3.1 + A4)
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🏆 YOLOv12s — Best Configuration
+# ═══════════════════════════════════════════════════════════════
+
+# Training Settings
+epochs: 100
+batch: 64
+imgsz: 640
+dataset: "weapon_dataset_full"  # 100% dataset for final training
+
+# ───────────────────────────────────────────────────────────────
+# Phase A1: Alpha Scheduling ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+alpha_start: 0.9          # Start with strong area weighting
+alpha_end: 0.4            # Anneal to moderate weighting
+small_obj_boost: 1.0      # No additional boost
+small_obj_px: 32          # Small object threshold (pixels)
+
+# ───────────────────────────────────────────────────────────────
+# Phase A2: Center Loss ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+center_loss_weight_init: 0.05   # Initial center loss weight
+center_loss_weight_min: 0.01    # Minimum (decayed) weight
+center_loss_decay_epochs: 1     # Decay per epoch
+
+# ───────────────────────────────────────────────────────────────
+# Phase A3.1: IoU Clipping ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+iou_clip_start: 6         # Initial IoU loss clip threshold
+iou_clip_end: 2           # Final IoU loss clip threshold
+
+# ───────────────────────────────────────────────────────────────
+# Phase A3.2: DFL Clipping ❌ DISABLED
+# ───────────────────────────────────────────────────────────────
+dfl_clip_start: 100.0     # No clipping
+dfl_clip_end: 100.0       # No clipping
+
+# ───────────────────────────────────────────────────────────────
+# Phase A4: TAL Alpha-Beta ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+tal_topk: 20              # Increased from default 10
+tal_alpha: 1              # Increased from default 0.5
+tal_beta: 7               # Increased from default 6.0
+</pre>
+
+---
+
+### 🏆 Best Configuration — YOLO26s (A1 + A2 + A3.1)
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# 🏆 YOLO26s — Best Configuration
+# ═══════════════════════════════════════════════════════════════
+
+# Training Settings
+epochs: 100
+batch: 64
+imgsz: 640
+dataset: "weapon_dataset_full"  # 100% dataset for final training
+
+# ───────────────────────────────────────────────────────────────
+# Phase A1: Alpha Scheduling ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+alpha_start: 0.9          # Start with strong area weighting
+alpha_end: 0.4            # Anneal to moderate weighting
+small_obj_boost: 1.0      # No additional boost
+small_obj_px: 32          # Small object threshold (pixels)
+
+# ───────────────────────────────────────────────────────────────
+# Phase A2: Center Loss ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+center_loss_weight_init: 0.05   # Initial center loss weight
+center_loss_weight_min: 0.01    # Minimum (decayed) weight
+center_loss_decay_epochs: 1     # Decay per epoch
+
+# ───────────────────────────────────────────────────────────────
+# Phase A3.1: IoU Clipping ✅ ENABLED
+# ───────────────────────────────────────────────────────────────
+iou_clip_start: 6         # Initial IoU loss clip threshold
+iou_clip_end: 2           # Final IoU loss clip threshold
+
+# ───────────────────────────────────────────────────────────────
+# Phase A3.2: DFL Clipping ❌ NOT APPLICABLE
+# ───────────────────────────────────────────────────────────────
+# YOLO26s does not use DFL — this phase is skipped entirely
+
+# ───────────────────────────────────────────────────────────────
+# Phase A4: TAL Alpha-Beta ⬚ DEFAULT (not tuned)
+# ───────────────────────────────────────────────────────────────
+tal_topk: 10              # Default value
+tal_alpha: 0.5            # Default value
+tal_beta: 6.0             # Default value
+</pre>
+
+---
+
+### 📋 Quick Comparison Table
+
+<table>
+  <tr>
+    <th align="left">Parameter</th>
+    <th align="center">🚫 Default<br><sub>(Disabled)</sub></th>
+    <th align="center">🔷 YOLOv12s<br><sub>(Best)</sub></th>
+    <th align="center">🔶 YOLO26s<br><sub>(Best)</sub></th>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Phase A1: Alpha Scheduling</b></td></tr>
+  <tr>
+    <td><code>alpha_start</code></td>
+    <td align="center">1.0</td>
+    <td align="center"><b>0.9</b></td>
+    <td align="center"><b>0.9</b></td>
+  </tr>
+  <tr>
+    <td><code>alpha_end</code></td>
+    <td align="center">1.0</td>
+    <td align="center"><b>0.4</b></td>
+    <td align="center"><b>0.4</b></td>
+  </tr>
+  <tr>
+    <td><code>small_obj_px</code></td>
+    <td align="center">32</td>
+    <td align="center">32</td>
+    <td align="center">32</td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Phase A2: Center Loss</b></td></tr>
+  <tr>
+    <td><code>center_loss_weight_init</code></td>
+    <td align="center">0.0</td>
+    <td align="center"><b>0.05</b></td>
+    <td align="center"><b>0.05</b></td>
+  </tr>
+  <tr>
+    <td><code>center_loss_weight_min</code></td>
+    <td align="center">0.0</td>
+    <td align="center"><b>0.01</b></td>
+    <td align="center"><b>0.01</b></td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Phase A3.1: IoU Clipping</b></td></tr>
+  <tr>
+    <td><code>iou_clip_start</code></td>
+    <td align="center">100.0</td>
+    <td align="center"><b>6</b></td>
+    <td align="center"><b>6</b></td>
+  </tr>
+  <tr>
+    <td><code>iou_clip_end</code></td>
+    <td align="center">100.0</td>
+    <td align="center"><b>2</b></td>
+    <td align="center"><b>2</b></td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Phase A3.2: DFL Clipping</b></td></tr>
+  <tr>
+    <td><code>dfl_clip_start</code></td>
+    <td align="center">100.0</td>
+    <td align="center">100.0 (off)</td>
+    <td align="center"><sub>N/A</sub></td>
+  </tr>
+  <tr>
+    <td><code>dfl_clip_end</code></td>
+    <td align="center">100.0</td>
+    <td align="center">100.0 (off)</td>
+    <td align="center"><sub>N/A</sub></td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Phase A4: TAL Alpha-Beta</b></td></tr>
+  <tr>
+    <td><code>tal_topk</code></td>
+    <td align="center">10</td>
+    <td align="center"><b>20</b></td>
+    <td align="center">10 (default)</td>
+  </tr>
+  <tr>
+    <td><code>tal_alpha</code></td>
+    <td align="center">0.5</td>
+    <td align="center"><b>1</b></td>
+    <td align="center">0.5 (default)</td>
+  </tr>
+  <tr>
+    <td><code>tal_beta</code></td>
+    <td align="center">6.0</td>
+    <td align="center"><b>7</b></td>
+    <td align="center">6.0 (default)</td>
+  </tr>
+  <tr><td colspan="4" align="center"><b>Training Settings</b></td></tr>
+  <tr>
+    <td><code>epochs</code></td>
+    <td align="center">70</td>
+    <td align="center"><b>100</b></td>
+    <td align="center"><b>100</b></td>
+  </tr>
+  <tr>
+    <td><code>dataset</code></td>
+    <td align="center">17% subset</td>
+    <td align="center"><b>100% full</b></td>
+    <td align="center"><b>100% full</b></td>
+  </tr>
+</table>
+
 > ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters.
 
 </details>
+
 
 
 </details>
