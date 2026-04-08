@@ -449,7 +449,7 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 ## 🔬 Loss Function Ablation Study Results (YOLOv12s/YOLO26s)
 
 <details>
-<summary><b>⚙️ 1. Experimental Setup</b></summary>
+<summary><b>⚙️ 1</b></summary>
 
 <br>
 
@@ -1306,10 +1306,6 @@ tal_beta: 6.0             # Default value
 
 > ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters. All other parameters follow Ultralytics defaults — see the expandable full YAML above for the complete list.
 
-</details>
-
-## 🏗️ Architecture Ablation Study Results (YOLOv12s)
-
 <details>
 <summary><b>⚙️ 1. Experimental Setup</b></summary>
 
@@ -1318,17 +1314,21 @@ tal_beta: 6.0             # Default value
 | Setting | Value |
 |---------|-------|
 | 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
-| 🔄 **Epochs per Run** | **70 epochs** |
-| 📦 **Batch Size** | **64** |
+| 🔄 **Epochs per Run** | **130 epochs** |
+| 📦 **Batch Size** | **48–72** <sub>(varies by architecture size)</sub> |
 | 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Time per Run** | ~1.2 hours |
+| ⏱️ **Avg. Time per Run** | ~3.2 hours |
+| ⏱️ **Total Search Time** | ~64 hours <sub>(20 architectures × ~3.2h)</sub> |
 | 🔬 **Methodology** | Grid search across **20 architectural variants** |
 | 🏛️ **Base Architecture** | YOLOv12s (P3–P5 default, 3 detection heads) |
 | 🎯 **Goal** | Identify the best detection head configuration for small-object weapon detection |
 
 > 📌 All architecture experiments use the **default loss function** (no custom loss phases enabled) to isolate the effect of architectural changes.
 
+> ⚠️ **Batch size note:** Larger architectures (e.g., wider channels, more heads, deeper backbones) require more GPU memory. Batch size was adjusted per architecture to maximize GPU utilization while fitting within **24GB VRAM** (RTX 4090): smaller architectures used up to **72**, while the largest variants ran at **48**.
+
 </details>
+
 
 ---
 
