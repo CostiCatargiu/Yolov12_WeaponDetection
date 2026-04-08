@@ -40,6 +40,45 @@
 
 <table>
   <tr>
+    <th align="center">Phase</th>
+    <th align="center">🧪 Experiments</th>
+    <th align="center">⏱️ Time</th>
+    <th align="center">📊 Dataset</th>
+    <th align="center">Details</th>
+  </tr>
+  <tr>
+    <td align="center"><b>🔬 Loss Ablation</b><br><sub>YOLOv12s</sub></td>
+    <td align="center"><code>206</code></td>
+    <td align="center"><code>~247h</code></td>
+    <td align="center">17%</td>
+    <td align="center"><sub>180 grid search + 26 combinations</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><b>🏗️ Arch Ablation</b><br><sub>YOLOv12s</sub></td>
+    <td align="center"><code>20</code></td>
+    <td align="center"><code>~64h</code></td>
+    <td align="center">17%</td>
+    <td align="center"><sub>20 architecture variants</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><b>🔶 Loss Transfer</b><br><sub>YOLO26s</sub></td>
+    <td align="center"><code>15</code></td>
+    <td align="center"><code>~15h</code></td>
+    <td align="center">17%</td>
+    <td align="center"><sub>4 individual + 11 combinations</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><b>🏋️ Full Dataset</b><br><sub>Final Trainings</sub></td>
+    <td align="center"><code>6</code></td>
+    <td align="center"><code>~80h</code></td>
+    <td align="center">100%</td>
+    <td align="center"><sub>2 baselines + 2 custom loss + 2 custom arch</sub></td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
     <td align="center" width="45%">
       <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/ba924428-fd9d-4064-9026-5842fad717d6" />
       <br><sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★)<br>5-head detection with auxiliary P2 branch at stride 4</sub>
