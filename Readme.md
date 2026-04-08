@@ -1475,7 +1475,7 @@ We designed **20 architectural variants** exploring different strategies for imp
 ### 📈 All Architectures Performance Comparison
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_RESULTS_IMAGE_HASH" alt="Architecture Grid Search Results" width="100%" />
+<img width="1774" height="876" alt="image" src="https://github.com/user-attachments/assets/fd4ea33d-cc23-4bbd-8116-264fb739be78" />
 </p>
 
 ---
@@ -1577,7 +1577,7 @@ We designed **20 architectural variants** exploring different strategies for imp
 ### 🧬 Architecture Diagram
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_DIAGRAM_IMAGE_HASH" alt="Arch-6 Architecture Diagram" width="100%" />
+<img width="940" height="620" alt="image" src="https://github.com/user-attachments/assets/4af41ad9-9a55-4e45-ac2a-de177ccc89de" />
 </p>
 
 <p align="center"><sub>Arch-6 (P2 Auxiliary ★): 5-head detection architecture with auxiliary P2 branch at stride 4.<br>🟦 New P2 layers | 🟧 Auxiliary split branch | 🔶 Modified layers vs original YOLOv12s.</sub></p>
