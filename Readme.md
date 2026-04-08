@@ -2174,6 +2174,7 @@ We designed **20 architectural variants** exploring different strategies for imp
 - ⚡ **A2C2f at P2:** Using attention at the highest resolution (Arch-15) adds compute without significant gains over C3k2
 - 🧪 **20 experiments** × ~3.2h = **~64 hours** of architecture search
 
+</details>
 
 ## 🏋️ Full Dataset Training — Custom Architecture & Custom Loss (YOLOv12s)
 
