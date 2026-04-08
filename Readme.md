@@ -2218,7 +2218,8 @@ After identifying the best architecture (**Arch-6 ★**) and best loss configura
 Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN1_RESULTS" alt="Arch-6 Default Loss Results" width="100%" />
+<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/fa473b1b-908e-4249-82f2-90455572229c" />
+
 </p>
 
 <table>
@@ -2343,7 +2344,7 @@ Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
 Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN2_RESULTS" alt="Arch-6 Custom Loss Results" width="100%" />
+<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/9a898e10-900e-4344-bd1d-741ae8e7edf6" />
 </p>
 
 <table>
