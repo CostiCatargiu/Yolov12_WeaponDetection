@@ -46,7 +46,7 @@
     </td>
     <td align="center" width="55%">
       <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/0bf3f8f9-70cc-4d75-8f33-11362a91d23d" />
-      <br><sub>📈 Training metrics — Baseline vs Custom Loss vs Custom Arch vs Combined</sub>
+      <br><sub>📈 Training metrics — Baseline vs Custom Loss + Arch</sub>
     </td>
   </tr>
 </table>
