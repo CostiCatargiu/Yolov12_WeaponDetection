@@ -1309,5 +1309,391 @@ tal_beta: 6.0             # Default value
 </details>
 
 
+## 🏗️ Architecture Ablation Study Results (YOLOv12s)
+
+<details>
+<summary><b>⚙️ 1. Experimental Setup</b></summary>
+
+<br>
+
+| Setting | Value |
+|---------|-------|
+| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
+| 🔄 **Epochs per Run** | **70 epochs** |
+| 📦 **Batch Size** | **64** |
+| 🖼️ **Image Size** | **640×640** |
+| ⏱️ **Time per Run** | ~1.2 hours |
+| 🔬 **Methodology** | Grid search across **20 architectural variants** |
+| 🏛️ **Base Architecture** | YOLOv12s (P3–P5 default heads) |
+| 🎯 **Goal** | Identify the best detection head configuration for small-object weapon detection |
+
+> 📌 All architecture experiments use the **default loss function** (no custom loss phases enabled) to isolate the effect of architectural changes.
+
+</details>
+
+---
+
+<details>
+<summary><b>🧬 2. Architecture Variants (Arch-1 to Arch-20)</b></summary>
+
+<br>
+
+We designed **20 architectural variants** exploring different strategies for improving small-object detection:
+
+### 🎯 Design Strategies Explored
+
+| Strategy | Architectures | Description |
+|----------|---------------|-------------|
+| 🔍 **P2 Head Addition** | Arch-1 to Arch-5, Arch-12 to Arch-15, Arch-19, Arch-20 | Adding a high-resolution P2 detection head (stride 4) |
+| 🔀 **Auxiliary Branch (P2×2)** | Arch-6 ★, Arch-7, Arch-9 to Arch-11, Arch-16 to Arch-18 | Dual P2 outputs via auxiliary split branch |
+| 📐 **P3 Auxiliary Branch** | Arch-8 | Auxiliary branch at P3 level instead of P2 |
+| 🏔️ **P6 Head Addition** | Arch-3 | Extra P6 head at stride 64 for very large objects |
+| 🔧 **BiFPN-style Neck** | Arch-2, Arch-9 | Replacing A2C2f with C3k2 throughout the neck |
+| 📏 **Width Scaling** | Arch-6 ★, Arch-8, Arch-9 to Arch-11, Arch-16, Arch-19 | Width scale 0.50 (vs default 0.25) |
+| 🏋️ **Deeper Backbone** | Arch-4 | Significantly increased backbone depth (3/5/6/7 repeats) |
+
+---
+
+### 📋 Full Architecture Comparison
+
+<table>
+  <tr>
+    <th align="center">Arch</th>
+    <th align="center">Heads</th>
+    <th align="left">Key Differences vs. Original YOLOv12s</th>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-1</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head (upsample→concat with layer 2→C3k2 128ch). Reduced backbone repeats (1/2/3/3 vs 2/2/4/4). Reduced neck repeats (1 vs 2). Fewer P5 C3k2 repeats (2 vs 2).</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-2</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head (C3k2 128ch). All neck A2C2f replaced with C3k2 (BiFPN-style). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-3</b></td>
+    <td align="center">5 (P2–P6)</td>
+    <td>+ P2 head (C3k2 128ch). + P6 head (Conv stride-2→C3k2 1024ch at stride 64). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-4</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head (C3k2 128ch). Much deeper backbone (3/5/6/7 repeats vs 2/2/4/4). Deeper neck (3 repeats vs 2). P5 C3k2 increased to 4 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-5</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head (upsample→concat with layer 2→C3k2 128ch). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats. Otherwise matches the original neck structure.</td>
+  </tr>
+  <tr style="background-color: #fff3cd;">
+    <td align="center"><b>Arch-6 ★</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td><b>+ P2 head with auxiliary branch</b> (C3k2 True + Conv split → 2 separate P2 outputs to Detect). Width scale 0.50 (vs 0.25). Backbone P5 increased to 5 repeats, P3 to 3 repeats. Bottom-up P3/P4 use C3k2 instead of A2C2f.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-7</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Same as Arch-6 but auxiliary C3k2 uses 2 repeats instead of 1. Width scale stays 0.25.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-8</b></td>
+    <td align="center">5 (P2+P3×2+P4+P5)</td>
+    <td>Auxiliary branch moved to P3 instead of P2 (C3k2 True + Conv at P3 level). P2 uses standard C3k2 128ch. Width scale 0.50. Backbone P5 to 5 repeats, P3 to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-9</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-6 auxiliary structure + all neck blocks replaced with C3k2 (BiFPN-style). No A2C2f in any neck stage. Width scale 0.50.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-10</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-6 auxiliary structure + 1×1 Conv channel alignment inserted before the aux split at P2. Adds a residual-style projection layer. Width scale 0.50.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-11</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-6 auxiliary structure + 2 sequential C3k2 blocks at P2 before aux split (multi-scale receptive field). Width scale 0.50.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-12</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head with 3× C3k2(True) at P2 (deep small-object refinement, full kernel). Backbone P5 to 5, P3 to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-13</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head with 192 channels instead of 128 (wider P2). Backbone P5 to 5, P3 to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-14</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head (C3k2 128ch). P3 stages deepened to 3× A2C2f in both top-down and bottom-up paths. Backbone P5 to 5, P3 to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-15</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head with A2C2f replacing C3k2 at P2 (attention at highest resolution). Backbone P5 to 5, P3 to 3 repeats.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-16</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-6 auxiliary structure but bottom-up P3/P4 use A2C2f instead of C3k2 for uniform attention across all scales. Width scale 0.50.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-17</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-7 auxiliary structure with 3× C3k2 in the aux branch (maximum aux depth). Bottom-up P3 uses C3k2.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-18</b></td>
+    <td align="center">5 (P2×2+P3–P5)</td>
+    <td>Arch-7 auxiliary structure with 192-channel aux branch instead of 128. Bottom-up P3 uses C3k2.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-19</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head with 256ch A2C2f attention (widest P2). Conv 256 3×3 projection after P2 concat. Backbone P5 reduced to 4 repeats, P3 to 2. Width scale 0.50.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Arch-20</b></td>
+    <td align="center">4 (P2–P5)</td>
+    <td>+ P2 head with direct skip from backbone layer 0 (first Conv stride-2) concatenated into P2 fusion (3-way concat). Backbone P5 to 5, P3 to 3 repeats.</td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>📊 3. Grid Search Results</b></summary>
+
+<br>
+
+### 📈 All Architectures Performance Comparison
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_YOUR_IMAGE_HASH" alt="Architecture Grid Search Results" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <th align="center" rowspan="2">Architecture</th>
+    <th align="center" rowspan="2">Heads</th>
+    <th align="center" colspan="5">Overall Metrics</th>
+    <th align="center" colspan="3">mAP50 by Size</th>
+    <th align="center" colspan="3">mAP50-95 by Size</th>
+  </tr>
+  <tr>
+    <th align="center">mAP50</th>
+    <th align="center">mAP50-95</th>
+    <th align="center">Precision</th>
+    <th align="center">Recall</th>
+    <th align="center">F1</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
+    <th align="center">🔍 Small</th>
+    <th align="center">📦 Medium</th>
+    <th align="center">🟫 Large</th>
+  </tr>
+  <tr style="background-color: #f0f0f0;">
+    <td><b>Baseline</b></td>
+    <td>3 (P3–P5)</td>
+    <td>0.816</td>
+    <td>0.525</td>
+    <td>0.831</td>
+    <td>0.746</td>
+    <td>0.786</td>
+    <td>0.530</td>
+    <td>0.750</td>
+    <td>0.828</td>
+    <td>0.297</td>
+    <td>0.424</td>
+    <td>0.550</td>
+  </tr>
+  <tr style="background-color: #fff3cd; border: 2px solid #dc3545;">
+    <td><b>Arch-6 ★ 🏆</b></td>
+    <td>5 (P2×2+P3–P5)</td>
+    <td><b>0.865</b></td>
+    <td><b>0.585</b></td>
+    <td><b>0.902</b></td>
+    <td><b>0.825</b></td>
+    <td><b>0.862</b></td>
+    <td><b>0.590</b></td>
+    <td><b>0.812</b></td>
+    <td><b>0.885</b></td>
+    <td><b>0.355</b></td>
+    <td><b>0.485</b></td>
+    <td><b>0.628</b></td>
+  </tr>
+</table>
+
+> 📌 **Full results for all 20 architectures** are shown in the image above. The table highlights the **Baseline** and the **winning architecture (Arch-6)** for quick reference.
+
+---
+
+### 🏆 Arch-6 vs Baseline — Improvement Summary
+
+<table>
+  <tr>
+    <th align="left">Metric</th>
+    <th align="center">Baseline</th>
+    <th align="center">Arch-6 ★</th>
+    <th align="center">Δ Improvement</th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td>0.816</td>
+    <td><b>0.865</b></td>
+    <td align="center"><b>+6.00%</b></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td>0.525</td>
+    <td><b>0.585</b></td>
+    <td align="center"><b>+11.43%</b></td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td>0.831</td>
+    <td><b>0.902</b></td>
+    <td align="center"><b>+8.54%</b></td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td>0.746</td>
+    <td><b>0.825</b></td>
+    <td align="center"><b>+10.59%</b></td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td>0.786</td>
+    <td><b>0.862</b></td>
+    <td align="center"><b>+9.67%</b></td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.530</td>
+    <td><b>0.590</b></td>
+    <td align="center"><b>+11.32%</b></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.750</td>
+    <td><b>0.812</b></td>
+    <td align="center"><b>+8.27%</b></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.828</td>
+    <td><b>0.885</b></td>
+    <td align="center"><b>+6.88%</b></td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.297</td>
+    <td><b>0.355</b></td>
+    <td align="center"><b>+19.53%</b></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.424</td>
+    <td><b>0.485</b></td>
+    <td align="center"><b>+14.38%</b></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.550</td>
+    <td><b>0.628</b></td>
+    <td align="center"><b>+14.18%</b></td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>🏆 4. Winner: Arch-6 — Design Rationale</b></summary>
+
+<br>
+
+### 🧬 Arch-6 Key Design Elements
+
+<table>
+  <tr>
+    <th align="left">Feature</th>
+    <th align="left">Description</th>
+    <th align="left">Impact</th>
+  </tr>
+  <tr>
+    <td><b>🔍 P2 Detection Head</b></td>
+    <td>Added high-resolution head at stride 4</td>
+    <td>Captures fine-grained details for small objects</td>
+  </tr>
+  <tr>
+    <td><b>🔀 Auxiliary P2 Branch</b></td>
+    <td>C3k2(True) + Conv split → 2 separate P2 outputs</td>
+    <td>Dual feature extraction improves small-object recall</td>
+  </tr>
+  <tr>
+    <td><b>📏 Width Scale 0.50</b></td>
+    <td>Doubled channel width (vs default 0.25)</td>
+    <td>Richer feature representations at all scales</td>
+  </tr>
+  <tr>
+    <td><b>🏋️ Deeper Backbone</b></td>
+    <td>P5 increased to 5 repeats, P3 to 3 repeats</td>
+    <td>Better feature extraction capacity</td>
+  </tr>
+  <tr>
+    <td><b>🔧 C3k2 Bottom-up</b></td>
+    <td>P3/P4 bottom-up use C3k2 instead of A2C2f</td>
+    <td>Efficient multi-scale aggregation</td>
+  </tr>
+</table>
+
+---
+
+### 🔍 Why Arch-6 Won
+
+| Aspect | Explanation |
+|--------|-------------|
+| 🎯 **Small Object Focus** | The dual P2 output provides two complementary views of high-resolution features, boosting small object detection by **+19.53%** (mAP50-95) |
+| 📐 **Width Scaling** | The 0.50 width scale gives the model enough capacity to learn discriminative features without excessive compute |
+| ⚖️ **Balanced Design** | Unlike deeper variants (Arch-4) or wider P2 variants (Arch-19), Arch-6 balances depth, width, and auxiliary branching |
+| 🏗️ **C3k2 in Bottom-up** | Using C3k2 instead of A2C2f in the bottom-up path reduces attention overhead at higher resolution while maintaining performance |
+
+</details>
+
+---
+
+<details>
+<summary><b>📌 5. Key Takeaways</b></summary>
+
+<br>
+
+- 🏆 **Winner:** **Arch-6** with auxiliary P2 branch (P2×2 + P3–P5, width scale 0.50)
+- 📈 **Best Improvement:** **+19.53%** on small objects (mAP50-95), **+11.43%** on overall mAP50-95
+- 🔍 **P2 Head is Critical:** All top-performing architectures include a P2 detection head
+- 🔀 **Auxiliary Branches Help:** Dual P2 outputs (Arch-6, 7, 9–11, 16–18) consistently outperform single P2 heads
+- 📏 **Width Scale Matters:** 0.50 width scale outperforms 0.25 in architectures with P2 heads
+- 🏔️ **P6 Head Not Beneficial:** Arch-3's P6 head at stride 64 did not improve small-object detection
+- 🏋️ **Diminishing Returns on Depth:** Arch-4's much deeper backbone (3/5/6/7) did not proportionally improve results
+- 🔧 **BiFPN-style Neck:** Mixed results — beneficial when combined with auxiliary branches (Arch-9) but not alone (Arch-2)
+- ⚡ **A2C2f at P2:** Using attention at the highest resolution (Arch-15) adds compute without significant gains over C3k2
+- 🧪 **20 experiments** × ~1.2h = **~24 hours** of architecture search
+
+</details>
 
 </details>
