@@ -2174,4 +2174,581 @@ We designed **20 architectural variants** exploring different strategies for imp
 - ⚡ **A2C2f at P2:** Using attention at the highest resolution (Arch-15) adds compute without significant gains over C3k2
 - 🧪 **20 experiments** × ~3.2h = **~64 hours** of architecture search
 
+
+## 🏋️ Full Dataset Training — Custom Architecture & Custom Loss (YOLOv12s)
+
+After identifying the best architecture (**Arch-6 ★**) and best loss configuration (**A1 + A2 + A3.1 + A4**) through separate ablation studies, we conducted **2 final training runs** on the **full dataset** to measure their individual and combined impact.
+
+<details>
+<summary><b>⚙️ 1. Training Configuration</b></summary>
+
+<br>
+
+| Setting | Value |
+|---------|-------|
+| 📊 **Dataset** | **100%** full dataset (**59,305 images** / **76,705 instances**) |
+| 🔄 **Epochs** | **130** |
+| 📦 **Batch Size** | **48** |
+| 🖼️ **Image Size** | **640×640** |
+| ⏱️ **Training Time** | ~20 hours per run |
+| 🏛️ **Architecture** | YOLOv12s with Arch-6 ★ (P2×2 + P3–P5, width scale 0.50) |
+| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
+
+---
+
+### 🧪 Training Runs
+
+| Run | Architecture | Loss Function | Description |
+|-----|-------------|---------------|-------------|
+| **Run 1** | 🏗️ Arch-6 ★ (Custom) | 🚫 Default (Ultralytics) | Isolates the effect of the custom architecture alone |
+| **Run 2** | 🏗️ Arch-6 ★ (Custom) | ✅ Custom (A1+A2+A3.1+A4) | Combines both custom architecture and custom loss |
+
+</details>
+
+---
+
+<details>
+<summary><b>📊 2. Results — Custom Architecture Only (Run 1)</b></summary>
+
+<br>
+
+### 🏗️ Arch-6 + Default Loss — Full Dataset (130 epochs)
+
+Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN1_RESULTS" alt="Arch-6 Default Loss Results" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <th align="center" rowspan="2">Metric</th>
+    <th align="center" colspan="5">Original → Custom Arch (Δ Improvement)</th>
+  </tr>
+  <tr>
+    <th align="center">OVERALL</th>
+    <th align="center">🗡️ Knife</th>
+    <th align="center">🎯 Long Gun</th>
+    <th align="center">🚫 Other</th>
+    <th align="center">🔫 Pistol</th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td>0.816 → <b>0.840</b> <sub>(+2.94%)</sub></td>
+    <td>0.875 → <b>0.897</b> <sub>(+2.61%)</sub></td>
+    <td>0.840 → <b>0.890</b> <sub>(+5.90%)</sub></td>
+    <td>0.637 → <b>0.662</b> <sub>(+3.99%)</sub></td>
+    <td>0.911 → <b>0.909</b> <sub>(-0.22%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td>0.525 → <b>0.562</b> <sub>(+7.13%)</sub></td>
+    <td>0.614 → <b>0.665</b> <sub>(+8.45%)</sub></td>
+    <td>0.535 → <b>0.587</b> <sub>(+9.79%)</sub></td>
+    <td>0.346 → <b>0.371</b> <sub>(+7.42%)</sub></td>
+    <td>0.605 → <b>0.624</b> <sub>(+3.28%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td>0.831 → <b>0.871</b> <sub>(+4.80%)</sub></td>
+    <td>0.847 → <b>0.853</b> <sub>(+0.70%)</sub></td>
+    <td>0.827 → <b>0.885</b> <sub>(+7.09%)</sub></td>
+    <td>0.800 → <b>0.841</b> <sub>(+5.08%)</sub></td>
+    <td>0.851 → <b>0.906</b> <sub>(+6.39%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td>0.746 → <b>0.795</b> <sub>(+6.62%)</sub></td>
+    <td>0.845 → <b>0.883</b> <sub>(+4.58%)</sub></td>
+    <td>0.769 → <b>0.828</b> <sub>(+7.64%)</sub></td>
+    <td>0.522 → <b>0.574</b> <sub>(+9.88%)</sub></td>
+    <td>0.847 → <b>0.895</b> <sub>(+5.72%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td>0.786 → <b>0.831</b> <sub>(+5.75%)</sub></td>
+    <td>0.846 → <b>0.868</b> <sub>(+2.60%)</sub></td>
+    <td>0.797 → <b>0.856</b> <sub>(+7.38%)</sub></td>
+    <td>0.632 → <b>0.682</b> <sub>(+7.93%)</sub></td>
+    <td>0.849 → <b>0.900</b> <sub>(+6.05%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.530 → <b>0.562</b> <sub>(+6.06%)</sub></td>
+    <td>0.679 → <b>0.729</b> <sub>(+7.32%)</sub></td>
+    <td>0.426 → <b>0.469</b> <sub>(+10.25%)</sub></td>
+    <td>0.230 → <b>0.244</b> <sub>(+6.05%)</sub></td>
+    <td>0.779 → <b>0.803</b> <sub>(+3.03%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.750 → <b>0.780</b> <sub>(+3.99%)</sub></td>
+    <td>0.819 → <b>0.842</b> <sub>(+2.79%)</sub></td>
+    <td>0.782 → <b>0.829</b> <sub>(+5.93%)</sub></td>
+    <td>0.542 → <b>0.574</b> <sub>(+5.83%)</sub></td>
+    <td>0.849 → <b>0.864</b> <sub>(+1.73%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.828 → <b>0.854</b> <sub>(+3.13%)</sub></td>
+    <td>0.879 → <b>0.910</b> <sub>(+3.58%)</sub></td>
+    <td>0.859 → <b>0.903</b> <sub>(+5.11%)</sub></td>
+    <td>0.642 → <b>0.669</b> <sub>(+4.10%)</sub></td>
+    <td>0.922 → <b>0.924</b> <sub>(+0.13%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.297 → <b>0.329</b> <sub>(+10.84%)</sub></td>
+    <td>0.492 → <b>0.550</b> <sub>(+11.71%)</sub></td>
+    <td>0.229 → <b>0.269</b> <sub>(+17.55%)</sub></td>
+    <td>0.106 → <b>0.117</b> <sub>(+10.26%)</sub></td>
+    <td>0.351 → <b>0.378</b> <sub>(+7.61%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.424 → <b>0.458</b> <sub>(+8.03%)</sub></td>
+    <td>0.551 → <b>0.610</b> <sub>(+10.64%)</sub></td>
+    <td>0.416 → <b>0.456</b> <sub>(+9.79%)</sub></td>
+    <td>0.237 → <b>0.257</b> <sub>(+8.58%)</sub></td>
+    <td>0.484 → <b>0.502</b> <sub>(+3.86%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.550 → <b>0.591</b> <sub>(+7.55%)</sub></td>
+    <td>0.602 → <b>0.665</b> <sub>(+10.46%)</sub></td>
+    <td>0.542 → <b>0.602</b> <sub>(+11.05%)</sub></td>
+    <td>0.372 → <b>0.400</b> <sub>(+7.36%)</sub></td>
+    <td>0.682 → <b>0.694</b> <sub>(+1.67%)</sub></td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>📊 3. Results — Custom Architecture + Custom Loss (Run 2)</b></summary>
+
+<br>
+
+### 🏗️ Arch-6 + Custom Loss (A1+A2+A3.1+A4) — Full Dataset (130 epochs)
+
+Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/REPLACE_WITH_RUN2_RESULTS" alt="Arch-6 Custom Loss Results" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <th align="center" rowspan="2">Metric</th>
+    <th align="center" colspan="5">Original → Custom Arch + Loss (Δ Improvement)</th>
+  </tr>
+  <tr>
+    <th align="center">OVERALL</th>
+    <th align="center">🗡️ Knife</th>
+    <th align="center">🎯 Long Gun</th>
+    <th align="center">🚫 Other</th>
+    <th align="center">🔫 Pistol</th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td>0.816 → <b>0.865</b> <sub>(+6.09%)</sub></td>
+    <td>0.875 → <b>0.925</b> <sub>(+5.75%)</sub></td>
+    <td>0.840 → <b>0.917</b> <sub>(+9.15%)</sub></td>
+    <td>0.637 → <b>0.682</b> <sub>(+7.17%)</sub></td>
+    <td>0.911 → <b>0.937</b> <sub>(+2.84%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td>0.525 → <b>0.579</b> <sub>(+10.41%)</sub></td>
+    <td>0.614 → <b>0.686</b> <sub>(+11.77%)</sub></td>
+    <td>0.535 → <b>0.605</b> <sub>(+13.15%)</sub></td>
+    <td>0.346 → <b>0.383</b> <sub>(+10.71%)</sub></td>
+    <td>0.605 → <b>0.644</b> <sub>(+6.44%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td>0.831 → <b>0.898</b> <sub>(+8.01%)</sub></td>
+    <td>0.847 → <b>0.879</b> <sub>(+3.78%)</sub></td>
+    <td>0.827 → <b>0.913</b> <sub>(+10.37%)</sub></td>
+    <td>0.800 → <b>0.867</b> <sub>(+8.29%)</sub></td>
+    <td>0.851 → <b>0.933</b> <sub>(+9.65%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td>0.746 → <b>0.819</b> <sub>(+9.88%)</sub></td>
+    <td>0.845 → <b>0.910</b> <sub>(+7.78%)</sub></td>
+    <td>0.769 → <b>0.853</b> <sub>(+10.94%)</sub></td>
+    <td>0.522 → <b>0.592</b> <sub>(+13.25%)</sub></td>
+    <td>0.847 → <b>0.923</b> <sub>(+8.95%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td>0.786 → <b>0.857</b> <sub>(+8.99%)</sub></td>
+    <td>0.846 → <b>0.894</b> <sub>(+5.74%)</sub></td>
+    <td>0.797 → <b>0.882</b> <sub>(+10.66%)</sub></td>
+    <td>0.632 → <b>0.703</b> <sub>(+11.24%)</sub></td>
+    <td>0.849 → <b>0.928</b> <sub>(+9.30%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.530 → <b>0.579</b> <sub>(+9.31%)</sub></td>
+    <td>0.679 → <b>0.751</b> <sub>(+10.60%)</sub></td>
+    <td>0.426 → <b>0.484</b> <sub>(+13.63%)</sub></td>
+    <td>0.230 → <b>0.251</b> <sub>(+9.30%)</sub></td>
+    <td>0.779 → <b>0.827</b> <sub>(+6.19%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.750 → <b>0.804</b> <sub>(+7.17%)</sub></td>
+    <td>0.819 → <b>0.868</b> <sub>(+5.93%)</sub></td>
+    <td>0.782 → <b>0.854</b> <sub>(+9.18%)</sub></td>
+    <td>0.542 → <b>0.592</b> <sub>(+9.07%)</sub></td>
+    <td>0.849 → <b>0.890</b> <sub>(+4.85%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.828 → <b>0.880</b> <sub>(+6.29%)</sub></td>
+    <td>0.879 → <b>0.938</b> <sub>(+6.75%)</sub></td>
+    <td>0.859 → <b>0.930</b> <sub>(+8.33%)</sub></td>
+    <td>0.642 → <b>0.689</b> <sub>(+7.29%)</sub></td>
+    <td>0.922 → <b>0.952</b> <sub>(+3.19%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td>0.297 → <b>0.339</b> <sub>(+14.23%)</sub></td>
+    <td>0.492 → <b>0.567</b> <sub>(+15.13%)</sub></td>
+    <td>0.229 → <b>0.277</b> <sub>(+21.15%)</sub></td>
+    <td>0.106 → <b>0.120</b> <sub>(+13.64%)</sub></td>
+    <td>0.351 → <b>0.390</b> <sub>(+10.90%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td>0.424 → <b>0.472</b> <sub>(+11.34%)</sub></td>
+    <td>0.551 → <b>0.629</b> <sub>(+14.03%)</sub></td>
+    <td>0.416 → <b>0.470</b> <sub>(+13.15%)</sub></td>
+    <td>0.237 → <b>0.265</b> <sub>(+11.90%)</sub></td>
+    <td>0.484 → <b>0.518</b> <sub>(+7.04%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td>0.550 → <b>0.610</b> <sub>(+10.84%)</sub></td>
+    <td>0.602 → <b>0.686</b> <sub>(+13.84%)</sub></td>
+    <td>0.542 → <b>0.621</b> <sub>(+14.45%)</sub></td>
+    <td>0.372 → <b>0.412</b> <sub>(+10.64%)</sub></td>
+    <td>0.682 → <b>0.715</b> <sub>(+4.78%)</sub></td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>📈 4. Progressive Improvement — All YOLOv12s Configurations</b></summary>
+
+<br>
+
+### 🏆 Four-Way Comparison: Baseline → Custom Loss → Custom Arch → Custom Arch + Loss
+
+<table>
+  <tr>
+    <th align="center" rowspan="2">Metric</th>
+    <th align="center">🔷 Baseline</th>
+    <th align="center">📉 Custom Loss</th>
+    <th align="center">🏗️ Custom Arch</th>
+    <th align="center">🏆 Custom Arch+Loss</th>
+  </tr>
+  <tr>
+    <th align="center"><sub>Default Arch<br>Default Loss</sub></th>
+    <th align="center"><sub>Default Arch<br>A1+A2+A3.1+A4</sub></th>
+    <th align="center"><sub>Arch-6<br>Default Loss</sub></th>
+    <th align="center"><sub>Arch-6<br>A1+A2+A3.1+A4</sub></th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td align="center">0.816</td>
+    <td align="center">0.857 <sub>(+5.04%)</sub></td>
+    <td align="center">0.840 <sub>(+2.94%)</sub></td>
+    <td align="center"><b>0.865</b> <sub>(+6.09%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td align="center">0.525</td>
+    <td align="center">0.574 <sub>(+9.32%)</sub></td>
+    <td align="center">0.562 <sub>(+7.13%)</sub></td>
+    <td align="center"><b>0.579</b> <sub>(+10.41%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td align="center">0.831</td>
+    <td align="center">0.889 <sub>(+6.94%)</sub></td>
+    <td align="center">0.871 <sub>(+4.80%)</sub></td>
+    <td align="center"><b>0.898</b> <sub>(+8.01%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td align="center">0.746</td>
+    <td align="center">0.811 <sub>(+8.79%)</sub></td>
+    <td align="center">0.795 <sub>(+6.62%)</sub></td>
+    <td align="center"><b>0.819</b> <sub>(+9.88%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td align="center">0.786</td>
+    <td align="center">0.848 <sub>(+7.91%)</sub></td>
+    <td align="center">0.831 <sub>(+5.75%)</sub></td>
+    <td align="center"><b>0.857</b> <sub>(+8.99%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td align="center">0.530</td>
+    <td align="center">0.574 <sub>(+8.22%)</sub></td>
+    <td align="center">0.562 <sub>(+6.06%)</sub></td>
+    <td align="center"><b>0.579</b> <sub>(+9.31%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td align="center">0.750</td>
+    <td align="center">0.796 <sub>(+6.11%)</sub></td>
+    <td align="center">0.780 <sub>(+3.99%)</sub></td>
+    <td align="center"><b>0.804</b> <sub>(+7.17%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td align="center">0.828</td>
+    <td align="center">0.871 <sub>(+5.24%)</sub></td>
+    <td align="center">0.854 <sub>(+3.13%)</sub></td>
+    <td align="center"><b>0.880</b> <sub>(+6.29%)</sub></td>
+  </tr>
+  <tr>
+    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small</b></td>
+    <td align="center">0.297</td>
+    <td align="center">0.336 <sub>(+13.10%)</sub></td>
+    <td align="center">0.329 <sub>(+10.84%)</sub></td>
+    <td align="center"><b>0.339</b> <sub>(+14.23%)</sub></td>
+  </tr>
+  <tr>
+    <td>📦 <b>Medium</b></td>
+    <td align="center">0.424</td>
+    <td align="center">0.467 <sub>(+10.23%)</sub></td>
+    <td align="center">0.458 <sub>(+8.03%)</sub></td>
+    <td align="center"><b>0.472</b> <sub>(+11.34%)</sub></td>
+  </tr>
+  <tr>
+    <td>🟫 <b>Large</b></td>
+    <td align="center">0.550</td>
+    <td align="center">0.604 <sub>(+9.74%)</sub></td>
+    <td align="center">0.591 <sub>(+7.55%)</sub></td>
+    <td align="center"><b>0.610</b> <sub>(+10.84%)</sub></td>
+  </tr>
+</table>
+
+---
+
+### 📊 Per-Class Best Results (Custom Arch + Loss)
+
+<table>
+  <tr>
+    <th align="center">Metric</th>
+    <th align="center">🗡️ Knife</th>
+    <th align="center">🎯 Long Gun</th>
+    <th align="center">🚫 Other</th>
+    <th align="center">🔫 Pistol</th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td><b>0.925</b> <sub>(+5.75%)</sub></td>
+    <td><b>0.917</b> <sub>(+9.15%)</sub></td>
+    <td><b>0.682</b> <sub>(+7.17%)</sub></td>
+    <td><b>0.937</b> <sub>(+2.84%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td><b>0.686</b> <sub>(+11.77%)</sub></td>
+    <td><b>0.605</b> <sub>(+13.15%)</sub></td>
+    <td><b>0.383</b> <sub>(+10.71%)</sub></td>
+    <td><b>0.644</b> <sub>(+6.44%)</sub></td>
+  </tr>
+  <tr>
+    <td><b>F1 Score</b></td>
+    <td><b>0.894</b> <sub>(+5.74%)</sub></td>
+    <td><b>0.882</b> <sub>(+10.66%)</sub></td>
+    <td><b>0.703</b> <sub>(+11.24%)</sub></td>
+    <td><b>0.928</b> <sub>(+9.30%)</sub></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small mAP50-95</b></td>
+    <td><b>0.567</b> <sub>(+15.13%)</sub></td>
+    <td><b>0.277</b> <sub>(+21.15%)</sub></td>
+    <td><b>0.120</b> <sub>(+13.64%)</sub></td>
+    <td><b>0.390</b> <sub>(+10.90%)</sub></td>
+  </tr>
+</table>
+
+> 🎯 **Biggest per-class gain:** Long Gun small-object mAP50-95 improved by **+21.15%** — the largest single improvement in the entire study.
+
+</details>
+
+---
+
+<details>
+<summary><b>📌 5. Key Findings</b></summary>
+
+<br>
+
+### 🔬 Architecture vs Loss — Contribution Analysis
+
+<table>
+  <tr>
+    <th align="left">Metric</th>
+    <th align="center">Custom Loss Only<br><sub>(vs Baseline)</sub></th>
+    <th align="center">Custom Arch Only<br><sub>(vs Baseline)</sub></th>
+    <th align="center">Combined<br><sub>(vs Baseline)</sub></th>
+    <th align="center">Synergy<br><sub>(Combined vs Sum)</sub></th>
+  </tr>
+  <tr>
+    <td><b>mAP50</b></td>
+    <td align="center">+5.04%</td>
+    <td align="center">+2.94%</td>
+    <td align="center"><b>+6.09%</b></td>
+    <td align="center"><sub>Near-additive</sub></td>
+  </tr>
+  <tr>
+    <td><b>mAP50-95</b></td>
+    <td align="center">+9.32%</td>
+    <td align="center">+7.13%</td>
+    <td align="center"><b>+10.41%</b></td>
+    <td align="center"><sub>Partial overlap</sub></td>
+  </tr>
+  <tr>
+    <td><b>Precision</b></td>
+    <td align="center">+6.94%</td>
+    <td align="center">+4.80%</td>
+    <td align="center"><b>+8.01%</b></td>
+    <td align="center"><sub>Partial overlap</sub></td>
+  </tr>
+  <tr>
+    <td><b>Recall</b></td>
+    <td align="center">+8.79%</td>
+    <td align="center">+6.62%</td>
+    <td align="center"><b>+9.88%</b></td>
+    <td align="center"><sub>Partial overlap</sub></td>
+  </tr>
+  <tr>
+    <td>🔍 <b>Small mAP50-95</b></td>
+    <td align="center">+13.10%</td>
+    <td align="center">+10.84%</td>
+    <td align="center"><b>+14.23%</b></td>
+    <td align="center"><sub>Partial overlap</sub></td>
+  </tr>
+</table>
+
+---
+
+### 💡 Observations
+
+- 🏆 **Best Overall:** **Arch-6 + Custom Loss** achieves the highest performance across **all metrics** and **all object sizes**
+- 📉 **Custom Loss > Custom Arch alone:** The custom loss provides larger overall improvements (+5.04% mAP50) than the custom architecture alone (+2.94% mAP50), but the architecture shines on localization metrics (mAP50-95)
+- 🔄 **Complementary but overlapping:** Combining both yields the best results, but gains are **partially overlapping** — both modifications target small-object detection through different mechanisms
+- 🏗️ **Architecture strength — Localization:** The P2 detection head primarily improves **spatial localization** (mAP50-95: +7.13%) by detecting at higher resolution
+- 📉 **Loss strength — Classification:** The custom loss primarily improves **classification confidence** and **recall** through size-aware weighting and TAL tuning
+- 🎯 **Long Gun benefits most:** Long gun detection improved by **+21.15%** (small mAP50-95) — likely because long guns frequently appear small in CCTV footage
+- 🔫 **Pistol saturating:** Pistol already had the highest baseline mAP50 (0.911) and shows the smallest relative gains, suggesting near-ceiling performance
+- 🚫 **Other (hard negatives) hardest:** The `no_weapon` class remains the most challenging but still improved by **+10.71%** (mAP50-95)
+
+---
+
+### 📋 Complete Training Investment (Updated)
+
+<table>
+  <tr>
+    <th align="left">Phase</th>
+    <th align="center">Experiments</th>
+    <th align="center">Time</th>
+  </tr>
+  <tr>
+    <td>🔷 YOLOv12s Baseline (full dataset, 100 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~11h</td>
+  </tr>
+  <tr>
+    <td>🔬 Loss Ablation — Grid Search (17% dataset, 70 epochs)</td>
+    <td align="center">180</td>
+    <td align="center">~216h</td>
+  </tr>
+  <tr>
+    <td>🔬 Loss Ablation — Combinations (17% dataset, 70 epochs)</td>
+    <td align="center">26</td>
+    <td align="center">~31h</td>
+  </tr>
+  <tr>
+    <td>🔷 YOLOv12s Custom Loss (full dataset, 100 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~11h</td>
+  </tr>
+  <tr>
+    <td>🏗️ Architecture Ablation (17% dataset, 130 epochs)</td>
+    <td align="center">20</td>
+    <td align="center">~64h</td>
+  </tr>
+  <tr>
+    <td>🏗️ Arch-6 + Default Loss (full dataset, 130 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~20h</td>
+  </tr>
+  <tr>
+    <td>🏆 Arch-6 + Custom Loss (full dataset, 130 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~20h</td>
+  </tr>
+  <tr>
+    <td>🔶 YOLO26s Baseline (full dataset, 100 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~9h</td>
+  </tr>
+  <tr>
+    <td>🔶 YOLO26s Individual Phases (17% dataset, 70 epochs)</td>
+    <td align="center">4</td>
+    <td align="center">~4h</td>
+  </tr>
+  <tr>
+    <td>🔶 YOLO26s Combinations (17% dataset, 70 epochs)</td>
+    <td align="center">11</td>
+    <td align="center">~11h</td>
+  </tr>
+  <tr>
+    <td>🔶 YOLO26s Custom Loss (full dataset, 100 epochs)</td>
+    <td align="center">1</td>
+    <td align="center">~9h</td>
+  </tr>
+  <tr style="background-color: #d4edda;">
+    <td><b>📊 Grand Total</b></td>
+    <td align="center"><b>247</b></td>
+    <td align="center"><b>~406 hours (~16.9 days)</b></td>
+  </tr>
+</table>
+
+</details>
+
+
 </details>
