@@ -3034,5 +3034,19 @@ Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 
 </details>
 
+<img width="1804" height="600" alt="Pasted image (6)" src="https://github.com/user-attachments/assets/68904257-65b0-43b2-ad34-08c67ba9d162" />
+
+<img width="1678" height="600" alt="Pasted image (5)" src="https://github.com/user-attachments/assets/e52b0e71-b29e-480e-98fb-0b1318ec9f20" />
+<img width="1678" height="600" alt="Pasted image (4)" src="https://github.com/user-attachments/assets/9396bc21-6521-4a90-82ab-8ef906c046d9" />
+<img width="1674" height="600" alt="Pasted image (3)" src="https://github.com/user-attachments/assets/0bf3fbbf-9a4f-4491-b14f-eb46214a840c" />
+<img width="1588" height="600" alt="Pasted image (2)" src="https://github.com/user-attachments/assets/2a917df0-7000-47ba-bc5a-81afd6acf0fb" />
+<img width="1924" height="720" alt="Pasted image" src="https://github.com/user-attachments/assets/6c6dc19b-db1b-4e83-a62c-d294e5ddc586" />
+
+![f94eb01e-2622](https://github.com/user-attachments/assets/e0afc35e-dbdf-49e4-984e-7801f31a9f3f)
+![ffe85d19-0914](https://github.com/user-attachments/assets/c0f58923-c6ff-4b6d-a1a1-da0bfa207a0b)
+![f22e6ac1-3702](https://github.com/user-attachments/assets/09fa4c6d-be7a-452a-ba0c-5488f0a6de45)
+![c8da2161-2884](https://github.com/user-attachments/assets/7e4077d8-33a2-487b-8b45-22dd08425d76)
+
+<img width="1678" height="600" alt="Pasted image (7)" src="https://github.com/user-attachments/assets/a1cd9256-eecb-40de-b797-a7d7de192ac9" />
 
 </details>
