@@ -3153,6 +3153,17 @@ Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline)
       <img src="https://github.com/user-attachments/assets/f042fca5-99cc-4b6e-a886-2456b26d1882" alt="Comparison 18" width="100%" />
     </td>
   </tr>
+  <tr>
+    <td align="center">
+        <img src="https://github.com/user-attachments/assets/88d5913a-43f6-4fe0-9c90-fed33ee1ced7" alt="Comparison 18" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/1d837c4c-c5ab-4762-b13b-9a61d8ae4f10" width="100%" />
+    </td>
+  </tr>
+
 </table>
 
 
