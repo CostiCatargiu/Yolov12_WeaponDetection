@@ -303,15 +303,6 @@ To validate the generalization capability of our custom models, we evaluated bot
 
 </div>
 
-### 📚 External Dataset References
-
-| Dataset | Source | Description |
-|:--------|:------:|:------------|
-| **Zenodo Weapon Dataset** | [📎 Link](https://zenodo.org/records/16422779) | Multi-class weapon detection dataset containing machetes, knives, baseball bats, rifles, and guns (8,478 images) |
-| **YouTube-GDD** | [📎 Link](https://github.com/ucas-gyx/youtube-gdd) | Gun detection dataset sourced from YouTube videos with diverse real-world scenarios (5,000 images) |
-| **Sohas Weapon (OD-WeaponDetection)** | [📎 Link](https://github.com/ari-dasci/OD-WeaponDetection) | Multi-class detection dataset including pistols, smartphones, knives, and everyday objects (5,859 images) |
-
----
 
 
 ---
