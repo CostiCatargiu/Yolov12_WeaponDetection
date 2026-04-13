@@ -208,6 +208,110 @@
 
 ---
 
+---
+
+## 🧪 External Dataset Evaluation
+
+To validate the generalization capability of our custom models, we evaluated both **YOLOv12s_custom** and **YOLO26s_custom** on **3 external datasets** that were **not used during training**. The results demonstrate that our models generalize well across diverse weapon detection benchmarks, achieving satisfactory performance on unseen data distributions.
+
+<div align="center">
+
+<table>
+  <tr>
+    <th align="center">Model</th>
+    <th align="center">Dataset</th>
+    <th align="center">Precision</th>
+    <th align="center">Recall</th>
+    <th align="center">F1 Score</th>
+    <th align="center">mAP50</th>
+    <th align="center">mAP50-95</th>
+    <th align="center">Classes</th>
+    <th align="center">Images</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
+    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
+    <td align="center"><code>0.8545</code></td>
+    <td align="center"><code>0.7982</code></td>
+    <td align="center"><code>0.8254</code></td>
+    <td align="center"><code>0.8121</code></td>
+    <td align="center"><code>0.5217</code></td>
+    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
+    <td align="center"><code>8,478</code></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
+    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
+    <td align="center"><code>0.8761</code></td>
+    <td align="center"><code>0.8014</code></td>
+    <td align="center"><code>0.8371</code></td>
+    <td align="center"><code>0.8262</code></td>
+    <td align="center"><code>0.5469</code></td>
+    <td align="center"><sub>gun</sub></td>
+    <td align="center"><code>5,000</code></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
+    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
+    <td align="center"><code>0.8489</code></td>
+    <td align="center"><code>0.7803</code></td>
+    <td align="center"><code>0.8132</code></td>
+    <td align="center"><code>0.7951</code></td>
+    <td align="center"><code>0.5323</code></td>
+    <td align="center"><sub>pistol, smartphone, knife, monedero, billete, tarjeta</sub></td>
+    <td align="center"><code>5,859</code></td>
+  </tr>
+  <tr>
+    <td colspan="9" align="center"><b>─────────────────────────────────────</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
+    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
+    <td align="center"><code>0.8124</code></td>
+    <td align="center"><code>0.7588</code></td>
+    <td align="center"><code>0.7847</code></td>
+    <td align="center"><code>0.7400</code></td>
+    <td align="center"><code>0.5008</code></td>
+    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
+    <td align="center"><code>8,478</code></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
+    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
+    <td align="center"><code>0.8390</code></td>
+    <td align="center"><code>0.7685</code></td>
+    <td align="center"><code>0.8022</code></td>
+    <td align="center"><code>0.7500</code></td>
+    <td align="center"><code>0.5250</code></td>
+    <td align="center"><sub>gun</sub></td>
+    <td align="center"><code>5,000</code></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
+    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
+    <td align="center"><code>0.8115</code></td>
+    <td align="center"><code>0.7462</code></td>
+    <td align="center"><code>0.7775</code></td>
+    <td align="center"><code>0.7300</code></td>
+    <td align="center"><code>0.5110</code></td>
+    <td align="center"><sub>pistol, smartphone, knife, monedero, billete, tarjeta</sub></td>
+    <td align="center"><code>5,859</code></td>
+  </tr>
+</table>
+
+<sub>✅ All F1 Scores exceed their corresponding mAP50 — indicating strong precision-recall balance across all external benchmarks.</sub>
+
+</div>
+
+### 📚 External Dataset References
+
+| Dataset | Source | Description |
+|:--------|:------:|:------------|
+| **Zenodo Weapon Dataset** | [📎 Link](https://zenodo.org/records/16422779) | Multi-class weapon detection dataset containing machetes, knives, baseball bats, rifles, and guns (8,478 images) |
+| **YouTube-GDD** | [📎 Link](https://github.com/ucas-gyx/youtube-gdd) | Gun detection dataset sourced from YouTube videos with diverse real-world scenarios (5,000 images) |
+| **Sohas Weapon (OD-WeaponDetection)** | [📎 Link](https://github.com/ari-dasci/OD-WeaponDetection) | Multi-class detection dataset including pistols, smartphones, knives, and everyday objects (5,859 images) |
+
+---
 
 
 ---
