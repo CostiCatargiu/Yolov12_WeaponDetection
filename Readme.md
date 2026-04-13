@@ -571,8 +571,6 @@ This preprocessing and augmentation strategy ensures the dataset reflects the va
 
 ---
 
----
-
 ### 📊 Class Distribution per Split
 
 | Split | Images | % | Instances | 🗡️ knife | 🎯 long_gun | 🚫 no_weapon | 🔫 pistol |
