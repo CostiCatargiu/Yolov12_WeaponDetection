@@ -590,12 +590,22 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 
 ### 🔳 Size Comparison — Small, Medium, Large
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/2f4dd189-1ba0-4340-a101-2c55e42b27e5" alt="mosaic_small" width="30%">
-  <img src="https://github.com/user-attachments/assets/727e3de5-209c-4698-a6f0-bf717d19d22a" alt="mosaic_medium" width="30%">
-  <img src="https://github.com/user-attachments/assets/8f45f604-baac-4d59-bfcf-20da3475eed3" alt="mosaic_large" width="30%">
-</p>
-<p align="center"><sub>🔍 Small Objects | 📦 Medium Objects | 🟫 Large Objects</sub></p>
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="https://github.com/user-attachments/assets/47228120-0edd-4de2-b192-297a769878ed" alt="mosaic_small" width="100%" />
+      <br><sub>🔍 Small Objects</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="https://github.com/user-attachments/assets/f9941675-a569-44b3-9d2a-5b7403a0157a" alt="mosaic_medium" width="100%" />
+      <br><sub>📦 Medium Objects</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="https://github.com/user-attachments/assets/f8a9ceb0-699d-4f35-8a07-7d78a227153d" alt="mosaic_large" width="100%" />
+      <br><sub>🟫 Large Objects</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
