@@ -479,6 +479,100 @@ NewWeaponDataset/
 
 ---
 
+## 🔄 Dataset Preprocessing & Augmentation
+
+<details>
+<summary><b>🛠️ Preprocessing Pipeline</b></summary>
+
+<br>
+
+All images underwent standardized preprocessing before training to ensure consistency and improve quality:
+
+<table>
+  <tr>
+    <th align="center">Step</th>
+    <th align="left">Description</th>
+    <th align="left">Purpose</th>
+  </tr>
+  <tr>
+    <td align="center">🔄 <b>Auto-Orient</b></td>
+    <td>Corrected image orientation based on EXIF metadata</td>
+    <td>Ensures consistent spatial layout regardless of capture device</td>
+  </tr>
+  <tr>
+    <td align="center">📐 <b>Resize</b></td>
+    <td>Uniform resizing to <code>640×640</code> pixels</td>
+    <td>Consistent with YOLO training requirements</td>
+  </tr>
+  <tr>
+    <td align="center">🌗 <b>Histogram Equalization</b></td>
+    <td>Applied histogram equalization to improve contrast</td>
+    <td>Enhances visibility and emphasizes object boundaries, particularly in low-light or high-glare conditions</td>
+  </tr>
+</table>
+
+</details>
+
+---
+
+<details>
+<summary><b>🎨 Augmentation Strategy</b></summary>
+
+<br>
+
+To increase robustness and reduce overfitting, we applied a controlled set of augmentations, generating **3 variants per training sample**:
+
+<table>
+  <tr>
+    <th align="center">Augmentation</th>
+    <th align="center">Parameters</th>
+    <th align="left">Purpose</th>
+  </tr>
+  <tr>
+    <td align="center">↔️ <b>Horizontal Flip</b></td>
+    <td align="center">50% probability</td>
+    <td>Simulates viewpoint variation and mirrored perspectives</td>
+  </tr>
+  <tr>
+    <td align="center">🔁 <b>Rotation</b></td>
+    <td align="center">−14° to +14°</td>
+    <td>Mimics camera tilt or hand motion in real-world footage</td>
+  </tr>
+  <tr>
+    <td align="center">◇ <b>Shear Transformation</b></td>
+    <td align="center">±13° (horizontal & vertical)</td>
+    <td>Introduces mild geometric distortion for pose robustness</td>
+  </tr>
+  <tr>
+    <td align="center">🌑 <b>Grayscale Conversion</b></td>
+    <td align="center">10% of images</td>
+    <td>Simulates poor lighting or monochromatic camera feeds</td>
+  </tr>
+  <tr>
+    <td align="center">🌫️ <b>Gaussian Blur</b></td>
+    <td align="center">Up to 1.6 px</td>
+    <td>Replicates motion blur and low-quality surveillance conditions</td>
+  </tr>
+</table>
+
+<br>
+
+> 📌 **Note:** These augmentations were applied during dataset preparation via **Roboflow** (offline augmentation, 3× output multiplier). This is **separate** from the runtime augmentations used by Ultralytics during training (mosaic, copy-paste, erasing, etc. — see [Training Config](#-8-training-config-reproducibility) for full details).
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Preprocessing-Auto_Orient_+_Resize_+_Histogram_EQ-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Augmentation-3x_per_sample-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Total_Output-~3x_Training_Images-green?style=flat-square" />
+</p>
+
+This preprocessing and augmentation strategy ensures the dataset reflects the variability encountered in real-world surveillance while maintaining high annotation fidelity.
+
+</details>
+
+---
+
+---
+
 ### 📊 Class Distribution per Split
 
 | Split | Images | % | Instances | 🗡️ knife | 🎯 long_gun | 🚫 no_weapon | 🔫 pistol |
