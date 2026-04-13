@@ -3034,19 +3034,142 @@ Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
 
 </details>
 
-<img width="1804" height="600" alt="Pasted image (6)" src="https://github.com/user-attachments/assets/68904257-65b0-43b2-ad34-08c67ba9d162" />
 
-<img width="1678" height="600" alt="Pasted image (5)" src="https://github.com/user-attachments/assets/e52b0e71-b29e-480e-98fb-0b1318ec9f20" />
-<img width="1678" height="600" alt="Pasted image (4)" src="https://github.com/user-attachments/assets/9396bc21-6521-4a90-82ab-8ef906c046d9" />
-<img width="1674" height="600" alt="Pasted image (3)" src="https://github.com/user-attachments/assets/0bf3fbbf-9a4f-4491-b14f-eb46214a840c" />
-<img width="1588" height="600" alt="Pasted image (2)" src="https://github.com/user-attachments/assets/2a917df0-7000-47ba-bc5a-81afd6acf0fb" />
-<img width="1924" height="720" alt="Pasted image" src="https://github.com/user-attachments/assets/6c6dc19b-db1b-4e83-a62c-d294e5ddc586" />
+---
 
-![f94eb01e-2622](https://github.com/user-attachments/assets/e0afc35e-dbdf-49e4-984e-7801f31a9f3f)
-![ffe85d19-0914](https://github.com/user-attachments/assets/c0f58923-c6ff-4b6d-a1a1-da0bfa207a0b)
-![f22e6ac1-3702](https://github.com/user-attachments/assets/09fa4c6d-be7a-452a-ba0c-5488f0a6de45)
-![c8da2161-2884](https://github.com/user-attachments/assets/7e4077d8-33a2-487b-8b45-22dd08425d76)
+## 🔍 Detection Comparison — Original vs Custom YOLOv12s
 
-<img width="1678" height="600" alt="Pasted image (7)" src="https://github.com/user-attachments/assets/a1cd9256-eecb-40de-b797-a7d7de192ac9" />
+Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline) and our **Custom YOLOv12s** (Arch-6 + Custom Loss). The custom model demonstrates significantly improved detection quality: **higher confidence scores**, **fewer misclassifications** between visually similar classes (e.g., `pistol` vs `other`, `long_gun` vs `other`), and **fewer missed detections** — especially for small and partially occluded weapons.
+
+<details>
+<summary><b>🖼️ Click to view all detection examples</b></summary>
+
+<br>
+
+<table>
+  <tr>
+    <td align="center" colspan="2"><b>📌 Key Improvements</b></td>
+  </tr>
+  <tr>
+    <td align="center">✅ Higher precision — fewer false positives</td>
+    <td align="center">✅ Correct class assignment — no pistol↔other confusion</td>
+  </tr>
+  <tr>
+    <td align="center">✅ Fewer missed detections on small objects</td>
+    <td align="center">✅ Higher confidence scores across all classes</td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/81a36b38-f4fc-4e47-a802-8412de4e6e9e" alt="Comparison 1" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/ed016dae-a8f9-4913-8e03-f5316e807cec" alt="Comparison 2" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/7697bce4-9b79-43f2-b933-0c74ce6a6749" alt="Comparison 3" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/e4130d7a-c79b-48b8-a20a-c738221c99e3" alt="Comparison 4" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/10bd416e-95cc-4232-812d-cf2278843326" alt="Comparison 5" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/74129349-7519-4e7f-bbfd-adc9d3a580fe" alt="Comparison 6" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/a5336359-a267-4625-ae5e-22d7e2aeb8a3" alt="Comparison 7" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/a396a200-b4b0-4ef1-9ea9-73adab028473" alt="Comparison 8" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/3d169eaa-c69c-4771-bfb8-3fe2e010f713" alt="Comparison 9" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/7e18de1b-9f26-40e3-89d4-bf3660e63371" alt="Comparison 10" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/acf423f0-2dba-424f-9f95-12069235f39f" alt="Comparison 11" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/3fb02ab3-b4cf-48ec-a6ab-b15eb394fad6" alt="Comparison 12" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/16348eb5-abaa-4011-a3a6-bc19d91007a8" alt="Comparison 13" width="100%" />
+    </td>
+  </tr>
+</table>
+
+<br>
+
+### 🔎 Common Issues Fixed by Custom Model
+
+<table>
+  <tr>
+    <th align="center">Issue in Original</th>
+    <th align="center">Fixed in Custom</th>
+    <th align="left">Description</th>
+  </tr>
+  <tr>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td><b>Class Confusion (pistol ↔ other):</b> Original frequently misclassifies handheld objects (phones, wallets) as pistols and vice versa. Custom model correctly distinguishes between weapon and non-weapon classes.</td>
+  </tr>
+  <tr>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td><b>Class Confusion (long_gun ↔ other):</b> Original mislabels elongated objects as long guns. Custom model maintains correct class boundaries.</td>
+  </tr>
+  <tr>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td><b>Missed Small Detections:</b> Original fails to detect small or distant weapons. Custom model's P2 head (stride 4) captures objects missed at stride 8.</td>
+  </tr>
+  <tr>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td><b>Low Confidence Scores:</b> Original produces borderline detections with low confidence. Custom model outputs higher, more decisive confidence scores.</td>
+  </tr>
+  <tr>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td><b>Duplicate / Overlapping Boxes:</b> Original occasionally produces redundant detections on the same object. Custom model provides cleaner, single-box predictions.</td>
+  </tr>
+</table>
+
+</details>
+
+---
+
 
 </details>
