@@ -555,18 +555,19 @@ A **17% stratified subset** of the full dataset was used for **grid search exper
 
 ### 📸 Sample Annotations
 
+
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/af5b7f23-f809-404d-8da0-17ddc436f894" alt="Example 1" width="100%" />
+      <img src="https://github.com/user-attachments/assets/68f45e46-a9bd-49b3-8ac7-63a01ac44d3d" alt="Example 1" width="100%" />
       <br><sub>Example 1</sub>
     </td>
     <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/b0805ccc-09e6-4167-abcb-35a583532762" alt="Example 2" width="100%" />
+      <img src="https://github.com/user-attachments/assets/45d8dc1d-4285-4595-87f0-8f1b50f01f23" alt="Example 2" width="100%" />
       <br><sub>Example 2</sub>
     </td>
     <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/dbab2e81-8b7b-45b4-be47-50eb64689d9d" alt="Example 3" width="100%" />
+      <img src="https://github.com/user-attachments/assets/d58f36ed-3773-464d-9902-e2655455883f" alt="Example 3" width="100%" />
       <br><sub>Example 3</sub>
     </td>
   </tr>
