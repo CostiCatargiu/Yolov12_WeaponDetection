@@ -299,8 +299,6 @@ To validate the generalization capability of our custom models, we evaluated bot
   </tr>
 </table>
 
-<sub>✅ All F1 Scores exceed their corresponding mAP50 — indicating strong precision-recall balance across all external benchmarks.</sub>
-
 </div>
 
 
