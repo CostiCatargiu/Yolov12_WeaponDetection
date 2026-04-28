@@ -93,8 +93,13 @@
       <br><sub>📊 FIGURE 3. Training metrics ablation study: original YOLOv12s (blue); YOLOv12s + (B1–B5) architectural enhancements (orange); YOLOv12s + (A1–A4) custom loss modifications (red); new model — YOLOv12s + combined proposed modifications (green).</sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <img width="1007" height="867" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/278e3270-9edf-4004-9d9a-a87eab3a3b89" />
+      <br><sub>🎯 FIGURE 5. Confusion matrices on the test set for the new model: a) small objects; b) medium objects; c) large objects; d) all objects.</sub>
+    </td>
+  </tr>
 </table>
-
 
 
 <table>
