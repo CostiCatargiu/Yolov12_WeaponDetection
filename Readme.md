@@ -158,10 +158,10 @@
 
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.530 → <b>0.574</b> <sub>(+8.22%)</sub></td>
     <td align="center">0.530 → <b>0.590</b> <sub>(+11.32%)</sub></td>
+    <td align="center">0.530 → <b>0.608</b> <sub>(+14.72%)</sub></td>
     <td align="center">0.498 → <b>0.542</b> <sub>(+8.98%)</sub></td>
-    <td align="center">0.542 → <b>0.574</b> <sub>(+5.76%)</sub></td>
+    <td align="center">0.542 → <b>0.590</b> <sub>(+8.86%)</sub></td>
   </tr>
 
   <tr>
@@ -174,10 +174,10 @@
 
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.828 → <b>0.871</b> <sub>(+5.24%)</sub></td>
-    <td align="center">0.828 → <b>0.885</b> <sub>(+6.88%)</sub></td>
+    <td align="center">0.828 → <b>0.865</b> <sub>(+4.47%)</sub></td>
+    <td align="center">0.828 → <b>0.874</b> <sub>(+5.56%)</sub></td>
     <td align="center">0.796 → <b>0.842</b> <sub>(+5.76%)</sub></td>
-    <td align="center">0.842 → <b>0.871</b> <sub>(+3.54%)</sub></td>
+    <td align="center">0.842 → <b>0.865</b> <sub>(+2.73%)</sub></td>
   </tr>
 
   <tr>
@@ -186,10 +186,10 @@
 
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.297 → <b>0.336</b> <sub>(+13.10%)</sub></td>
     <td align="center">0.297 → <b>0.355</b> <sub>(+19.53%)</sub></td>
+    <td align="center">0.297 → <b>0.372</b> <sub>(+25.25%)</sub></td>
     <td align="center">0.276 → <b>0.316</b> <sub>(+14.55%)</sub></td>
-    <td align="center">0.316 → <b>0.336</b> <sub>(+6.32%)</sub></td>
+    <td align="center">0.316 → <b>0.355</b> <sub>(+12.34%)</sub></td>
   </tr>
 
   <tr>
@@ -202,13 +202,14 @@
 
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.550 → <b>0.604</b> <sub>(+9.74%)</sub></td>
-    <td align="center">0.550 → <b>0.628</b> <sub>(+14.18%)</sub></td>
+    <td align="center">0.550 → <b>0.597</b> <sub>(+8.55%)</sub></td>
+    <td align="center">0.550 → <b>0.604</b> <sub>(+9.82%)</sub></td>
     <td align="center">0.524 → <b>0.584</b> <sub>(+11.59%)</sub></td>
-    <td align="center">0.584 → <b>0.604</b> <sub>(+3.31%)</sub></td>
+    <td align="center">0.584 → <b>0.597</b> <sub>(+2.23%)</sub></td>
   </tr>
 
 </table>
+
 
 <sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+14.55%</b> improvement on small objects | YOLOv12s outperforms YOLO26s by <b>+6.32%</b> on small objects (mAP50-95)</sub>
 
