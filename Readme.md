@@ -211,6 +211,7 @@
 </table>
 
 
+
 <sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+14.55%</b> improvement on small objects | YOLOv12s outperforms YOLO26s by <b>+6.32%</b> on small objects (mAP50-95)</sub>
 
 </div>
