@@ -1,4 +1,6 @@
-<h1 align="center">🔫 Small-Object Weapon Detection with Custom YOLOv12s & YOLO26s</h1>
+<h1 align="center">🔫 Real-Time Weapon Detection with Enhanced YOLOv12s & a Custom Dataset</h1>
+
+<p align="center"><sub>Official repository for the paper <b>"Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset"</b> — C. Catargiu & I. B. Ciocoiu, Gheorghe Asachi Technical University of Iasi</sub></p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
@@ -7,19 +9,19 @@
 </p>
 
 <p align="center">
-  <a href="https://universe.roboflow.com/gundetectiondatase<img width="1600" height="988" alt="thumbnail (1)" src="https://github.com/user-attachments/assets/aa4aa57c-2c5c-4389-8785-0536ab81f082" />/nogun/dataset/2">
-    <img src="https://img.shields.io/badge/NoGun_Dataset-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="NoGun Dataset">
-  </a>
-  <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8">
+  <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8">
     <img src="https://img.shields.io/badge/WeaponDataset_v8-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="WeaponDataset v8">
+  </a>
+  <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">
+    <img src="https://img.shields.io/badge/NoGun_Dataset-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="NoGun Dataset">
   </a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Model-YOLOv12s_Custom-red?style=flat-square" />
-  <img src="https://img.shields.io/badge/Model-YOLO26s-red?style=flat-square" />
+  <img src="https://img.shields.io/badge/Comparison-YOLO26-orange?style=flat-square" />
   <img src="https://img.shields.io/badge/Focus-Small_Object_Detection-purple?style=flat-square" />
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+  <img src="https://img.shields.io/badge/Speed-205--210_FPS_(RTX_4090)-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
 </p>
 
@@ -27,293 +29,144 @@
 
 ## 🏆 Research Highlights
 
-<table>
-  <tr>
-    <th align="center">🧪 Total Experiments</th>
-    <th align="center">⏱️ Total Training Time</th>
-  </tr>
-  <tr>
-    <td align="center"><code>247</code></td>
-    <td align="center"><code>~406 hours (~16.9 days)</code></td>
-  </tr>
-</table>
+The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware loss** (A1–A4) and **(ii)** five **lightweight, append-only, zero-gated enhancement modules** in the detection head (B1–B5). Both models were trained on a new **26,528-image / 38,067-instance** custom dataset with a **leakage-free, cluster-based split**. All headline gains are averaged over **3 independent seeds** and exceed seed-to-seed variation by an **order of magnitude**, while preserving **real-time operation (205–210 FPS vs ~220 FPS baseline, RTX 4090)**.
 
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
-      <br><sub>🏗️ Custom YOLOv12s Architecture <br></sub>
+      <img width="100%" alt="Custom YOLOv12s Architecture" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
+      <br><sub>🏗️ Modified YOLOv12s architecture — five zero-gated head modules (B1–B5)</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+      <img width="100%" alt="Training Metrics — Baseline vs Custom Loss + Arch" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
       <br><sub>📈 Training metrics — Baseline vs Custom Loss + Arch</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
-      <br><sub>📊 Training metrics ablation study: original YOLOv12s (blue); YOLOv12s + (B1–B5) architectural enhancements (orange); YOLOv12s + (A1–A4) custom loss modifications (red); new model — YOLOv12s + combined proposed modifications (green).</sub>
+      <br><sub>📊 Training metrics ablation study: original YOLOv12s (blue); + (B1–B5) architectural enhancements (orange); + (A1–A4) custom loss (red); combined proposed model (green).</sub>
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
-      <br><sub>🎯 Confusion matrices on the test set for the new model: a) small objects; b) medium objects; c) large objects; d) all objects.</sub>
+      <br><sub>🎯 Confusion matrices on the test set for the new model: a) small; b) medium; c) large; d) all objects.</sub>
     </td>
   </tr>
 </table>
 
-
 <table>
   <tr>
-    <th align="center" colspan="6">📈 Performance Improvements</th>
+    <th align="center" colspan="5">📈 Test-Set Performance (mean over 3 seeds — see Seed Reproducibility)</th>
   </tr>
   <tr>
     <th align="center">Metric</th>
-    <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom Loss</sub></th>
-    <th align="center">🧪 YOLOv12s<br><sub>Baseline → Custom Loss+Arch</sub></th>
-    <th align="center">🔶 YOLO26s<br><sub>Baseline → YOLOv12s+Custom Loss</sub></th>
-    <th align="center">🏗️ Baseline<br><sub>YOLO26s vs YOLOv12s</sub></th>
+    <th align="center">🔷 YOLOv12s<br><sub>Baseline → + Custom Loss (A1–A4)</sub></th>
+    <th align="center">🏆 YOLOv12s<br><sub>Baseline → + Loss + Arch (Proposed)</sub></th>
+    <th align="center">🔶 YOLO26s<br><sub>(same data, split & schedule)</sub></th>
   </tr>
   <tr>
-    <td align="left"><b>mAP50</b></td>
-    <td align="center">0.812 → <b>0.839</b> <sub>(+3.33%)</sub></td>
-    <td align="center">0.812 → <b>0.852</b> <sub>(+4.93%)</sub></td>
-    <td align="center">0.807 → <b>0.839</b> <sub>(+3.97%)</sub></td>
-    <td align="center">0.807 → <b>0.812</b> <sub>(+0.62%)</sub></td>
+    <td align="left"><b>mAP@50</b></td>
+    <td align="center">0.812 → <b>0.839</b> <sub>(+3.3%)</sub></td>
+    <td align="center">0.812 → <b>0.852</b> <sub>(+4.9%)</sub></td>
+    <td align="center">0.807</td>
   </tr>
   <tr>
-    <td align="left"><b>mAP50-95</b></td>
-    <td align="center">0.516 → <b>0.539</b> <sub>(+4.46%)</sub></td>
-    <td align="center">0.516 → <b>0.553</b> <sub>(+7.17%)</sub></td>
-    <td align="center">0.521 → <b>0.539</b> <sub>(+3.45%)</sub></td>
-    <td align="center">0.521 → <b>0.516</b> <sub>(-0.96%)</sub></td>
+    <td align="left"><b>mAP@50-95</b></td>
+    <td align="center">0.516 → <b>0.539</b> <sub>(+4.5%)</sub></td>
+    <td align="center">0.516 → <b>0.553</b> <sub>(+7.2%)</sub></td>
+    <td align="center">0.521</td>
   </tr>
   <tr>
     <td align="left"><b>Precision</b></td>
-    <td align="center">0.833 → <b>0.852</b> <sub>(+2.28%)</sub></td>
-    <td align="center">0.833 → <b>0.865</b> <sub>(+3.84%)</sub></td>
-    <td align="center">0.845 → <b>0.852</b> <sub>(+0.83%)</sub></td>
-    <td align="center">0.845 → <b>0.833</b> <sub>(-1.42%)</sub></td>
+    <td align="center">0.833 → <b>0.852</b> <sub>(+2.3%)</sub></td>
+    <td align="center">0.833 → <b>0.865</b> <sub>(+3.8%)</sub></td>
+    <td align="center">0.845</td>
   </tr>
   <tr>
     <td align="left"><b>Recall</b></td>
-    <td align="center">0.747 → <b>0.782</b> <sub>(+4.69%)</sub></td>
-    <td align="center">0.747 → <b>0.800</b> <sub>(+7.10%)</sub></td>
-    <td align="center">0.753 → <b>0.782</b> <sub>(+3.85%)</sub></td>
-    <td align="center">0.753 → <b>0.747</b> <sub>(-0.80%)</sub></td>
+    <td align="center">0.747 → <b>0.782</b> <sub>(+4.7%)</sub></td>
+    <td align="center">0.747 → <b>0.800</b> <sub>(+7.1%)</sub></td>
+    <td align="center">0.753</td>
   </tr>
   <tr>
-    <td align="left"><b>F1 Score</b></td>
-    <td align="center">0.788 → <b>0.816</b> <sub>(+3.55%)</sub></td>
-    <td align="center">0.788 → <b>0.831</b> <sub>(+5.46%)</sub></td>
-    <td align="center">0.796 → <b>0.816</b> <sub>(+2.51%)</sub></td>
-    <td align="center">0.796 → <b>0.788</b> <sub>(-1.01%)</sub></td>
+    <td align="left"><b>F1-score</b></td>
+    <td align="center">0.788 → <b>0.816</b> <sub>(+3.6%)</sub></td>
+    <td align="center">0.788 → <b>0.831</b> <sub>(+5.5%)</sub></td>
+    <td align="center">0.796</td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50</b></td>
+    <td colspan="5" align="center"><b>🔍 Size-Specific mAP@50</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.640 → <b>0.681</b> <sub>(+6.41%)</sub></td>
-    <td align="center">0.640 → <b>0.708</b> <sub>(+10.63%)</sub></td>
-    <td align="center">0.615 → <b>0.681</b> <sub>(+10.73%)</sub></td>
-    <td align="center">0.615 → <b>0.640</b> <sub>(+4.07%)</sub></td>
+    <td align="center">0.640 → <b>0.681</b> <sub>(+6.4%)</sub></td>
+    <td align="center">0.640 → <b>0.708</b> <sub>(+10.6%)</sub></td>
+    <td align="center">0.615</td>
   </tr>
   <tr>
     <td align="left">📦 <b>Medium</b></td>
-    <td align="center">0.781 → <b>0.818</b> <sub>(+4.74%)</sub></td>
-    <td align="center">0.781 → <b>0.826</b> <sub>(+5.76%)</sub></td>
-    <td align="center">0.780 → <b>0.818</b> <sub>(+4.87%)</sub></td>
-    <td align="center">0.780 → <b>0.781</b> <sub>(+0.13%)</sub></td>
+    <td align="center">0.781 → <b>0.818</b> <sub>(+4.7%)</sub></td>
+    <td align="center">0.781 → <b>0.826</b> <sub>(+5.8%)</sub></td>
+    <td align="center">0.780</td>
   </tr>
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.848 → <b>0.866</b> <sub>(+2.12%)</sub></td>
-    <td align="center">0.848 → <b>0.872</b> <sub>(+2.83%)</sub></td>
-    <td align="center">0.843 → <b>0.866</b> <sub>(+2.73%)</sub></td>
-    <td align="center">0.843 → <b>0.848</b> <sub>(+0.59%)</sub></td>
+    <td align="center">0.848 → <b>0.866</b> <sub>(+2.1%)</sub></td>
+    <td align="center">0.848 → <b>0.872</b> <sub>(+2.8%)</sub></td>
+    <td align="center">0.843</td>
   </tr>
   <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+    <td colspan="5" align="center"><b>🔍 Size-Specific mAP@50-95</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.324 → <b>0.348</b> <sub>(+7.41%)</sub></td>
-    <td align="center">0.324 → <b>0.354</b> <sub>(+9.26%)</sub></td>
-    <td align="center">0.317 → <b>0.348</b> <sub>(+9.78%)</sub></td>
-    <td align="center">0.317 → <b>0.324</b> <sub>(+2.21%)</sub></td>
+    <td align="center">0.324 → <b>0.348</b> <sub>(+7.4%)</sub></td>
+    <td align="center">0.324 → <b>0.354</b> <sub>(+9.3%)</sub></td>
+    <td align="center">0.317</td>
   </tr>
   <tr>
     <td align="left">📦 <b>Medium</b></td>
-    <td align="center">0.445 → <b>0.472</b> <sub>(+6.07%)</sub></td>
-    <td align="center">0.445 → <b>0.480</b> <sub>(+7.87%)</sub></td>
-    <td align="center">0.466 → <b>0.472</b> <sub>(+1.29%)</sub></td>
-    <td align="center">0.466 → <b>0.445</b> <sub>(-4.51%)</sub></td>
+    <td align="center">0.445 → <b>0.472</b> <sub>(+6.1%)</sub></td>
+    <td align="center">0.445 → <b>0.480</b> <sub>(+7.9%)</sub></td>
+    <td align="center">0.466</td>
   </tr>
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.574 → <b>0.591</b> <sub>(+2.96%)</sub></td>
-    <td align="center">0.574 → <b>0.595</b> <sub>(+3.66%)</sub></td>
-    <td align="center">0.588 → <b>0.591</b> <sub>(+0.51%)</sub></td>
-    <td align="center">0.588 → <b>0.574</b> <sub>(-2.38%)</sub></td>
+    <td align="center">0.574 → <b>0.591</b> <sub>(+3.0%)</sub></td>
+    <td align="center">0.574 → <b>0.595</b> <sub>(+3.7%)</sub></td>
+    <td align="center">0.588</td>
   </tr>
 </table>
 
-<sub>🔍 <b>Key Findings:</b> Custom loss achieves up to <b>+10.73%</b> improvement on small objects | YOLOv12s outperforms YOLO26s by <b>+9.78%</b> on small objects (mAP50-95)</sub>
+<sub>🔍 <b>Key findings:</b> Largest relative gains exactly where the design aims — <b>small objects (+10.6% mAP@50, +12.8% Recall)</b> and the <b>no_weapon confounder class (+11.6% mAP@50, +16.4% Recall)</b>. The proposed YOLOv12s also outperforms <b>YOLO26s</b> trained under identical conditions, at every object size.</sub>
 
 </div>
-
-## 📊 Ablation Study — Performance by Object Size
-
-<details>
-<summary><b>🔍 Small Objects (&lt;32 pixels)</b> — click to expand</summary>
-
-| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1+A2+A3+A4) | +Architecture   | 🏆 New Model         |
-|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
-| **mAP@50**    | 0.640    | 0.669 (+4.53%)  | 0.631 (−1.41%)   | 0.665 (+3.91%)   | 0.674 (+5.31%)   | 0.681 (+6.41%)                | 0.664 (+3.75%)   | **0.708 (+10.63%)**   |
-| **mAP@50–95** | 0.324    | 0.336 (+3.70%)  | 0.319 (−1.54%)   | 0.341 (+5.25%)   | 0.339 (+4.63%)   | 0.348 (+7.41%)                | 0.334 (+3.09%)   | **0.354 (+9.26%)**    |
-| **Precision** | 0.758    | 0.770 (+1.58%)  | 0.762 (+0.53%)   | 0.766 (+1.06%)   | 0.778 (+2.64%)   | 0.783 (+3.30%)                | 0.769 (+1.45%)   | **0.790 (+4.22%)**    |
-| **Recall**    | 0.585    | 0.622 (+6.32%)  | 0.572 (−2.22%)   | 0.628 (+7.35%)   | 0.625 (+6.84%)   | 0.648 (+10.77%)               | 0.611 (+4.44%)   | **0.660 (+12.82%)**   |
-| **F1-score**  | 0.662    | 0.692 (+4.53%)  | 0.653 (−1.36%)   | 0.694 (+4.83%)   | 0.697 (+5.29%)   | 0.708 (+6.95%)                | 0.682 (+3.02%)   | **0.719 (+8.61%)**    |
-
-</details>
-
-<details>
-<summary><b>📦 Medium Objects (&lt;96 pixels)</b> — click to expand</summary>
-
-| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1+A2+A3+A4) | +Architecture   | 🏆 New Model         |
-|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
-| **mAP@50**    | 0.781    | 0.811 (+3.84%)  | 0.773 (−1.02%)   | 0.807 (+3.33%)   | 0.814 (+4.23%)   | 0.818 (+4.74%)                | 0.797 (+2.05%)   | **0.826 (+5.76%)**    |
-| **mAP@50–95** | 0.445    | 0.464 (+4.27%)  | 0.439 (−1.35%)   | 0.467 (+4.94%)   | 0.465 (+4.49%)   | 0.472 (+6.07%)                | 0.457 (+2.70%)   | **0.480 (+7.87%)**    |
-| **Precision** | 0.816    | 0.838 (+2.70%)  | 0.820 (+0.49%)   | 0.833 (+2.08%)   | 0.845 (+3.55%)   | 0.851 (+4.29%)                | 0.832 (+1.96%)   | **0.860 (+5.39%)**    |
-| **Recall**    | 0.723    | 0.751 (+3.87%)  | 0.714 (−1.24%)   | 0.754 (+4.29%)   | 0.752 (+4.01%)   | 0.763 (+5.53%)                | 0.741 (+2.49%)   | **0.775 (+7.19%)**    |
-| **F1-score**  | 0.767    | 0.792 (+3.26%)  | 0.758 (−1.17%)   | 0.791 (+3.13%)   | 0.796 (+3.78%)   | 0.805 (+4.95%)                | 0.784 (+2.22%)   | **0.815 (+6.26%)**    |
-
-</details>
-
-<details>
-<summary><b>🟫 Large Objects (&gt;96 pixels)</b> — click to expand</summary>
-
-| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1+A2+A3+A4) | +Architecture   | 🏆 New Model         |
-|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
-| **mAP@50**    | 0.848    | 0.858 (+1.18%)  | 0.853 (+0.59%)   | 0.854 (+0.71%)   | 0.862 (+1.65%)   | 0.866 (+2.12%)                | 0.856 (+0.94%)   | **0.872 (+2.83%)**    |
-| **mAP@50–95** | 0.574    | 0.583 (+1.57%)  | 0.578 (+0.70%)   | 0.585 (+1.92%)   | 0.582 (+1.39%)   | 0.591 (+2.96%)                | 0.582 (+1.39%)   | **0.595 (+3.66%)**    |
-| **Precision** | 0.844    | 0.867 (+2.73%)  | 0.851 (+0.83%)   | 0.862 (+2.13%)   | 0.873 (+3.44%)   | 0.880 (+4.27%)                | 0.861 (+2.01%)   | **0.893 (+5.81%)**    |
-| **Recall**    | 0.808    | 0.822 (+1.73%)  | 0.815 (+0.87%)   | 0.825 (+2.10%)   | 0.823 (+1.86%)   | 0.831 (+2.85%)                | 0.818 (+1.24%)   | **0.838 (+3.71%)**    |
-| **F1-score**  | 0.825    | 0.843 (+2.18%)  | 0.832 (+0.85%)   | 0.842 (+2.06%)   | 0.846 (+2.55%)   | 0.854 (+3.52%)                | 0.839 (+1.70%)   | **0.864 (+4.73%)**    |
-
-</details>
-
----
-
-## 🧪 External Dataset Evaluation
-
-To validate the generalization capability of our custom models, we evaluated both **YOLOv12s_custom** and **YOLO26s_custom** on **3 external datasets** that were **not used during training**. The results demonstrate that our models generalize well across diverse weapon detection benchmarks, achieving satisfactory performance on unseen data distributions.
-
-<div align="center">
-<table>
-  <tr>
-    <th align="center">Model</th>
-    <th align="center">Dataset</th>
-    <th align="center">Precision</th>
-    <th align="center">Recall</th>
-    <th align="center">F1 Score</th>
-    <th align="center">mAP50</th>
-    <th align="center">mAP50-95</th>
-    <th align="center">Classes</th>
-    <th align="center">Images</th>
-  </tr>
-  <tr>
-    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
-    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
-    <td align="center"><code>0.833</code></td>
-    <td align="center"><code>0.778</code></td>
-    <td align="center"><code>0.805</code></td>
-    <td align="center"><code>0.792</code></td>
-    <td align="center">—</td>
-    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
-    <td align="center"><code>8,478</code></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
-    <td align="center"><code>0.854</code></td>
-    <td align="center"><code>0.781</code></td>
-    <td align="center"><code>0.816</code></td>
-    <td align="center"><code>0.805</code></td>
-    <td align="center">—</td>
-    <td align="center"><sub>gun</sub></td>
-    <td align="center"><code>5,000</code></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
-    <td align="center"><code>0.828</code></td>
-    <td align="center"><code>0.760</code></td>
-    <td align="center"><code>0.793</code></td>
-    <td align="center"><code>0.776</code></td>
-    <td align="center">—</td>
-    <td align="center"><sub>pistol, smartphone, knife, coin purse, ticket, card</sub></td>
-    <td align="center"><code>5,859</code></td>
-  </tr>
-  <tr><td colspan="9"><hr/></td></tr>
-  <tr>
-    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
-    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
-    <td align="center"><code>0.8124</code></td>
-    <td align="center"><code>0.7588</code></td>
-    <td align="center"><code>0.7847</code></td>
-    <td align="center"><code>0.7400</code></td>
-    <td align="center"><code>0.5008</code></td>
-    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
-    <td align="center"><code>8,478</code></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
-    <td align="center"><code>0.8390</code></td>
-    <td align="center"><code>0.7685</code></td>
-    <td align="center"><code>0.8022</code></td>
-    <td align="center"><code>0.7500</code></td>
-    <td align="center"><code>0.5250</code></td>
-    <td align="center"><sub>gun</sub></td>
-    <td align="center"><code>5,000</code></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
-    <td align="center"><code>0.8115</code></td>
-    <td align="center"><code>0.7462</code></td>
-    <td align="center"><code>0.7775</code></td>
-    <td align="center"><code>0.7300</code></td>
-    <td align="center"><code>0.5110</code></td>
-    <td align="center"><sub>pistol, smartphone, knife, monedero, billete, tarjeta</sub></td>
-    <td align="center"><code>5,859</code></td>
-  </tr>
-</table>
-
-</div>
-
-
 
 ---
 
 ## 📖 Overview
 
-This repository accompanies our **research paper** on **small-object weapon detection**. We present:
+This repository accompanies our research paper on **real-time small-object weapon detection**. We present:
 
-- 📦 A **custom dataset** built from **~1,200 YouTube videos** with **59,305 images** and **76,705 annotated instances**
-- 🏗️ A **modified YOLOv12s architecture** with **P2–P5 detection heads** optimized for **small object detection**
-- 📉 A **custom loss function** with **size-aware weighting** and **tuned TaskAligned assigner**
-- 🔍 A **comprehensive ablation study** to identify optimal hyperparameters for loss and architecture
-- 📊 **Transfer validation** to **YOLO26s** using the best-performing configurations from YOLOv12s
+- 📦 A **custom dataset**: **26,528 images** / **38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, range/tactical footage) and curated web images
+- 🧬 A **leakage-free data split**: perceptual-hash clustering of near-duplicate frames (64-bit dHash, Hamming ≤ 5, union-find → **19,036 clusters**), whole clusters assigned to a single split via stratified greedy 70/15/15 — audited so **no near-duplicate pair crosses a split boundary**
+- 📉 A **small-object-aware loss** (A1–A4): dynamic curriculum weighting, auxiliary center loss, adaptive loss clipping, and small-object-tuned Task-Aligned assignment
+- 🏗️ Five **lightweight, append-only, zero-gated head modules** (B1–B5): *ZGSmallDetail* (P3), *ZGLSKAWideFuseV2* (P4), *ZGLSKAWideFuse* (P5), *ZGGlobalContext* (all levels), and *DetectAuxDual* (training-only auxiliary head) — the standard **P3/P4/P5 layout is retained** (a P2/five-scale extension was tested and rejected)
+- 🔬 An **extensive ablation study**: 40+ architectural variants, loss grid searches, per-size analysis, and a **3-seed reproducibility study** for every headline configuration
+- 🔶 A controlled comparison against **YOLO26** ("s" scale, official Ultralytics implementation) trained under exactly the same dataset, split, schedule, and hyperparameters
+- 🌍 **External-dataset validation** on three public benchmarks without retraining (mAP@50 = 0.776–0.805)
 
 ### 📑 What You'll Find Below
 
 | Section | Description |
 |---------|-------------|
-| 📊 **Dataset Statistics** | Class distribution, size analysis, split percentages |
-| 🖼️ **Dataset Examples** | Sample images with annotations across different scenarios |
-| 🏗️ **Architecture Details** | P2–P5 head modifications and comparisons |
-| 📉 **Loss Function Ablation** | Custom loss components and tuning results |
-| 🧪 **Experiment Results** | Performance metrics, confusion matrices, training curves |
-| 🔍 **Prediction Examples** | Side-by-side comparisons (Original vs Custom model) |
-| ⬇️ **Model Weights** | Pre-trained weights for YOLOv12s and YOLO26s |
+| 📊 **Dataset** | Sources, classes, preprocessing, leakage-free split, size statistics |
+| 🏗️ **Proposed Model** | Custom loss (A1–A4) and zero-gated head modules (B1–B5) |
+| 📈 **Results** | Overall & per-class metrics, size-specific ablation, confusion matrices |
+| 🎲 **Seed Reproducibility** | 3-seed mean ± std for all four configurations |
+| 🔶 **YOLO26 Comparison** | Controlled comparison under identical conditions |
+| 🌍 **External Validation** | Zero-shot transfer to 3 public weapon datasets |
+| ⬇️ **Weights & Configs** | Pre-trained weights and full training configurations |
 
 ---
 
@@ -321,7 +174,7 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 | Domain | Use Cases |
 |--------|-----------|
-| 📹 **Surveillance** | CCTV monitoring, real-time threat detection, smart city integration |
+| 📹 **Surveillance** | CCTV monitoring, real-time threat detection, smart-city integration |
 | 🛡️ **Public Safety** | Transportation hubs, stadiums, schools, public gatherings |
 | 🚪 **Access Control** | Entry point screening, secure facilities, building protection |
 | 🚔 **Law Enforcement** | Real-time threat assessment, evidence analysis, situational awareness |
@@ -329,65 +182,52 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 ---
 
-## 🖥️ Hardware & Software Configuration
-
-<details>
-<summary><b>⚙️ Click to expand System Specifications</b></summary>
-
-<br>
-
-| Component | Specification |
-|-----------|---------------|
-| 💻 **Operating System** | Ubuntu 22.04.3 LTS |
-| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
-| 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
-| 🗄️ **RAM** | DDR5 64GB (6000MHz) |
-| 💾 **Storage** | SSD 2TB |
-| 🐍 **Python** | 3.10.2 |
-| 🔥 **PyTorch** | 2.1.2 |
-| ⚡ **CUDA** | 12.1 |
-
-</details>
-
----
-
 ## ⚡ Dataset Summary
 
 <table>
   <tr>
-    <th align="left" width="200">📋 Property</th>
+    <th align="left" width="220">📋 Property</th>
     <th align="left">📊 Details</th>
   </tr>
   <tr>
     <td>🖼️ <b>Total Images</b></td>
-    <td><code>59,305</code></td>
+    <td><code>26,528</code></td>
   </tr>
   <tr>
     <td>🔢 <b>Total Instances</b></td>
-    <td><code>76,705</code> (0 empty labels)</td>
+    <td><code>38,067</code> (manually annotated; verified by the second author)</td>
   </tr>
   <tr>
     <td>🏷️ <b>Classes</b></td>
     <td>
       <img src="https://img.shields.io/badge/knife-E74C3C?style=flat-square" />
+      <img src="https://img.shields.io/badge/pistol-9B59B6?style=flat-square" />
       <img src="https://img.shields.io/badge/long__gun-3498DB?style=flat-square" />
       <img src="https://img.shields.io/badge/no__weapon-95A5A6?style=flat-square" />
-      <img src="https://img.shields.io/badge/pistol-9B59B6?style=flat-square" />
     </td>
   </tr>
   <tr>
-    <td>🧰 <b>Format</b></td>
-    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized)</td>
+    <td>🎬 <b>Sources</b></td>
+    <td>1,200+ YouTube videos (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) + curated web images</td>
   </tr>
   <tr>
-    <td>📜 <b>License</b></td>
-    <td><img src="https://img.shields.io/badge/MIT-green?style=flat-square" /></td>
+    <td>🧰 <b>Format</b></td>
+    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized), axis-aligned boxes</td>
+  </tr>
+  <tr>
+    <td>🧬 <b>Split</b></td>
+    <td>70 / 15 / 15 (train/val/test), <b>leakage-free</b> cluster-based split (see below)</td>
+  </tr>
+  <tr>
+    <td>📜 <b>Usage</b></td>
+    <td>All frames collected from publicly accessible sources — released <b>for research purposes only</b></td>
   </tr>
   <tr>
     <td>☁️ <b>Hosting</b></td>
     <td>
+      Two companion Roboflow projects forming a single dataset:<br>
+      <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
       <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
-      <a href="https://app.roboflow.com/gundetectiondataset/weapondataset-oi2g3/8"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
     </td>
   </tr>
   <tr>
@@ -406,75 +246,44 @@ This repository accompanies our **research paper** on **small-object weapon dete
 
 <br>
 
-The **NewWeaponDataset** is specifically designed for **small-object weapon detection** with the following characteristics:
-
-- 🎯 **Multi-class Detection** — Covers 4 classes: `knife`, `pistol`, `long_gun`, and `no_weapon`
-- 🎬 **Diverse Sources** — Extracted from **~1,200 YouTube videos** with varied content and scenarios
-- 📐 **Resolution Variety** — Includes multiple resolutions and aspect ratios for robust training
-- 🌓 **Scene Diversity** — Contains day/night footage, CCTV recordings, and handheld camera shots
-- 💨 **Real-world Challenges** — Features occlusions, motion blur, and cluttered backgrounds
+- 🎯 **Multi-class Detection** — 4 classes: `knife`, `pistol`, `long_gun`, and `no_weapon`
+- 🎬 **Diverse Sources** — 1,200+ YouTube videos plus curated web images, deliberately mixing viewpoints, resolutions, lighting, and weapon-handling contexts
+- 🌓 **Scene Diversity** — day/night/artificial lighting, close vs distant views, CCTV and handheld footage
+- 💨 **Real-world Challenges** — occlusions, motion blur, dense crowds, cluttered backgrounds
+- ✂️ **Consistent Labeling** — one label per weapon type (every pistol model → `pistol`); partially visible/truncated weapons annotated with the same class as fully visible ones
 
 </details>
 
 ---
 
 <details>
-<summary><b>🏷️ Class Descriptions</b></summary>
+<summary><b>🏷️ Class Descriptions — and why <code>no_weapon</code> exists</b></summary>
 
 <br>
 
 - 🗡️ **`knife`** — Bladed weapons including knives and similar sharp objects
 - 🔫 **`pistol`** — Handguns and short firearms
 - 🎯 **`long_gun`** — Rifles, shotguns, and other long-barreled firearms
-- 🚫 **`no_weapon`** — Hard negatives such as phones, tools, umbrellas, and camera equipment
+- 🚫 **`no_weapon`** — A curated set of visually confusable items: phones, remote controls, selfie sticks, and similarly shaped hand-held tools
 
-### ❓ Why Include `no_weapon`?
+### ❓ Why an explicit `no_weapon` class?
 
-The `no_weapon` class serves as **hard negatives** — visually similar objects that are frequently misclassified as weapons. Including these examples:
+An explicit negative class was preferred over leaving such objects as unlabeled background because it **supervises the decision boundary directly** (following the *Not-Pistol* precedent of Bhatti et al., IEEE Access 2021). It directly targets the dominant failure mode of deployed weapon detectors — high false-positive rates on weapon-shaped everyday objects:
 
 - ✅ **Reduces false positives** in production environments
 - ✅ **Improves precision** in crowded and complex scenes
-- ✅ **Teaches the model to distinguish** weapons from everyday objects like 📱 phones, 🔧 tools, ☂️ umbrellas, and 📷 camera equipment
+- ✅ **Forces the model to learn** the boundary between genuine weapons and confounders
 
 </details>
 
 ---
-
-## 📊 Dataset Details
-
-<details>
-<summary><b>📁 Full Dataset (100%)</b></summary>
-
-<br>
-
-### 🗂️ Folder Structure
-
-<pre>
-NewWeaponDataset/
-├── 📂 train/                   <b>82.76%</b>  │  49,079 images  │  63,452 instances
-│   ├── 🖼️ images/
-│   └── 🏷️ labels/
-├── 📂 valid/                   <b>12.73%</b>  │  7,552 images   │  9,730 instances
-│   ├── 🖼️ images/
-│   └── 🏷️ labels/
-├── 📂 test/                    <b>4.51%</b>   │  2,674 images   │  3,523 instances
-│   ├── 🖼️ images/
-│   └── 🏷️ labels/
-└── ⚙️ data.yaml
-────────────────────────────────────────────────────────────────────
-<b>Total:</b>                          <b>100%</b>    │  <b>59,305 images</b>  │  <b>76,705 instances</b>
-</pre>
-
----
-
-## 🔄 Dataset Preprocessing & Augmentation
 
 <details>
 <summary><b>🛠️ Preprocessing Pipeline</b></summary>
 
 <br>
 
-All images underwent standardized preprocessing before training to ensure consistency and improve quality:
+All images underwent standardized preprocessing, **applied uniformly to all three splits** so training and evaluation share the same input distribution:
 
 <table>
   <tr>
@@ -484,368 +293,18 @@ All images underwent standardized preprocessing before training to ensure consis
   </tr>
   <tr>
     <td align="center">🔄 <b>Auto-Orient</b></td>
-    <td>Corrected image orientation based on EXIF metadata</td>
-    <td>Ensures consistent spatial layout regardless of capture device</td>
+    <td>Rotates the pixel matrix based on orientation metadata</td>
+    <td>Prevents the model from learning misleading pose variations (sideways weapons, rotated people)</td>
   </tr>
   <tr>
     <td align="center">📐 <b>Resize</b></td>
-    <td>Uniform resizing to <code>640×640</code> pixels</td>
-    <td>Consistent with YOLO training requirements</td>
+    <td>Uniform resizing to <code>640×640</code> px</td>
+    <td>Consistent with YOLO training requirements (640 px confirmed against 800/960 px alternatives — no improvement)</td>
   </tr>
   <tr>
-    <td align="center">🌗 <b>Histogram Equalization</b></td>
-    <td>Applied histogram equalization to improve contrast</td>
-    <td>Enhances visibility and emphasizes object boundaries, particularly in low-light or high-glare conditions</td>
-  </tr>
-</table>
-
-</details>
-
----
-
-<details>
-<summary><b>🎨 Augmentation Strategy</b></summary>
-
-<br>
-
-To increase robustness and reduce overfitting, we applied a controlled set of augmentations, generating **3 variants per training sample**:
-
-<table>
-  <tr>
-    <th align="center">Augmentation</th>
-    <th align="center">Parameters</th>
-    <th align="left">Purpose</th>
-  </tr>
-  <tr>
-    <td align="center">↔️ <b>Horizontal Flip</b></td>
-    <td align="center">50% probability</td>
-    <td>Simulates viewpoint variation and mirrored perspectives</td>
-  </tr>
-  <tr>
-    <td align="center">🔁 <b>Rotation</b></td>
-    <td align="center">−14° to +14°</td>
-    <td>Mimics camera tilt or hand motion in real-world footage</td>
-  </tr>
-  <tr>
-    <td align="center">◇ <b>Shear Transformation</b></td>
-    <td align="center">±13° (horizontal & vertical)</td>
-    <td>Introduces mild geometric distortion for pose robustness</td>
-  </tr>
-  <tr>
-    <td align="center">🌑 <b>Grayscale Conversion</b></td>
-    <td align="center">10% of images</td>
-    <td>Simulates poor lighting or monochromatic camera feeds</td>
-  </tr>
-  <tr>
-    <td align="center">🌫️ <b>Gaussian Blur</b></td>
-    <td align="center">Up to 1.6 px</td>
-    <td>Replicates motion blur and low-quality surveillance conditions</td>
-  </tr>
-</table>
-
-<br>
-
-> 📌 **Note:** These augmentations were applied during dataset preparation via **Roboflow** (offline augmentation, 3× output multiplier). This is **separate** from the runtime augmentations used by Ultralytics during training (mosaic, copy-paste, erasing, etc. — see [Training Config](#-8-training-config-reproducibility) for full details).
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Preprocessing-Auto_Orient_+_Resize_+_Histogram_EQ-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/Augmentation-3x_per_sample-orange?style=flat-square" />
-  <img src="https://img.shields.io/badge/Total_Output-~3x_Training_Images-green?style=flat-square" />
-</p>
-
-This preprocessing and augmentation strategy ensures the dataset reflects the variability encountered in real-world surveillance while maintaining high annotation fidelity.
-
-</details>
-
----
-
-### 📊 Class Distribution per Split
-
-| Split | Images | % | Instances | 🗡️ knife | 🎯 long_gun | 🚫 no_weapon | 🔫 pistol |
-|-------|-------:|--:|----------:|---------:|------------:|-------------:|----------:|
-| Train | 49,079 | 82.76% | 63,452 | 10,511 **(16.6%)** | 19,273 **(30.4%)** | 10,161 **(16.0%)** | 23,507 **(37.1%)** |
-| Valid | 7,552 | 12.73% | 9,730 | 1,813 **(18.6%)** | 2,750 **(28.3%)** | 1,324 **(13.6%)** | 3,843 **(39.5%)** |
-| Test | 2,674 | 4.51% | 3,523 | 686 **(19.5%)** | 941 **(26.7%)** | 656 **(18.6%)** | 1,240 **(35.2%)** |
-| **Total** | **59,305** | **100%** | **76,705** | **13,010** | **22,964** | **12,141** | **28,590** |
-
----
-
-### 📐 Size Distribution (Full Dataset)
-
-Objects categorized by **bounding box dimensions** in pixels:
-
-| Size | Threshold | Description |
-|------|-----------|-------------|
-| 🔍 **Small** | < 32px | Tiny objects, hardest to detect |
-| 📦 **Medium** | 32px – 96px | Standard-sized objects |
-| 🟫 **Large** | > 96px | Large, easier to detect |
-
-| Class | Split | Images | Instances | 🔍 Small | 📦 Medium | 🟫 Large |
-|-------|-------|-------:|----------:|----------|-----------|----------|
-| 🗡️ **knife** | Train | 49,079 | 10,511 | 1,027 (9.8%) | 1,435 (13.7%) | 8,049 (76.6%) |
-| | Valid | 7,552 | 1,813 | 177 (9.8%) | 248 (13.7%) | 1,388 (76.6%) |
-| | Test | 2,674 | 686 | 67 (9.8%) | 94 (13.7%) | 525 (76.6%) |
-| | **Subtotal** | — | **13,009** | **1,271 (9.8%)** | **1,776 (13.7%)** | **9,962 (76.6%)** |
-| 🎯 **long_gun** | Train | 49,079 | 19,273 | 1,253 (6.5%) | 2,139 (11.1%) | 15,881 (82.4%) |
-| | Valid | 7,552 | 2,750 | 179 (6.5%) | 305 (11.1%) | 2,266 (82.4%) |
-| | Test | 2,674 | 941 | 61 (6.5%) | 104 (11.1%) | 776 (82.4%) |
-| | **Subtotal** | — | **22,960** | **1,494 (6.5%)** | **2,556 (11.1%)** | **18,910 (82.4%)** |
-| 🚫 **other** | Train | 49,079 | 10,161 | 1,021 (10.0%) | 1,551 (15.3%) | 7,589 (74.7%) |
-| | Valid | 7,552 | 1,324 | 133 (10.0%) | 202 (15.3%) | 989 (74.7%) |
-| | Test | 2,674 | 656 | 66 (10.0%) | 100 (15.3%) | 490 (74.7%) |
-| | **Subtotal** | — | **12,141** | **1,220 (10.0%)** | **1,852 (15.3%)** | **9,069 (74.7%)** |
-| 🔫 **pistol** | Train | 49,079 | 23,507 | 5,078 (21.6%) | 3,996 (17.0%) | 14,433 (61.4%) |
-| | Valid | 7,552 | 3,843 | 830 (21.6%) | 653 (17.0%) | 2,360 (61.4%) |
-| | Test | 2,674 | 1,240 | 268 (21.6%) | 211 (17.0%) | 761 (61.4%) |
-| | **Subtotal** | — | **28,590** | **6,163 (21.6%)** | **4,862 (17.0%)** | **17,565 (61.4%)** |
-| **ALL** | Train | 49,079 (82.76%) | 63,452 (82.74%) | 8,379 (13.2%) | 9,121 (14.4%) | 45,952 (72.4%) |
-| | Valid | 7,552 (12.73%) | 9,730 (12.68%) | 1,319 (13.6%) | 1,408 (14.5%) | 7,003 (72.0%) |
-| | Test | 2,674 (4.51%) | 3,523 (4.59%) | 462 (13.1%) | 509 (14.5%) | 2,552 (72.4%) |
-| | **TOTAL** | **59,305 (100%)** | **76,700 (100%)** | **10,148 (13.2%)** | **11,046 (14.4%)** | **55,506 (72.4%)** |
-
-> 📌 **Note:** Pistols have the highest proportion of small objects (**21.6%**), making them the most challenging class for small-object detection.
-
-</details>
-
----
-
-<details>
-<summary><b>📁 Ablation Dataset (17% Subset)</b></summary>
-
-<br>
-
-A **17% stratified subset** of the full dataset was used for **grid search experiments** to enable faster iteration while maintaining representative class distributions.
-
-### 📊 Ablation Dataset Split
-
-| Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🚫 other | 🔫 pistol |
-|-------|--------|-----------|----------|-------------|----------|-----------|
-| **Train** | 8,343 (82.8%) | 10,927 (83.0%) | 1,779 (16.3%) | 3,315 (30.3%) | 1,815 (16.6%) | 4,018 (36.8%) |
-| **Valid** | 1,283 (12.7%) | 1,643 (12.5%) | 307 (18.7%) | 493 (30.0%) | 206 (12.5%) | 637 (38.8%) |
-| **Test** | 454 (4.5%) | 598 (4.5%) | 121 (20.2%) | 156 (26.1%) | 114 (19.1%) | 207 (34.6%) |
-| **TOTAL** | **10,080** | **13,168** | 2,207 (16.8%) | 3,964 (30.1%) | 2,135 (16.2%) | 4,862 (36.9%) |
-
----
-
-### 📐 Size Distribution (Ablation Dataset)
-
-| Class | Split | Images | Instances | 🔍 Small | 📦 Medium | 🟫 Large |
-|-------|-------|-------:|----------:|----------|-----------|----------|
-| 🗡️ **knife** | Train | 8,343 | 1,779 | 192 (10.8%) | 229 (12.9%) | 1,358 (76.3%) |
-| | Valid | 1,283 | 307 | 33 (10.8%) | 40 (12.9%) | 234 (76.3%) |
-| | Test | 454 | 121 | 13 (10.8%) | 16 (12.9%) | 92 (76.3%) |
-| | **Subtotal** | 10,080 | **2,207** | **239 (10.8%)** | **284 (12.9%)** | **1,684 (76.3%)** |
-| 🎯 **long_gun** | Train | 8,343 | 3,315 | 222 (6.7%) | 345 (10.4%) | 2,748 (82.9%) |
-| | Valid | 1,283 | 493 | 33 (6.7%) | 51 (10.4%) | 409 (82.9%) |
-| | Test | 454 | 156 | 10 (6.7%) | 16 (10.4%) | 130 (82.9%) |
-| | **Subtotal** | 10,080 | **3,964** | **264 (6.7%)** | **412 (10.4%)** | **3,288 (82.9%)** |
-| 🚫 **other** | Train | 8,343 | 1,815 | 200 (11.0%) | 305 (16.8%) | 1,310 (72.2%) |
-| | Valid | 1,283 | 206 | 23 (11.0%) | 35 (16.8%) | 148 (72.2%) |
-| | Test | 454 | 114 | 13 (11.0%) | 19 (16.8%) | 82 (72.2%) |
-| | **Subtotal** | 10,080 | **2,135** | **235 (11.0%)** | **359 (16.8%)** | **1,541 (72.2%)** |
-| 🔫 **pistol** | Train | 8,343 | 4,018 | 872 (21.7%) | 683 (17.0%) | 2,463 (61.4%) |
-| | Valid | 1,283 | 637 | 138 (21.7%) | 108 (17.0%) | 391 (61.4%) |
-| | Test | 454 | 207 | 45 (21.7%) | 35 (17.0%) | 127 (61.4%) |
-| | **Subtotal** | 10,080 | **4,862** | **1,053 (21.7%)** | **826 (17.0%)** | **2,983 (61.4%)** |
-| **ALL** | Train | 8,343 (82.8%) | 10,927 (82.9%) | 1,486 (13.6%) | 1,562 (14.3%) | 7,879 (72.1%) |
-| | Valid | 1,283 (12.7%) | 1,643 (12.5%) | 227 (13.8%) | 234 (14.2%) | 1,182 (71.9%) |
-| | Test | 454 (4.5%) | 598 (4.6%) | 81 (13.5%) | 86 (14.4%) | 431 (72.1%) |
-| | **TOTAL** | **10,080 (100%)** | **13,168 (100%)** | **1,791 (13.6%)** | **1,881 (14.3%)** | **9,496 (72.1%)** |
-
-> 📌 Class proportions are **consistent with the full dataset**, ensuring ablation results transfer effectively.
-
-</details>
-
----
-
-<details>
-<summary><b>🖼️ Dataset Examples</b></summary>
-
-<br>
-
-### 📸 Sample Annotations
-
-<table>
-  <tr>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/68f45e46-a9bd-49b3-8ac7-63a01ac44d3d" alt="Example 1" width="100%" />
-      <br><sub>Example 1</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/45d8dc1d-4285-4595-87f0-8f1b50f01f23" alt="Example 2" width="100%" />
-      <br><sub>Example 2</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/d58f36ed-3773-464d-9902-e2655455883f" alt="Example 3" width="100%" />
-      <br><sub>Example 3</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/771c6c0a-df49-4022-b7c9-f8077600066b" alt="Example 4" width="100%" />
-      <br><sub>Example 4</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/a1abe70d-6257-4f42-9663-5ffd23228bb6" alt="Example 5" width="100%" />
-      <br><sub>Example 5</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/b951ecec-a0c3-47b0-b16a-4d22ce4d937b" alt="Example 6" width="100%" />
-      <br><sub>Example 6</sub>
-    </td>
-  </tr>
-</table>
-
----
-
-### 🔳 Size Comparison — Small, Medium, Large
-
-<table>
-  <tr>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/47228120-0edd-4de2-b192-297a769878ed" alt="mosaic_small" width="100%" />
-      <br><sub>🔍 Small Objects</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/f9941675-a569-44b3-9d2a-5b7403a0157a" alt="mosaic_medium" width="100%" />
-      <br><sub>📦 Medium Objects</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="https://github.com/user-attachments/assets/f8a9ceb0-699d-4f35-8a07-7d78a227153d" alt="mosaic_large" width="100%" />
-      <br><sub>🟫 Large Objects</sub>
-    </td>
-  </tr>
-</table>
-
----
-
-### 📊 Class Distribution Visualization
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/5b18d380-a33e-47e3-aadd-eb3769f93447" alt="class_distribution" width="80%">
-</p>
-
-</details>
-
-## 🔬 Loss Function Ablation Study Results (YOLOv12s/YOLO26s)
-
-<details>
-<summary><b>⚙️ 1. Experimental Setup</b></summary>
-
-<br>
-
-| Setting | Value |
-|---------|-------|
-| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
-| 🔄 **Epochs per Run** | **70 epochs** |
-| 📦 **Batch Size** | **64** |
-| 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Time per Run (YOLOv12s)** | ~1.2 hours |
-| ⏱️ **Time per Run (YOLO26s)** | ~1.0 hours |
-| 🔬 **Methodology** | Grid search with **isolated phases** |
-
-</details>
-
----
-
-<details>
-<summary><b>🧪 2. YOLOv12s Grid Search Experiments</b></summary>
-
-<br>
-
-We conducted a **comprehensive ablation study** across **180 valid experiments** to identify optimal hyperparameters for small-object weapon detection.
-
-<table>
-  <tr>
-    <th align="left">🧪 Experiment</th>
-    <th align="left">⚙️ Parameter</th>
-    <th align="left">🔢 Values Tested</th>
-    <th align="center">📈 Combinations<br><sub>(Valid / Invalid / Total)</sub></th>
-    <th align="center">⏱️ Time<br><sub>(Per Run / Total)</sub></th>
-    <th align="left">✅ Optimal</th>
-  </tr>
-  <tr>
-    <td rowspan="3"><b>A1. Alpha Scheduling</b></td>
-    <td><code>α_start</code></td>
-    <td><sub>0.5, 0.6, 0.7, 0.8, 0.9, 1.0</sub></td>
-    <td rowspan="3" align="center"><b>30</b> / 6 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
-    <td rowspan="3" align="center"><sub>~1.2h / ~36h</sub></td>
-    <td><code>0.9</code></td>
-  </tr>
-  <tr>
-    <td><code>α_end</code></td>
-    <td><sub>0.3, 0.4, 0.5, 0.6, 0.7, 0.8</sub></td>
-    <td><code>0.4</code></td>
-  </tr>
-  <tr>
-    <td><code>small_obj_px</code></td>
-    <td><sub>32</sub></td>
-    <td><code>32</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>A2. Center Loss Weight</b></td>
-    <td><code>Loss_min</code></td>
-    <td><sub>0.00, 0.005, 0.010, 0.015, 0.020, 0.025</sub></td>
-    <td rowspan="2" align="center"><b>32</b> / 4 / 36<br><sub>❌ Invalid: init &lt; min</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~38h</sub></td>
-    <td><code>0.01</code></td>
-  </tr>
-  <tr>
-    <td><code>Loss_init</code></td>
-    <td><sub>0.01, 0.02, 0.03, 0.05, 0.07, 0.10</sub></td>
-    <td><code>0.05</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>A3.1. IoU Clipping</b></td>
-    <td><code>IoU_start</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><code>6</code></td>
-  </tr>
-  <tr>
-    <td><code>IoU_end</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td><code>2</code></td>
-  </tr>
-  <tr>
-    <td rowspan="2"><b>A3.2. DFL Clipping</b></td>
-    <td><code>DFL_start</code></td>
-    <td><sub>6, 8, 10, 12, 15, 20</sub></td>
-    <td rowspan="2" align="center"><b>35</b> / 1 / 36<br><sub>❌ Invalid: end &lt; start</sub></td>
-    <td rowspan="2" align="center"><sub>~1.2h / ~42h</sub></td>
-    <td><code>8</code></td>
-  </tr>
-  <tr>
-    <td><code>DFL_end</code></td>
-    <td><sub>2, 3, 4, 5, 6, 8</sub></td>
-    <td><code>5</code></td>
-  </tr>
-  <tr>
-    <td rowspan="3"><b>A4. TAL Alpha-Beta</b></td>
-    <td><code>Alpha (α)</code></td>
-    <td><sub>0.25, 0.4, 0.5, 0.6, 0.75, 1.0</sub></td>
-    <td rowspan="3" align="center"><b>48</b> / 0 / 48<br><sub>✅ All valid</sub></td>
-    <td rowspan="3" align="center"><sub>~1.2h / ~58h</sub></td>
-    <td><code>1</code></td>
-  </tr>
-  <tr>
-    <td><code>Beta</code></td>
-    <td><sub>4, 5, 6, 7, 8, 10</sub></td>
-    <td><code>7</code></td>
-  </tr>
-  <tr>
-    <td><code>Topk</code></td>
-    <td><sub>4, 5, 6, 8, 10, 12, 15, 20, 25</sub></td>
-    <td><code>20</code></td>
-  </tr>
-  <tr>
-    <td><b>📊 Grid Search Total</b></td>
-    <td align="center">—</td>
-    <td align="center">—</td>
-    <td align="center"><b>180 / 12 / 192</b></td>
-    <td align="center"><b>~1.2h / ~216h</b><br><sub>(~9 days)</sub></td>
-    <td align="center">—</td>
+    <td align="center">🌗 <b>Auto-Adjust Contrast</b></td>
+    <td>Adaptive histogram equalization across the full dynamic range</td>
+    <td>Emphasizes object boundaries in low-light/high-glare conditions — critical for small objects whose features get lost in shadows</td>
   </tr>
 </table>
 
@@ -854,2210 +313,363 @@ We conducted a **comprehensive ablation study** across **180 valid experiments**
 ---
 
 <details>
-<summary><b>🔗 3. YOLOv12s Phase Combination Experiments</b></summary>
+<summary><b>🧬 Leakage-Free Data Split (important!)</b></summary>
 
 <br>
 
-After identifying the **optimal parameters** for each individual phase, we conducted **26 additional experiments** to find the **best combination**:
+Most images originate from video footage, so **successive frames are nearly identical** — a naive per-frame split would leak near-duplicates between train and test, yielding over-optimistic accuracy. Our split prevents this:
 
-| Phases | Combinations Tested |
-|--------|---------------------|
-| **2 phases** | A1+A2, A1+A3.1, A1+A3.2, A1+A4, A2+A3.1, A2+A3.2, A2+A4, A3.1+A3.2, A3.1+A4, A3.2+A4 |
-| **3 phases** | A1+A2+A3.1, A1+A2+A3.2, A1+A2+A4, A1+A3.1+A3.2, A1+A3.1+A4, A1+A3.2+A4, A2+A3.1+A3.2, A2+A3.1+A4, A2+A3.2+A4, A3.1+A3.2+A4 |
-| **4 phases** | A1+A2+A3.1+A3.2, **A1+A2+A3.1+A4 🏆**, A1+A2+A3.2+A4, A1+A3.1+A3.2+A4, A2+A3.1+A3.2+A4 |
-| **5 phases** | A1+A2+A3.1+A3.2+A4 |
+1. **Hash** — every frame is reduced to a **64-bit perceptual hash** (difference hash)
+2. **Link** — any two images within **Hamming distance ≤ 5** are linked (a standard threshold for dHash near-duplicate detection)
+3. **Cluster** — connected components extracted via **union-find** → **19,036 clusters** over the 26,528 images
+4. **Assign** — every **whole cluster** goes to a single split via a **stratified greedy procedure** targeting 70/15/15 for the total image count *and* every class simultaneously
+5. **Audit** — a final cross-split check verified that **no image pair within the near-duplicate threshold crosses a split boundary**
 
-<sub>**Legend:** A1 = Alpha Scheduling, A2 = Center Loss, A3.1 = IoU Clipping, A3.2 = DFL Clipping, A4 = TAL Alpha-Beta</sub>
-
-> 🏆 **Winner:** Combination **A1 + A2 + A3.1 + A4** achieved the best overall performance on YOLOv12s.
-
-<details>
-<summary><b>📊 Click to view YOLOv12s Combination Results</b></summary>
-
-<br>
-
-### 📈 All Combinations Performance Comparison
-
-<p align="center">
-<img width="1426" height="1073" alt="image" src="https://github.com/user-attachments/assets/e73654bd-d49d-4c58-96c2-12e2e3024641" />
-</p>
-
----
-
-### 🏆 Winner (A1 + A2 + A3.1 + A4) — Full Dataset Training Results
-
-After identifying the best combination, we trained on the **full dataset (100%)** for **~11 hours**:
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/6c82aa4b-3533-41a9-918a-e4f48cbcd7eb" alt="Winner Full Dataset Results" width="100%" />
-</p>
-
-Training results for **100** epochs on the full dataset.
-
-<p align="center">
-    <img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/fcaeafe8-87e6-4576-85ea-e0f1efe5e136" />
-</p>
-
-</details>
+➡️ The reported metrics reflect **generalization**, not memorized near-duplicates.
 
 </details>
 
 ---
 
+### 📊 Dataset Split & Class Distribution <sub>(Paper — Table 1)</sub>
+
+| Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🔫 pistol | 🚫 no_weapon |
+|-------|-------:|----------:|---------:|------------:|----------:|-------------:|
+| Train | 18,577 (70.0%) | 26,103 | 4,294 (16.5%) | 7,337 (28.1%) | 9,187 (35.2%) | 5,285 (20.2%) |
+| Validation | 3,973 (15.0%) | 5,853 | 923 (15.8%) | 1,561 (26.7%) | 1,985 (33.9%) | 1,384 (23.6%) |
+| Test | 3,978 (15.0%) | 6,111 | 941 (15.4%) | 1,643 (26.9%) | 2,060 (33.7%) | 1,467 (24.0%) |
+| **Total** | **26,528** | **38,067** | **6,158 (16.2%)** | **10,541 (27.7%)** | **13,232 (34.8%)** | **8,136 (21.4%)** |
+
+### 📐 Bounding-Box Size Distribution <sub>(Paper — Table 2; COCO size convention on 640×640 images)</sub>
+
+| Size | Threshold | Split | Small | Medium | Large | Total |
+|------|-----------|-------|------:|-------:|------:|------:|
+| 🔍 Small ≤ 32×32 px · 📦 Medium ≤ 96×96 px · 🟫 Large > 96×96 px | | Train | 2,198 (8.4%) | 5,312 (20.4%) | 18,593 (71.2%) | 26,103 |
+| | | Validation | 475 (8.1%) | 1,087 (18.6%) | 4,291 (73.3%) | 5,853 |
+| | | Test | 499 (8.2%) | 1,167 (19.1%) | 4,445 (72.7%) | 6,111 |
+| | | **Total** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** | **38,067** |
+
+### 📐 Size Distribution per Class <sub>(Paper — Table 3)</sub>
+
+| Class | Total boxes | 🔍 Small | 📦 Medium | 🟫 Large |
+|-------|------------:|---------:|----------:|---------:|
+| 🗡️ knife | 6,158 | 225 (3.7%) | 1,065 (17.3%) | 4,868 (79.1%) |
+| 🎯 long_gun | 10,541 | 482 (4.6%) | 1,542 (14.6%) | 8,517 (80.8%) |
+| 🔫 pistol | 13,232 | **2,023 (15.3%)** | 3,414 (25.8%) | 7,795 (58.9%) |
+| 🚫 no_weapon | 8,136 | 442 (5.4%) | 1,545 (19.0%) | 6,149 (75.6%) |
+| **Total** | **38,067** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** |
+
+> 📌 **Note:** Small instances are strongly class-dependent — the `pistol` class accounts for **63.8% of all small boxes** (15.3% of pistol instances are small), reflecting that handguns frequently appear small and distant in surveillance footage. This concentration of small, hard instances, together with the heterogeneous `no_weapon` class, is exactly what the loss and architecture design target.
+
+---
+
+## 📉 Proposed Model — Part A: Small-Object-Aware Loss & Assignment
+
+Four modifications (A1–A4) to the standard YOLOv12 training objective; hyperparameters tuned by grid search on the validation set.
+
 <details>
-<summary><b>🚀 4. YOLO26s Transfer Experiments</b></summary>
+<summary><b>📉 A1 — Dynamic Curriculum Weighting ✅ (enabled)</b></summary>
 
 <br>
 
-After obtaining the optimal configuration on **YOLOv12s**, we transferred the best-performing hyperparameters to **YOLO26s** to validate cross-architecture generalization.
+Each positive assignment receives a combined weight mixing a **normalized inverse-area term** (favoring small objects) with the **target score**, blended by a curriculum coefficient *α(t)* that transitions from **early area-dominant** to **later balanced** learning. Applied to both the IoU and DFL loss terms.
 
-> ⚠️ **Note:** Phase A3.2 (DFL Clipping) is **not applicable** to YOLO26s architecture and was excluded from all experiments.
-
-### 🧪 YOLO26s Individual Phase Validation
-
-First, we validated each phase **individually** on YOLO26s using the optimal parameters from YOLOv12s:
-
-| # | Phase | Description | Experiments |
-|---|-------|-------------|-------------|
-| 1 | A1 | Alpha Scheduling only | 1 |
-| 2 | A2 | Center Loss only | 1 |
-| 3 | A3.1 | IoU Clipping only | 1 |
-| 4 | A4 | TAL Alpha-Beta only | 1 |
-
-### 🔗 YOLO26s Combination Experiments
-
-After validating individual phases, we tested the following **11 combinations**:
-
-| Phases | Combinations Tested |
-|--------|---------------------|
-| **2 phases** | A1+A2, A1+A3.1, A1+A4, A2+A3.1, A2+A4, A3.1+A4 |
-| **3 phases** | **A1+A2+A3.1 🏆**, A1+A2+A4, A1+A3.1+A4, A2+A3.1+A4 |
-| **4 phases** | A1+A2+A3.1+A4 |
-
-<sub>**Legend:** A1 = Alpha Scheduling, A2 = Center Loss, A3.1 = IoU Clipping, A4 = TAL Alpha-Beta</sub>
-
-> 🏆 **Winner:** Combination **A1 + A2 + A3.1** achieved the best performance on YOLO26s, confirming successful cross-architecture transfer.
-
-<details>
-<summary><b>📊 Click to view YOLO26s Combination Results</b></summary>
-
-<br>
-
-### 📈 All Combinations Performance Comparison
-
-<p align="center">
-<img width="1426" height="1073" alt="image" src="https://github.com/user-attachments/assets/5d1e0b60-5dea-404d-b532-0c35585e2b07" />
-</p>
-
----
-
-### 🏆 Winner (A1 + A2 + A3.1) — Full Dataset Training Results
-
-After identifying the best combination, we trained on the **full dataset (100%)** for **~9 hours**:
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/83772459-f208-4c6e-99a0-da55c9d1beef" alt="YOLO26s Winner Full Dataset Results" width="100%" />
-</p>
-
-Training results for **100** epochs on the full dataset.
-
-<p align="center">
-  <img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/63d94a6a-b205-4988-b0c6-7bffa7222de9" />
-</p>
-
-</details>
-
-</details>
-
----
-
-<details>
-<summary><b>✅ 5. Final Optimal Configurations</b></summary>
-
-<br>
-
-<table>
-  <tr>
-    <th align="center">🔷 YOLOv12s Best Config</th>
-    <th align="center">🔶 YOLO26s Best Config</th>
-  </tr>
-  <tr>
-    <td><b>A1 + A2 + A3.1 + A4</b></td>
-    <td><b>A1 + A2 + A3.1</b></td>
-  </tr>
-  <tr>
-    <td>Alpha + Center Loss + IoU Clipping + TAL</td>
-    <td>Alpha + Center Loss + IoU Clipping</td>
-  </tr>
-</table>
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🏆 Best Configuration: A1 + A2 + A3.1 (+ A4 for YOLOv12s)
-# ═══════════════════════════════════════════════════════════════
-
-# Phase A1: Alpha Scheduling ✅
-alpha_start: 0.9
-alpha_end: 0.4
-small_obj_px: 32
-
-# Phase A2: Center Loss ✅
-center_loss_weight_init: 0.05
-center_loss_weight_min: 0.01
-
-# Phase A3.1: IoU Clipping ✅
-iou_clip_start: 6
-iou_clip_end: 2
-
-# Phase A3.2: DFL Clipping ❌ (Disabled / Not applicable to YOLO26s)
-dfl_clip_start: 100.0
-dfl_clip_end: 100.0
-
-# Phase A4: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO26s)
-tal_topk: 20        # YOLOv12s: 20, YOLO26s: 10 (default)
-tal_alpha: 1        # YOLOv12s: 1, YOLO26s: 0.5 (default)
-tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
-</pre>
-
-</details>
-
----
-
-<details>
-<summary><b>📊 6. Complete Training Summary</b></summary>
-
-<br>
-
-| Model | Phase | Dataset | Experiments | Time per Run | Total Time |
-|-------|-------|---------|-------------|--------------|------------|
-| **YOLOv12s** | Baseline | **100%** | 1 | — | **~11h** |
-| **YOLOv12s** | Grid Search | 17% | 180 | ~1.2h | ~216h |
-| **YOLOv12s** | Combinations | 17% | 26 | ~1.2h | ~31h |
-| **YOLOv12s** | 🏆 Final Training | **100%** | 1 | — | **~11h** |
-| **YOLO26s** | Baseline | **100%** | 1 | — | **~9h** |
-| **YOLO26s** | Individual Phases | 17% | 4 | ~1.0h | ~4h |
-| **YOLO26s** | Combinations | 17% | 11 | ~1.0h | ~11h |
-| **YOLO26s** | 🏆 Final Training | **100%** | 1 | — | **~9h** |
-
----
-
-### 📈 Total Training Investment
-
-| Metric | Value |
-|--------|-------|
-| 🧪 **Total Experiments** | **225** (2 baselines + 180 grid + 26 combos + 4 phases + 11 combos + 2 final) |
-| ⏱️ **Baseline Training** | ~20 hours (11h + 9h) |
-| ⏱️ **Ablation Time (17% dataset)** | ~262 hours (~10.9 days) |
-| ⏱️ **Full Dataset Training (Custom)** | ~20 hours (11h + 9h) |
-| ⏱️ **Grand Total** | **~302 hours (~12.6 days)** |
-
-</details>
-
----
-
-<details>
-<summary><b>📌 7. Key Takeaways</b></summary>
-
-<br>
-
-- ⏱️ **Total Training Time:** ~302 hours (**~12.6 days**) across **225 experiments**
-  - 🔷 **YOLOv12s:** ~269 hours (1 baseline + 180 grid search + 26 combinations + 1 final)
-  - 🔶 **YOLO26s:** ~33 hours (1 baseline + 4 individual phases + 11 combinations + 1 final)
-- ✅ **Valid Configurations:** 180 out of 192 planned (**93.75% valid rate**)
-- ❌ **Skipped Configurations:** 12 invalid combinations where `end < start` or `init < min`
-- 🏆 **YOLOv12s Best:** **A1 + A2 + A3.1 + A4** (Alpha + Center Loss + IoU Clipping + TAL)
-- 🏆 **YOLO26s Best:** **A1 + A2 + A3.1** (Alpha + Center Loss + IoU Clipping)
-- 🔄 **Cross-Architecture Transfer:** Optimal config from YOLOv12s **successfully transferred** to YOLO26s
-- ⚡ **YOLO26s Efficiency:** ~17% faster per experiment compared to YOLOv12s (~1.0h vs ~1.2h)
-- 🚫 **DFL Clipping (A3.2):** Not applicable to YOLO26s, excluded from transfer experiments
-- 🎯 **Most Impactful:** TAL Alpha-Beta tuning showed significant impact on small-object recall (YOLOv12s)
-- 📉 **Alpha Scheduling:** Annealing from `α_start=0.9` to `α_end=0.4` prioritizes small objects early
-- 🔧 **Loss Clipping:** IoU clipping stabilizes training (DFL clipping provided diminishing returns)
-- 📈 **Best Improvements:** Up to **+14.55%** on small objects (mAP50-95) for YOLO26s, **+13.10%** for YOLOv12s
-
-</details>
-
----
-
-<details>
-<summary><b>📄 8. Training Config (Reproducibility)</b></summary>
-
-<br>
-
-### 🔬 Full Training Configuration
-
-The complete YAML configuration used for all experiments, including default Ultralytics parameters and our custom loss additions.
-
-<details>
-<summary><b>📋 Click to expand full default YAML (all parameters)</b></summary>
-
-<br>
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 📋 Complete Training Configuration
-# ═══════════════════════════════════════════════════════════════
-
-# ───────────────────────────────────────────────────────────────
-# Core Settings
-# ───────────────────────────────────────────────────────────────
-task: detect
-mode: train
-model: yolov12.yaml                    # Architecture definition
-data: data.yaml                        # Dataset configuration
-pretrained: yolov12s.pt                # Pre-trained weights
-
-# ───────────────────────────────────────────────────────────────
-# Training Schedule
-# ───────────────────────────────────────────────────────────────
-epochs: 120
-time: null
-patience: 20
-batch: 44
-imgsz: 640
-close_mosaic: 15
-
-# ───────────────────────────────────────────────────────────────
-# Optimizer
-# ───────────────────────────────────────────────────────────────
-optimizer: auto
-lr0: 0.01
-lrf: 0.01
-momentum: 0.937
-weight_decay: 0.0005
-warmup_epochs: 3.0
-warmup_momentum: 0.8
-warmup_bias_lr: 0.0
-cos_lr: false
-nbs: 64
-
-# ───────────────────────────────────────────────────────────────
-# Loss Weights (Ultralytics Defaults)
-# ───────────────────────────────────────────────────────────────
-box: 7.5
-cls: 0.5
-dfl: 1.5
-pose: 12.0
-kobj: 1.0
-
-# ───────────────────────────────────────────────────────────────
-# Data Augmentation
-# ───────────────────────────────────────────────────────────────
-hsv_h: 0.015
-hsv_s: 0.7
-hsv_v: 0.4
-degrees: 0.0
-translate: 0.1
-scale: 0.5
-shear: 0.0
-perspective: 0.0
-flipud: 0.0
-fliplr: 0.5
-bgr: 0.0
-mosaic: 1.0
-mixup: 0.0
-copy_paste: 0.1
-copy_paste_mode: flip
-auto_augment: randaugment
-erasing: 0.4
-crop_fraction: 1.0
-
-# ───────────────────────────────────────────────────────────────
-# Validation & Inference
-# ───────────────────────────────────────────────────────────────
-val: true
-split: val
-conf: null
-iou: 0.7
-max_det: 300
-half: false
-agnostic_nms: false
-
-# ───────────────────────────────────────────────────────────────
-# General Settings
-# ───────────────────────────────────────────────────────────────
-save: true
-save_period: -1
-cache: false
-device: null
-workers: 8
-project: null
-name: null
-exist_ok: false
-verbose: true
-seed: 0
-deterministic: true
-single_cls: false
-rect: false
-resume: false
-amp: true
-fraction: 1.0
-profile: false
-freeze: null
-multi_scale: false
-overlap_mask: true
-mask_ratio: 4
-dropout: 0.0
-
-# ───────────────────────────────────────────────────────────────
-# Output & Visualization
-# ───────────────────────────────────────────────────────────────
-plots: true
-save_json: false
-save_hybrid: false
-save_txt: false
-save_conf: false
-save_crop: false
-save_frames: false
-show: false
-show_labels: true
-show_conf: true
-show_boxes: true
-line_width: null
-visualize: false
-
-# ───────────────────────────────────────────────────────────────
-# Export Settings
-# ───────────────────────────────────────────────────────────────
-format: torchscript
-keras: false
-optimize: false
-int8: false
-dynamic: false
-simplify: true
-opset: null
-workspace: null
-nms: false
-
-# ───────────────────────────────────────────────────────────────
-# Misc
-# ───────────────────────────────────────────────────────────────
-source: null
-vid_stride: 1
-stream_buffer: false
-augment: false
-classes: null
-retina_masks: false
-embed: null
-cfg: null
-tracker: botsort.yaml
-</pre>
-
-</details>
-
----
-
-### 🚫 Ablation Baseline — Custom Loss Phases Disabled
-
-For grid search experiments, we used a **17% subset** with **70 epochs** and all custom loss phases **disabled**:
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🔬 Ablation Study - Custom Loss Defaults (All Phases Disabled)
-# ═══════════════════════════════════════════════════════════════
-# 📌 Uses all Ultralytics defaults above, with these overrides:
-
-# Training Overrides (Ablation)
-epochs: 70                         # Reduced for faster iteration
-batch: 64                         # Increased for ablation
-dataset: "weapon_dataset_17pct"   # 17% stratified subset
-
-# ───────────────────────────────────────────────────────────────
-# Phase A1: Alpha Scheduling (DISABLED)
-# ───────────────────────────────────────────────────────────────
-alpha_start: 1.0          # No area weighting
-alpha_end: 1.0            # No area weighting
-small_obj_boost: 1.0      # No boost (multiplier = 1)
-small_obj_px: 32          # Default small object threshold
-
-# ───────────────────────────────────────────────────────────────
-# Phase A2: Center Loss (DISABLED)
-# ───────────────────────────────────────────────────────────────
-center_loss_weight_init: 0.0    # No center loss
-center_loss_weight_min: 0.0     # No center loss
-center_loss_decay_epochs: 1     # Irrelevant when weight=0
-
-# ───────────────────────────────────────────────────────────────
-# Phase A3: Adaptive Clipping (DISABLED)
-# ───────────────────────────────────────────────────────────────
-iou_clip_start: 100.0     # No clipping (very high)
-iou_clip_end: 100.0       # No clipping (very high)
-dfl_clip_start: 100.0     # No clipping (very high) — N/A for YOLO26s
-dfl_clip_end: 100.0       # No clipping (very high) — N/A for YOLO26s
-
-# ───────────────────────────────────────────────────────────────
-# Phase A4: TAL Alpha-Beta (DEFAULT)
-# ───────────────────────────────────────────────────────────────
-tal_topk: 10
-tal_alpha: 0.5
-tal_beta: 6.0
-</pre>
-
-> 💡 **Note:** Enable one phase at a time while keeping others at their disabled/default values to isolate the effect of each hyperparameter.
-
----
-
-### 🏆 Best Configuration — YOLOv12s (A1 + A2 + A3.1 + A4)
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🏆 YOLOv12s — Best Configuration (Final Training)
-# ═══════════════════════════════════════════════════════════════
-# 📌 Uses all Ultralytics defaults above, with these overrides:
-
-# Training Overrides (Final)
-epochs: 100                        # Full training
-dataset: "weapon_dataset_full"     # 100% dataset
-
-# ───────────────────────────────────────────────────────────────
-# Phase A1: Alpha Scheduling ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-alpha_start: 0.9          # Start with strong area weighting
-alpha_end: 0.4            # Anneal to moderate weighting
-small_obj_boost: 1.0      # No additional boost
-small_obj_px: 32          # Small object threshold (pixels)
-
-# ───────────────────────────────────────────────────────────────
-# Phase A2: Center Loss ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-center_loss_weight_init: 0.05   # Initial center loss weight
-center_loss_weight_min: 0.01    # Minimum (decayed) weight
-center_loss_decay_epochs: 1     # Decay per epoch
-
-# ───────────────────────────────────────────────────────────────
-# Phase A3.1: IoU Clipping ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-iou_clip_start: 6         # Initial IoU loss clip threshold
-iou_clip_end: 2           # Final IoU loss clip threshold
-
-# ───────────────────────────────────────────────────────────────
-# Phase A3.2: DFL Clipping ❌ DISABLED
-# ───────────────────────────────────────────────────────────────
-dfl_clip_start: 100.0     # No clipping
-dfl_clip_end: 100.0       # No clipping
-
-# ───────────────────────────────────────────────────────────────
-# Phase A4: TAL Alpha-Beta ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-tal_topk: 20              # Increased from default 10
-tal_alpha: 1              # Increased from default 0.5
-tal_beta: 7               # Increased from default 6.0
-</pre>
-
----
-
-### 🏆 Best Configuration — YOLO26s (A1 + A2 + A3.1)
-
-<pre>
-# ═══════════════════════════════════════════════════════════════
-# 🏆 YOLO26s — Best Configuration (Final Training)
-# ═══════════════════════════════════════════════════════════════
-# 📌 Uses all Ultralytics defaults above, with these overrides:
-
-# Training Overrides (Final)
-epochs: 100                        # Full training
-dataset: "weapon_dataset_full"     # 100% dataset
-
-# ───────────────────────────────────────────────────────────────
-# Phase A1: Alpha Scheduling ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-alpha_start: 0.9          # Start with strong area weighting
-alpha_end: 0.4            # Anneal to moderate weighting
-small_obj_boost: 1.0      # No additional boost
-small_obj_px: 32          # Small object threshold (pixels)
-
-# ───────────────────────────────────────────────────────────────
-# Phase A2: Center Loss ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-center_loss_weight_init: 0.05   # Initial center loss weight
-center_loss_weight_min: 0.01    # Minimum (decayed) weight
-center_loss_decay_epochs: 1     # Decay per epoch
-
-# ───────────────────────────────────────────────────────────────
-# Phase A3.1: IoU Clipping ✅ ENABLED
-# ───────────────────────────────────────────────────────────────
-iou_clip_start: 6         # Initial IoU loss clip threshold
-iou_clip_end: 2           # Final IoU loss clip threshold
-
-# ───────────────────────────────────────────────────────────────
-# Phase A3.2: DFL Clipping ❌ NOT APPLICABLE
-# ───────────────────────────────────────────────────────────────
-# YOLO26s does not use DFL — this phase is skipped entirely
-
-# ───────────────────────────────────────────────────────────────
-# Phase A4: TAL Alpha-Beta ⬚ DEFAULT (not tuned)
-# ───────────────────────────────────────────────────────────────
-tal_topk: 10              # Default value
-tal_alpha: 0.5            # Default value
-tal_beta: 6.0             # Default value
-</pre>
-
----
-
-### 📋 Quick Comparison Table
-
-<table>
-  <tr>
-    <th align="left">Parameter</th>
-    <th align="center">🚫 Default<br><sub>(Disabled)</sub></th>
-    <th align="center">🔷 YOLOv12s<br><sub>(Best)</sub></th>
-    <th align="center">🔶 YOLO26s<br><sub>(Best)</sub></th>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Training Settings</b></td></tr>
-  <tr>
-    <td><code>epochs</code></td>
-    <td align="center">70 <sub>(ablation)</sub></td>
-    <td align="center"><b>100</b></td>
-    <td align="center"><b>100</b></td>
-  </tr>
-  <tr>
-    <td><code>batch</code></td>
-    <td align="center">64 <sub>(ablation)</sub></td>
-    <td align="center">44</td>
-    <td align="center">44</td>
-  </tr>
-  <tr>
-    <td><code>dataset</code></td>
-    <td align="center">17% subset</td>
-    <td align="center"><b>100% full</b></td>
-    <td align="center"><b>100% full</b></td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Ultralytics Loss Weights</b></td></tr>
-  <tr>
-    <td><code>box</code></td>
-    <td align="center">7.5</td>
-    <td align="center">7.5</td>
-    <td align="center">7.5</td>
-  </tr>
-  <tr>
-    <td><code>cls</code></td>
-    <td align="center">0.5</td>
-    <td align="center">0.5</td>
-    <td align="center">0.5</td>
-  </tr>
-  <tr>
-    <td><code>dfl</code></td>
-    <td align="center">1.5</td>
-    <td align="center">1.5</td>
-    <td align="center"><sub>N/A</sub></td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Phase A1: Alpha Scheduling</b></td></tr>
-  <tr>
-    <td><code>alpha_start</code></td>
-    <td align="center">1.0</td>
-    <td align="center"><b>0.9</b></td>
-    <td align="center"><b>0.9</b></td>
-  </tr>
-  <tr>
-    <td><code>alpha_end</code></td>
-    <td align="center">1.0</td>
-    <td align="center"><b>0.4</b></td>
-    <td align="center"><b>0.4</b></td>
-  </tr>
-  <tr>
-    <td><code>small_obj_px</code></td>
-    <td align="center">32</td>
-    <td align="center">32</td>
-    <td align="center">32</td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Phase A2: Center Loss</b></td></tr>
-  <tr>
-    <td><code>center_loss_weight_init</code></td>
-    <td align="center">0.0</td>
-    <td align="center"><b>0.05</b></td>
-    <td align="center"><b>0.05</b></td>
-  </tr>
-  <tr>
-    <td><code>center_loss_weight_min</code></td>
-    <td align="center">0.0</td>
-    <td align="center"><b>0.01</b></td>
-    <td align="center"><b>0.01</b></td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Phase A3.1: IoU Clipping</b></td></tr>
-  <tr>
-    <td><code>iou_clip_start</code></td>
-    <td align="center">100.0</td>
-    <td align="center"><b>6</b></td>
-    <td align="center"><b>6</b></td>
-  </tr>
-  <tr>
-    <td><code>iou_clip_end</code></td>
-    <td align="center">100.0</td>
-    <td align="center"><b>2</b></td>
-    <td align="center"><b>2</b></td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Phase A3.2: DFL Clipping</b></td></tr>
-  <tr>
-    <td><code>dfl_clip_start</code></td>
-    <td align="center">100.0</td>
-    <td align="center">100.0 (off)</td>
-    <td align="center"><sub>N/A</sub></td>
-  </tr>
-  <tr>
-    <td><code>dfl_clip_end</code></td>
-    <td align="center">100.0</td>
-    <td align="center">100.0 (off)</td>
-    <td align="center"><sub>N/A</sub></td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Phase A4: TAL Alpha-Beta</b></td></tr>
-  <tr>
-    <td><code>tal_topk</code></td>
-    <td align="center">10</td>
-    <td align="center"><b>20</b></td>
-    <td align="center">10 (default)</td>
-  </tr>
-  <tr>
-    <td><code>tal_alpha</code></td>
-    <td align="center">0.5</td>
-    <td align="center"><b>1</b></td>
-    <td align="center">0.5 (default)</td>
-  </tr>
-  <tr>
-    <td><code>tal_beta</code></td>
-    <td align="center">6.0</td>
-    <td align="center"><b>7</b></td>
-    <td align="center">6.0 (default)</td>
-  </tr>
-  <tr><td colspan="4" align="center"><b>Key Ultralytics Defaults (unchanged)</b></td></tr>
-  <tr>
-    <td><code>optimizer</code></td>
-    <td align="center" colspan="3">auto</td>
-  </tr>
-  <tr>
-    <td><code>lr0</code></td>
-    <td align="center" colspan="3">0.01</td>
-  </tr>
-  <tr>
-    <td><code>lrf</code></td>
-    <td align="center" colspan="3">0.01</td>
-  </tr>
-  <tr>
-    <td><code>momentum</code></td>
-    <td align="center" colspan="3">0.937</td>
-  </tr>
-  <tr>
-    <td><code>weight_decay</code></td>
-    <td align="center" colspan="3">0.0005</td>
-  </tr>
-  <tr>
-    <td><code>warmup_epochs</code></td>
-    <td align="center" colspan="3">3.0</td>
-  </tr>
-  <tr>
-    <td><code>patience</code></td>
-    <td align="center" colspan="3">20</td>
-  </tr>
-  <tr>
-    <td><code>close_mosaic</code></td>
-    <td align="center" colspan="3">15</td>
-  </tr>
-  <tr>
-    <td><code>copy_paste</code></td>
-    <td align="center" colspan="3">0.1</td>
-  </tr>
-  <tr>
-    <td><code>mosaic</code></td>
-    <td align="center" colspan="3">1.0</td>
-  </tr>
-  <tr>
-    <td><code>erasing</code></td>
-    <td align="center" colspan="3">0.4</td>
-  </tr>
-  <tr>
-    <td><code>iou</code> <sub>(NMS)</sub></td>
-    <td align="center" colspan="3">0.7</td>
-  </tr>
-  <tr>
-    <td><code>imgsz</code></td>
-    <td align="center" colspan="3">640</td>
-  </tr>
-  <tr>
-    <td><code>seed</code></td>
-    <td align="center" colspan="3">0</td>
-  </tr>
-  <tr>
-    <td><code>deterministic</code></td>
-    <td align="center" colspan="3">true</td>
-  </tr>
-  <tr>
-    <td><code>amp</code></td>
-    <td align="center" colspan="3">true</td>
-  </tr>
-</table>
-
-> ⚠️ **Important:** Parameters from **Phase A1** (Alpha Scheduling), **Phase A2** (Center Loss), and **Phase A3** (Adaptive Clipping) are **only available in our custom loss function implementation**. Phase A4 (TAL Alpha-Beta) uses the standard Ultralytics parameters. All other parameters follow Ultralytics defaults — see the expandable full YAML above for the complete list.
-
-</details>
-
----
-
-## 🏗️ Architecture Ablation Study Results (YOLOv12s)
-
-<details>
-<summary><b>⚙️ 1. Experimental Setup</b></summary>
-
-<br>
-
-| Setting | Value |
-|---------|-------|
-| 📊 **Dataset Size** | **17%** of the full dataset (**10,080 images** / **13,168 instances**) |
-| 🔄 **Epochs per Run** | **130 epochs** |
-| 📦 **Batch Size** | **48–72** <sub>(varies by architecture size)</sub> |
-| 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Avg. Time per Run** | ~3.2 hours |
-| ⏱️ **Total Search Time** | ~64 hours <sub>(20 architectures × ~3.2h)</sub> |
-| 🔬 **Methodology** | Grid search across **20 architectural variants** |
-| 🏛️ **Base Architecture** | YOLOv12s (P3–P5 default, 3 detection heads) |
-| 🎯 **Goal** | Identify the best detection head configuration for small-object weapon detection |
-
-> 📌 All architecture experiments use the **default loss function** (no custom loss phases enabled) to isolate the effect of architectural changes.
-
-> ⚠️ **Batch size note:** Larger architectures (e.g., wider channels, more heads, deeper backbones) require more GPU memory. Batch size was adjusted per architecture to maximize GPU utilization while fitting within **24GB VRAM** (RTX 4090): smaller architectures used up to **72**, while the largest variants ran at **48**.
-
-</details>
-
----
-
-<details>
-<summary><b>🧬 2. Architecture Variants (Arch-1 to Arch-20)</b></summary>
-
-<br>
-
-We designed **20 architectural variants** exploring different strategies for improving small-object detection:
-
-### 🎯 Design Strategies Explored
-
-| Strategy | Architectures | Description |
-|----------|---------------|-------------|
-| 🔍 **P2 Head Addition** | Arch-1 to Arch-5, Arch-12 to Arch-15, Arch-19, Arch-20 | Adding a high-resolution P2 detection head (stride 4) |
-| 🔀 **Auxiliary Branch (P2×2)** | Arch-6 ★, Arch-7, Arch-9 to Arch-11, Arch-16 to Arch-18 | Dual P2 outputs via auxiliary split branch |
-| 📐 **P3 Auxiliary Branch** | Arch-8 | Auxiliary branch at P3 level instead of P2 |
-| 🏔️ **P6 Head Addition** | Arch-3 | Extra P6 head at stride 64 for very large objects |
-| 🔧 **BiFPN-style Neck** | Arch-2, Arch-9 | Replacing A2C2f with C3k2 throughout the neck |
-| 📏 **Width Scaling** | Arch-6 ★, Arch-8, Arch-9 to Arch-11, Arch-16, Arch-19 | Width scale 0.50 (vs default 0.25) |
-| 🏋️ **Deeper Backbone** | Arch-4 | Significantly increased backbone depth (3/5/6/7 repeats) |
-
----
-
-### 📋 Full Architecture Comparison
-
-<table>
-  <tr>
-    <th align="center">Arch</th>
-    <th align="center">Heads</th>
-    <th align="left">Key Differences vs. Original YOLOv12s</th>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-1</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head (upsample→concat with layer 2→C3k2 128ch). Reduced backbone repeats (1/2/3/3 vs 2/2/4/4). Reduced neck repeats (1 vs 2). Fewer P5 C3k2 repeats (2 vs 2).</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-2</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head (C3k2 128ch). All neck A2C2f replaced with C3k2 (BiFPN-style). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-3</b></td>
-    <td align="center">5 (P2–P6)</td>
-    <td>+ P2 head (C3k2 128ch). + P6 head (Conv stride-2→C3k2 1024ch at stride 64). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-4</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head (C3k2 128ch). Much deeper backbone (3/5/6/7 repeats vs 2/2/4/4). Deeper neck (3 repeats vs 2). P5 C3k2 increased to 4 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-5</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head (upsample→concat with layer 2→C3k2 128ch). Backbone P5 A2C2f increased to 5 repeats. Backbone P3 C3k2 increased to 3 repeats. Otherwise matches the original neck structure.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>Arch-6 ★</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td><b>+ P2 head with auxiliary branch</b> (C3k2 True + Conv split → 2 separate P2 outputs to Detect). Width scale 0.50 (vs 0.25). Backbone P5 increased to 5 repeats, P3 to 3 repeats. Bottom-up P3/P4 use C3k2 instead of A2C2f.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-7</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Same as Arch-6 but auxiliary C3k2 uses 2 repeats instead of 1. Width scale stays 0.25.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-8</b></td>
-    <td align="center">5 (P2+P3×2+P4+P5)</td>
-    <td>Auxiliary branch moved to P3 instead of P2 (C3k2 True + Conv at P3 level). P2 uses standard C3k2 128ch. Width scale 0.50. Backbone P5 to 5 repeats, P3 to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-9</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-6 auxiliary structure + all neck blocks replaced with C3k2 (BiFPN-style). No A2C2f in any neck stage. Width scale 0.50.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-10</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-6 auxiliary structure + 1×1 Conv channel alignment inserted before the aux split at P2. Adds a residual-style projection layer. Width scale 0.50.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-11</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-6 auxiliary structure + 2 sequential C3k2 blocks at P2 before aux split (multi-scale receptive field). Width scale 0.50.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-12</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head with 3× C3k2(True) at P2 (deep small-object refinement, full kernel). Backbone P5 to 5, P3 to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-13</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head with 192 channels instead of 128 (wider P2). Backbone P5 to 5, P3 to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-14</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head (C3k2 128ch). P3 stages deepened to 3× A2C2f in both top-down and bottom-up paths. Backbone P5 to 5, P3 to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-15</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head with A2C2f replacing C3k2 at P2 (attention at highest resolution). Backbone P5 to 5, P3 to 3 repeats.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-16</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-6 auxiliary structure but bottom-up P3/P4 use A2C2f instead of C3k2 for uniform attention across all scales. Width scale 0.50.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-17</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-7 auxiliary structure with 3× C3k2 in the aux branch (maximum aux depth). Bottom-up P3 uses C3k2.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-18</b></td>
-    <td align="center">5 (P2×2+P3–P5)</td>
-    <td>Arch-7 auxiliary structure with 192-channel aux branch instead of 128. Bottom-up P3 uses C3k2.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-19</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head with 256ch A2C2f attention (widest P2). Conv 256 3×3 projection after P2 concat. Backbone P5 reduced to 4 repeats, P3 to 2. Width scale 0.50.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>Arch-20</b></td>
-    <td align="center">4 (P2–P5)</td>
-    <td>+ P2 head with direct skip from backbone layer 0 (first Conv stride-2) concatenated into P2 fusion (3-way concat). Backbone P5 to 5, P3 to 3 repeats.</td>
-  </tr>
-</table>
-
-</details>
-
----
-
-<details>
-<summary><b>📊 3. Grid Search Results</b></summary>
-
-<br>
-
-### 📈 All Architectures Performance Comparison
-
-<p align="center">
-<img width="1774" height="876" alt="image" src="https://github.com/user-attachments/assets/fd4ea33d-cc23-4bbd-8116-264fb739be78" />
-</p>
-
----
-
-### 🏆 Arch-6 vs Baseline — Improvement Summary
-
-<table>
-  <tr>
-    <th align="left">Metric</th>
-    <th align="center">Baseline</th>
-    <th align="center">Arch-6 ★</th>
-    <th align="center">Δ Improvement</th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td>0.816</td>
-    <td><b>0.865</b></td>
-    <td align="center"><b>+6.00%</b></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td>0.525</td>
-    <td><b>0.585</b></td>
-    <td align="center"><b>+11.43%</b></td>
-  </tr>
-  <tr>
-    <td><b>Precision</b></td>
-    <td>0.831</td>
-    <td><b>0.902</b></td>
-    <td align="center"><b>+8.54%</b></td>
-  </tr>
-  <tr>
-    <td><b>Recall</b></td>
-    <td>0.746</td>
-    <td><b>0.825</b></td>
-    <td align="center"><b>+10.59%</b></td>
-  </tr>
-  <tr>
-    <td><b>F1 Score</b></td>
-    <td>0.786</td>
-    <td><b>0.862</b></td>
-    <td align="center"><b>+9.67%</b></td>
-  </tr>
-  <tr>
-    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.530</td>
-    <td><b>0.590</b></td>
-    <td align="center"><b>+11.32%</b></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.750</td>
-    <td><b>0.812</b></td>
-    <td align="center"><b>+8.27%</b></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.828</td>
-    <td><b>0.885</b></td>
-    <td align="center"><b>+6.88%</b></td>
-  </tr>
-  <tr>
-    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.297</td>
-    <td><b>0.355</b></td>
-    <td align="center"><b>+19.53%</b></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.424</td>
-    <td><b>0.485</b></td>
-    <td align="center"><b>+14.38%</b></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.550</td>
-    <td><b>0.628</b></td>
-    <td align="center"><b>+14.18%</b></td>
-  </tr>
-</table>
-
-> 📌 **Full results for all 20 architectures** are shown in the image above. The table highlights the **Baseline** and the **winning architecture (Arch-6)**.
-
-</details>
-
----
-
-<details>
-<summary><b>🏆 4. Winner: Arch-6 — Architecture Deep Dive</b></summary>
-
-<br>
-
-### 🧬 Architecture Diagram
-
-<p align="center">
-<img width="940" height="620" alt="image" src="https://github.com/user-attachments/assets/4af41ad9-9a55-4e45-ac2a-de177ccc89de" />
-</p>
-
-<p align="center"><sub>Arch-6 (P2 Auxiliary ★): 5-head detection architecture with auxiliary P2 branch at stride 4.<br>🟦 New P2 layers | 🟧 Auxiliary split branch | 🔶 Modified layers vs original YOLOv12s.</sub></p>
-
----
-
-### 🎯 Design Highlights
-
-<table>
-  <tr>
-    <th align="left">Feature</th>
-    <th align="left">Description</th>
-    <th align="left">Impact</th>
-  </tr>
-  <tr>
-    <td><b>🔍 P2 Detection Head</b></td>
-    <td>Added high-resolution head at stride 4 (160×160)</td>
-    <td>Captures fine-grained details for small objects</td>
-  </tr>
-  <tr>
-    <td><b>🔀 Auxiliary P2 Branch</b></td>
-    <td>C3k2(True) + Conv split → 2 separate P2 outputs to Detect</td>
-    <td>Extra gradient supervision forces stronger P2 features</td>
-  </tr>
-  <tr>
-    <td><b>📏 Width Scale 0.50</b></td>
-    <td>Doubled channel width (vs default 0.25)</td>
-    <td>2× more representational capacity everywhere</td>
-  </tr>
-  <tr>
-    <td><b>🏋️ Deeper Backbone</b></td>
-    <td>P3: ×2→×3 repeats, P5: ×4→×5 repeats</td>
-    <td>Richer feature extraction at critical scales</td>
-  </tr>
-  <tr>
-    <td><b>🔧 C3k2 in Bottom-up</b></td>
-    <td>P3 bottom-up uses C3k2 instead of A2C2f</td>
-    <td>Saves compute at mid-resolution where attention is less critical</td>
-  </tr>
-  <tr>
-    <td><b>🎯 5 Detection Heads</b></td>
-    <td>P2×2 (aux+main) + P3 + P4 + P5</td>
-    <td>+2 heads at stride 4 dramatically improve small-object recall</td>
-  </tr>
-</table>
-
----
-
-<details>
-<summary><b>📐 Layer-by-Layer Comparison (Original vs Arch-6)</b></summary>
-
-<br>
-
-#### 🏛️ Backbone (L0–L8)
-
-<table>
-  <tr>
-    <th align="center">Layer</th>
-    <th align="left">Original YOLOv12s</th>
-    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
-    <th align="center">Change</th>
-    <th align="left">Rationale</th>
-  </tr>
-  <tr>
-    <td align="center"><b>L0</b></td>
-    <td>Conv [64, 3, 2]</td>
-    <td>Conv [64, 3, 2]</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L1</b></td>
-    <td>Conv [128, 3, 2, 1, 2]</td>
-    <td>Conv [128, 3, 2, 1, 2]</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L2</b></td>
-    <td>C3k2 [256, False, 0.25] ×2</td>
-    <td>C3k2 [256, False, 0.25] ×2</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L3</b></td>
-    <td>Conv [256, 3, 2, 1, 4]</td>
-    <td>Conv [256, 3, 2, 1, 4]</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L4</b></td>
-    <td>C3k2 [512, False, 0.25] ×2</td>
-    <td>C3k2 [512, False, 0.25] <b>×3</b></td>
-    <td align="center">🔶 ×2→×3</td>
-    <td>Extra repeat enriches P3-level features, providing stronger mid-scale representations before entering the attention stages.</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L5</b></td>
-    <td>Conv [512, 3, 2]</td>
-    <td>Conv [512, 3, 2]</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L6</b></td>
-    <td>A2C2f [512, True, 4] ×4</td>
-    <td>A2C2f [512, True, 4] ×4</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L7</b></td>
-    <td>Conv [1024, 3, 2]</td>
-    <td>Conv [1024, 3, 2]</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L8</b></td>
-    <td>A2C2f [1024, True, 1] ×4</td>
-    <td>A2C2f [1024, True, 1] <b>×5</b></td>
-    <td align="center">🔶 ×4→×5</td>
-    <td>Extra repeat at the deepest stage captures richer semantic features before entering the top-down path.</td>
-  </tr>
-</table>
-
----
-
-#### 🔽 Neck — Top-Down FPN (L9–L19)
-
-<table>
-  <tr>
-    <th align="center">Layer</th>
-    <th align="left">Original YOLOv12s</th>
-    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
-    <th align="center">Change</th>
-    <th align="left">Rationale</th>
-  </tr>
-  <tr>
-    <td align="center"><b>L9</b></td>
-    <td>Upsample ×2</td>
-    <td>Upsample ×2</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L10</b></td>
-    <td>Concat (L8_up + L6_bb)</td>
-    <td>Concat (L8_up + L6_bb)</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L11</b></td>
-    <td>A2C2f [512, False, -1] ×2</td>
-    <td>A2C2f [512, False, -1] ×2</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L12</b></td>
-    <td>Upsample ×2</td>
-    <td>Upsample ×2</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L13</b></td>
-    <td>Concat (L11_up + L4_bb)</td>
-    <td>Concat (L11_up + L4_bb)</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr>
-    <td align="center"><b>L14</b></td>
-    <td>A2C2f [256, False, -1] ×2</td>
-    <td>A2C2f [256, False, -1] ×2</td>
-    <td align="center">✅ Same</td>
-    <td>—</td>
-  </tr>
-  <tr style="background-color: #d4edda;">
-    <td align="center"><b>L15</b></td>
-    <td>Conv [256, 3, 2] <sub>(start bottom-up)</sub></td>
-    <td>🟦 Upsample ×2 <sub>(NEW — extends to P2)</sub></td>
-    <td align="center">🆕 Added</td>
-    <td>Extends the top-down path one scale further to reach stride-4 resolution for small-object detection.</td>
-  </tr>
-  <tr style="background-color: #d4edda;">
-    <td align="center"><b>L16</b></td>
-    <td>—</td>
-    <td>🟦 Concat (L15_up + L2_bb)</td>
-    <td align="center">🆕 Added</td>
-    <td>Fuses upsampled P3 features with high-resolution P2 backbone features, combining semantic depth with spatial detail.</td>
-  </tr>
-  <tr style="background-color: #d4edda;">
-    <td align="center"><b>L17</b></td>
-    <td>—</td>
-    <td>🟦 C3k2 [128, False, 0.25] ×2</td>
-    <td align="center">🆕 Added</td>
-    <td>Processes fused P2 features with a lightweight block. Uses C3k2 instead of A2C2f to keep compute manageable at the highest resolution (160×160).</td>
-  </tr>
-  <tr style="background-color: #fce4d6;">
-    <td align="center"><b>L18</b></td>
-    <td>—</td>
-    <td>🟧 C3k2 [128, True] ×1 <sub>(AUX)</sub></td>
-    <td align="center">🆕 Added</td>
-    <td>Auxiliary branch with full 3×3 kernels. Dead-end path directly to Detect. Provides extra gradient supervision at P2, forcing the network to learn strong high-resolution features.</td>
-  </tr>
-  <tr style="background-color: #fce4d6;">
-    <td align="center"><b>L19</b></td>
-    <td>—</td>
-    <td>🟧 Conv [128, 3, 1] <sub>(MAIN P2)</sub></td>
-    <td align="center">🆕 Added</td>
-    <td>Main P2 branch with stride-1 Conv (no downsampling). Projects channels before continuing into the bottom-up PAN path. Also feeds into Detect.</td>
-  </tr>
-</table>
-
----
-
-#### 🔼 Head — Bottom-Up PAN (L20–L28 + Detect)
-
-<table>
-  <tr>
-    <th align="center">Layer</th>
-    <th align="left">Original YOLOv12s</th>
-    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
-    <th align="center">Change</th>
-    <th align="left">Rationale</th>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L20</b><br><sub>(was L15)</sub></td>
-    <td>Conv [256, 3, 2]</td>
-    <td>Conv [<b>128</b>, 3, 2]</td>
-    <td align="center">🔶 256→128ch</td>
-    <td>Starts bottom-up from P2 (128ch) instead of P3 (256ch). Lower channel count matches the finer P2 scale.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L21</b><br><sub>(was L16)</sub></td>
-    <td>Concat (L15 + L11)</td>
-    <td>Concat (L20 + <b>L14</b>)</td>
-    <td align="center">🔶 Sources shifted</td>
-    <td>Concatenates P2 downsampled with P3 from neck (L14) instead of original P3 with P4. One extra fusion step in the path.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L22</b><br><sub>(was L17)</sub></td>
-    <td>A2C2f [512, False, -1] ×2</td>
-    <td><b>C3k2</b> [<b>256</b>, False, 0.25] ×2</td>
-    <td align="center">🔶 A2C2f→C3k2<br>512→256ch</td>
-    <td>Replaced attention block with lightweight C3k2 at P3 scale. Saves compute at mid-resolution where attention is less critical.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L23</b><br><sub>(was L18)</sub></td>
-    <td>Conv [512, 3, 2]</td>
-    <td>Conv [<b>256</b>, 3, 2]</td>
-    <td align="center">🔶 512→256ch</td>
-    <td>Channel count adjusted to match the new P3→P4 transition (256→512 happens at concat).</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L24</b><br><sub>(was L19)</sub></td>
-    <td>Concat (L18 + L8)</td>
-    <td>Concat (L23 + <b>L11</b>)</td>
-    <td align="center">🔶 Sources shifted</td>
-    <td>Fuses with P4 from neck (L11) instead of P5 from backbone. Extended path adds one more fusion opportunity.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L25</b></td>
-    <td>—</td>
-    <td>A2C2f [512, False, -1] ×2</td>
-    <td align="center">🔶 New position</td>
-    <td>A2C2f at P4 in the bottom-up path. Attention applied here where feature maps are smaller (40×40) and attention cost is reasonable.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L26</b></td>
-    <td>—</td>
-    <td>Conv [512, 3, 2]</td>
-    <td align="center">🔶 New position</td>
-    <td>Downsamples P4 to P5 resolution for the final concat.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L27</b></td>
-    <td>—</td>
-    <td>Concat (L26 + L8_bb)</td>
-    <td align="center">🔶 New position</td>
-    <td>Final fusion: bottom-up P4 features + P5 backbone features.</td>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>L28</b><br><sub>(was L20)</sub></td>
-    <td>C3k2 [1024, True] ×2</td>
-    <td>C3k2 [1024, True] <b>×3</b></td>
-    <td align="center">🔶 ×2→×3</td>
-    <td>Extra repeat at P5 for stronger final feature refinement before detection.</td>
-  </tr>
-</table>
-
----
-
-#### 🎯 Detection Head
-
-<table>
-  <tr>
-    <th align="center">Component</th>
-    <th align="left">Original YOLOv12s</th>
-    <th align="left">Arch-6 (P2 Auxiliary ★)</th>
-    <th align="center">Change</th>
-  </tr>
-  <tr style="background-color: #fff3cd;">
-    <td align="center"><b>Detect</b></td>
-    <td>Detect [L14, L17, L20] — <b>3 heads</b></td>
-    <td>Detect [L18, L19, L22, L25, L28] — <b>5 heads</b></td>
-    <td align="center">🔶 3→5 heads</td>
-  </tr>
-</table>
-
-<sub>Two additional detection heads at stride 4 (aux + main P2) dramatically improve small-object recall.</sub>
-
-</details>
-
----
-
-<details>
-<summary><b>📊 Summary of Changes</b></summary>
-
-<br>
-
-<table>
-  <tr>
-    <th align="center">Change Type</th>
-    <th align="center">Count</th>
-    <th align="left">Details</th>
-  </tr>
-  <tr>
-    <td align="center">🆕 <b>New layers added</b></td>
-    <td align="center"><b>5</b></td>
-    <td>L15 (Upsample), L16 (Concat), L17 (C3k2), L18 (C3k2 aux), L19 (Conv main)</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Backbone repeats increased</b></td>
-    <td align="center"><b>2</b></td>
-    <td>L4: ×2→×3, L8: ×4→×5</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Head repeats increased</b></td>
-    <td align="center"><b>1</b></td>
-    <td>L28: ×2→×3</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Block type changed</b></td>
-    <td align="center"><b>1</b></td>
-    <td>L22: A2C2f→C3k2 (lighter at P3 scale)</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Channel widths adjusted</b></td>
-    <td align="center"><b>2</b></td>
-    <td>L20: 256→128, L23: 512→256 (to accommodate P2 scale)</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Detection heads added</b></td>
-    <td align="center"><b>2</b></td>
-    <td>Aux P2 (L18) + Main P2 (L19) at stride 4</td>
-  </tr>
-  <tr>
-    <td align="center">🔶 <b>Width scale changed</b></td>
-    <td align="center"><b>1</b></td>
-    <td>0.25→0.50 (doubles effective channel widths across entire network)</td>
-  </tr>
-</table>
-
-</details>
-
----
-
-<details>
-<summary><b>⚡ Impact Comparison: Original vs Arch-6</b></summary>
-
-<br>
-
-<table>
-  <tr>
-    <th align="left">Metric</th>
-    <th align="center">Original YOLOv12s</th>
-    <th align="center">Arch-6 ★</th>
-    <th align="left">Impact</th>
-  </tr>
-  <tr>
-    <td><b>Detection heads</b></td>
-    <td align="center">3 (P3, P4, P5)</td>
-    <td align="center"><b>5 (P2×2, P3, P4, P5)</b></td>
-    <td>+2 heads at stride 4 for small-object coverage</td>
-  </tr>
-  <tr>
-    <td><b>Smallest stride</b></td>
-    <td align="center">8 (P3)</td>
-    <td align="center"><b>4 (P2)</b></td>
-    <td>2× higher resolution detection — catches objects missed at stride 8</td>
-  </tr>
-  <tr>
-    <td><b>Feature map at finest head</b></td>
-    <td align="center">80×80</td>
-    <td align="center"><b>160×160</b></td>
-    <td>4× more spatial anchors at the finest scale</td>
-  </tr>
-  <tr>
-    <td><b>Backbone depth</b></td>
-    <td align="center">×2/×2/×4/×4</td>
-    <td align="center"><b>×2/×3/×4/×5</b></td>
-    <td>Deeper P3 and P5 for richer features</td>
-  </tr>
-  <tr>
-    <td><b>Auxiliary supervision</b></td>
-    <td align="center">None</td>
-    <td align="center"><b>L18 dead-end to Detect</b></td>
-    <td>Extra gradient signal forces stronger P2 features during training</td>
-  </tr>
-  <tr>
-    <td><b>Width multiplier</b></td>
-    <td align="center">0.25</td>
-    <td align="center"><b>0.50</b></td>
-    <td>2× wider channels — more representational capacity everywhere</td>
-  </tr>
-  <tr>
-    <td><b>Neck fusion depth</b></td>
-    <td align="center">P5→P3 (2 upsample steps)</td>
-    <td align="center"><b>P5→P2 (3 upsample steps)</b></td>
-    <td>One extra fusion level brings semantic info to highest resolution</td>
-  </tr>
-  <tr>
-    <td><b>Compute cost</b></td>
-    <td align="center">Lower</td>
-    <td align="center">Higher</td>
-    <td>Trade-off: more compute for significantly better small-object detection</td>
-  </tr>
-</table>
-
-</details>
-
----
-
-<details>
-<summary><b>🔍 Why Arch-6 Won</b></summary>
-
-<br>
-
-| Aspect | Explanation |
-|--------|-------------|
-| 🎯 **Small Object Focus** | The dual P2 output provides two complementary views of high-resolution features, boosting small object detection by **+19.53%** (mAP50-95) |
-| 📐 **Width Scaling** | The 0.50 width scale gives the model enough capacity to learn discriminative features without excessive compute |
-| ⚖️ **Balanced Design** | Unlike deeper variants (Arch-4) or wider P2 variants (Arch-19), Arch-6 balances depth, width, and auxiliary branching |
-| 🏗️ **C3k2 in Bottom-up** | Using C3k2 instead of A2C2f in the bottom-up path reduces attention overhead at higher resolution while maintaining performance |
-| 🔀 **Auxiliary Supervision** | The dead-end L18 branch forces the network to develop strong P2 features during training, acting as a regularizer |
-| 📏 **Resolution Coverage** | Stride-4 detection at 160×160 provides 4× more spatial positions than P3 (80×80), crucial for detecting small weapons |
-
-</details>
-
-</details>
-
----
-
-<details>
-<summary><b>📖 5. Architecture Legend & Terminology</b></summary>
-
-<br>
-
-<details>
-<summary><b>🔧 Operations</b></summary>
-
-<br>
-
-| Item | Meaning |
-|------|---------|
-| **Conv** | Standard Convolution + BatchNorm + SiLU activation. Used for downsampling (stride 2) or channel projection (stride 1). Learnable filter that extracts local features. |
-| **C3k2** | Cross-Stage Partial Bottleneck with 2 Convolutions. Lightweight block that splits input channels, processes one half through bottleneck convolutions, then concatenates both halves. Efficient and fast. |
-| **A2C2f** | Area-Attention Cross-stage 2-conv Fusion. Advanced block with built-in multi-head area attention that captures long-range spatial dependencies. Heavier than C3k2 but more powerful. |
-| **Upsample** | Nearest Neighbor Upsampling. Doubles spatial resolution (H×2, W×2) without learnable parameters. Used in top-down path to match feature map sizes. |
-| **Concat [1]** | Channel-wise Concatenation along dim=1. Joins two or more feature maps by stacking their channels. Spatial dimensions must match. No learnable parameters. |
-| **Detect** | Final Detection Head. Takes multi-scale feature maps and outputs bounding box coordinates + class probability scores. |
+- Search range for *α₁, α₂*: `[0.1, 1.0]` → **optimal: α₁ = 0.7, α₂ = 0.4**
+- Small-object threshold: area ≤ **32×32 px**
 
 </details>
 
 <details>
-<summary><b>📐 Parameters</b></summary>
+<summary><b>🎯 A2 — Auxiliary Center Loss for Small Objects ❌ (disabled in the final model)</b></summary>
 
 <br>
 
-| Item | Meaning |
-|------|---------|
-| **[channels]** | Output channel count after the operation. Example: `[512]` → 512 output channels. |
-| **[ch, kernel, stride]** | Conv specification. Example: `[128, 3, 2]` → 128 channels, 3×3 kernel, stride 2 (halves resolution). |
-| **[ch, k, s, pad, groups]** | Extended Conv specification with padding and grouped convolution. Example: `[128, 3, 2, 1, 2]` → 2-group conv. |
-| **True / False** | Kernel size toggle. `True` = full 3×3 kernels (stronger, heavier). `False` = compact 1×1 mix (lighter, faster). |
-| **0.25** | Bottleneck width ratio (C3k2 only). 0.25 = only 25% of channels pass through the bottleneck path. |
-| **4 / 1** | Number of area-attention heads (A2C2f only). `4` = 4-head attention at P4. `1` = single-head at P5. |
-| **-1** | Attention disabled (A2C2f only). Used in neck/head for lightweight fusion mode without attention overhead. |
-| **×N** | Number of sequential block repeats. Example: `×3` = the block is stacked 3 times in series. |
-| **[None, 2, "nearest"]** | Upsample config: scale factor 2, nearest interpolation (no smoothing). |
-| **nc** | Number of object classes. `nc=4` → 4 detection categories. |
+A lightweight **L1 penalty on box centers**, applied only to small targets with a decaying schedule, intended to fix "miss by a few pixels" errors where IoU collapses for tiny boxes.
+
+- Weight search range for *α₃, α₄*: `[0, 0.1]`
+- **Result:** the tuned weight brought **no measurable improvement** on the validation set → **switched off** in the final model (λ_center = 0). Described for completeness; its individual effect is reported in the ablation (it slightly *hurts* small-object metrics — see Table 6 column +A2).
 
 </details>
 
 <details>
-<summary><b>🏛️ Architecture Sections</b></summary>
+<summary><b>✂️ A3 — Adaptive Loss Clipping ✅ (enabled)</b></summary>
 
 <br>
 
-| Section | Layers | Description |
-|---------|--------|-------------|
-| **BACKBONE** | L0–L8 | Feature Extraction. Progressively downsamples the input image across 5 scales (P1→P5). Uses Conv for downsampling, C3k2 at early stages, A2C2f with attention at deep stages. |
-| **NECK** | L9–L19 | Top-Down Fusion (FPN). Upsamples deep features and fuses them with backbone skip connections, propagating rich semantic information from P5 down to P2. Contains the auxiliary split at L18/L19. |
-| **HEAD** | L20–L28 + Detect | Bottom-Up Fusion (PAN) + Detection. Downsamples fused features back from P2 to P5, re-fusing with neck outputs. Feeds 5 multi-scale outputs into the Detect layer. |
+Per-batch clipping of the IoU and DFL losses with **epoch-dependent ceilings**, preventing gradient explosions from mislabeled data or hard positives — yielding smoother loss curves and more stable convergence.
+
+- Search range for *α₅–α₈*: `[10, 70]` (unity step) → **optimal: α₅ = 50, α₆ = 30, α₇ = 25, α₈ = 15**
 
 </details>
 
 <details>
-<summary><b>🟦🟧 New & Modified Layers</b></summary>
+<summary><b>🧲 A4 — Assignment Tuned Towards Small Objects (TAL) ✅ (enabled)</b></summary>
 
 <br>
 
-| Category | Item | Meaning |
-|----------|------|---------|
-| 🟦 **P2 Head** | L15, L16, L17 | Added to original YOLOv12s. Upsample + Concat + C3k2 that extends detection down to stride 4 for small-object coverage. Present in all P2 architectures. |
-| 🟧 **Auxiliary Split** | L18, L19 | Exclusive to Arch-6. L17 forks into two parallel branches: L18 (C3k2 True → Detect directly) provides auxiliary supervision, L19 (Conv stride 1) continues into bottom-up PAN path. |
+The default Task-Aligned Assigner uses a small candidate pool (*k* = 10), which can produce false negatives for small objects when no anchor overlaps the target.
+
+| Parameter | YOLOv12 default | Ours | Search range |
+|-----------|:---------------:|:----:|:------------:|
+| Candidate pool `top-k` | 10 | **13** | [2, 25] |
+| Score exponent | 0.5 | **0.7** | — |
+| IoU exponent | 6.0 | **4.0** | — |
+
+The retuned exponents better balance classification confidence vs localization quality during assignment; the larger pool improves recall in small-gun scenarios.
+
+</details>
+
+> 🏆 **Final loss configuration: A1 + A3 + A4** (A2 evaluated but disabled). λ_box, λ_DFL, λ_cls remain at the original YOLOv12 values.
+
+---
+
+## 🏗️ Proposed Model — Part B: Zero-Gated Head Enhancements
+
+> ⚠️ **Design decision:** the intuitive remedy — extending the pyramid with a **stride-4 P2 head** — was tested and **rejected**: it sharply increased compute and memory (160×160 feature maps) while producing **no consistent improvement** over the 3-scale design. The final model **keeps the standard P3/P4/P5 layout** (and the stock YOLOv12s backbone + PAN neck, width 0.50) and enhances **only the detection head**.
+
+<details>
+<summary><b>🔧 B1 — Append-Only, Zero-Gated Design Principle</b></summary>
+
+<br>
+
+Every enhancement is inserted as a **residual branch scaled by a learnable gate γ initialized to zero**:
+
+- At the start of training each module is an **exact identity** — the network reproduces the pretrained YOLOv12s baseline exactly (after a one-time remap of the detection-head index)
+- Gates open **only where the added branch reduces training loss**
+- Worst realistic outcome = baseline performance → **low-risk strengthening** of small-object detection
+- Each block preserves channel width and spatial resolution, dropping into the existing P3–P5 streams without altering the rest of the network
 
 </details>
 
 <details>
-<summary><b>🔗 Concat Labels</b></summary>
+<summary><b>🔍 B2 — Scale-Specific Feature Enhancement (ZGSmallDetail · ZGLSKAWideFuseV2 · ZGLSKAWideFuse)</b></summary>
 
 <br>
 
-| Label | Layer | Description |
-|-------|-------|-------------|
-| (P5 upsampled + P4 backbone) | L10 | Upsampled P5 features concatenated with P4 skip from backbone (L6). |
-| (P4 upsampled + P3 backbone) | L13 | Upsampled P4 features concatenated with P3 skip from backbone (L4). |
-| (P3 upsampled + P2 backbone) | L16 | Upsampled P3 features concatenated with P2 skip from backbone (L2). |
-| (P2 downsampled + P3 neck) | L21 | Main P2 branch downsampled and concatenated with P3 from neck (L14). |
-| (P3 downsampled + P4 neck) | L24 | P3 downsampled and concatenated with P4 from neck (L11). |
-| (P4 downsampled + P5 backbone) | L27 | P4 downsampled and concatenated with P5 from backbone (L8). |
+| Level | Module | Structure | Role |
+|-------|--------|-----------|------|
+| **P3** (stride 8) | 🟦 **ZGSmallDetail** | Two parallel depth-wise convs (3×3 + 5×5) → sum → GroupNorm → gated residual | Reinforces fine, high-frequency detail that large-receptive-field fusion washes out — the features small firearms depend on. Every large-receptive-field variant at P3 *degraded* small-object accuracy. |
+| **P4** (stride 16) | 🟨 **ZGLSKAWideFuseV2** | Channel-expanding two-branch block: square large-kernel attention (11×11) ⊕ hybrid branch (23-tap strip attention for elongated objects + small-kernel detail extractor) → concat → project | Preserves medium/large-object context while keeping small-object detail at the fusion source |
+| **P5** (stride 32) | 🟥 **ZGLSKAWideFuse** | Square + strip large-kernel attention fusion | Models the broad spatial context appropriate for the coarsest scale |
+
+**Kernel choices validated by sweeps:** square kernel k ∈ {7, 11, 15} → **k = 11** optimal with near-flat behavior around it (not fragile); the **23-tap strip kernel** is motivated by the elongated geometry of knives and long guns and was validated as a standalone branch; channel-split fusion was rejected because it starved both branches of capacity.
 
 </details>
 
 <details>
-<summary><b>📏 Stride / Resolution Map</b></summary>
+<summary><b>🌐 B3 — Global-Context Recalibration (ZGGlobalContext, all levels)</b></summary>
 
 <br>
 
-| Stride | Scale | Resolution <sub>(640×640 input)</sub> | Usage |
-|--------|-------|---------------------------------------|-------|
-| 2 | P1 | 320 × 320 | Initial downsampled features |
-| **4** | **P2** | **160 × 160** | **Highest-resolution detection (very small objects)** ★ |
-| 8 | P3 | 80 × 80 | Small object detection |
-| 16 | P4 | 40 × 40 | Medium object detection |
-| 32 | P5 | 20 × 20 | Large object detection |
+Per-location features lack whole-image context — exactly what the heterogeneous `no_weapon` class needs to be separated from genuine weapons. After scale-specific enhancement, each level passes through a **squeeze-and-excitation-style** block:
+
+`Global Average Pool → 1×1 bottleneck (reduction 8) + SiLU → 1×1 expansion → zero-gated additive broadcast to every location`
+
+At **near-zero cost** this recalibrates each location with an image-wide signal, improving appearance-vs-context discrimination without disturbing per-location detail. (Zero-init gates follow ReZero/GCNet practice.)
 
 </details>
 
 <details>
-<summary><b>🎯 Detect Outputs</b></summary>
+<summary><b>🎓 B4 — Dual-Head Auxiliary Supervision (DetectAuxDual)</b></summary>
 
 <br>
 
-| Output | Layer | Stride | Description |
-|--------|-------|--------|-------------|
-| 🟧 **Aux P2** | L18 | 4 | Auxiliary head at stride 4. Dead-end branch providing extra supervision at highest resolution. |
-| 🟧 **Main P2** | L19 | 4 | Main P2 head at stride 4. Also feeds into bottom-up path before reaching Detect. |
-| 🔷 **P3** | L22 | 8 | P3 head at stride 8. |
-| 🔷 **P4** | L25 | 16 | P4 head at stride 16. |
-| 🔷 **P5** | L28 | 32 | P5 head at stride 32. |
+- **Main head** — supervised on the three context-enhanced feature maps (outputs of B2–B3)
+- **Auxiliary head** — supervised on the **raw, pre-enhancement** P3/P4/P5 neck features; provides a short, direct gradient path that rewards the backbone for preserving high-resolution detail
+- The auxiliary head is **active only during training** and **dropped at inference** → the deployed model runs the three main heads at strides 8/16/32 with **zero added latency**
 
 </details>
+
+<details>
+<summary><b>⚖️ B5 — Parameter & Speed Budget</b></summary>
+
+<br>
+
+| | Baseline YOLOv12s | Proposed (deployed) |
+|---|:---:|:---:|
+| **Parameters (inference)** | 9.10 M | 11.68 M (+2.58 M, +28%, dominated by the P5 fusion block) |
+| **Training-only auxiliary branch** | — | 0.82 M (removed at deployment) |
+| **Throughput (RTX 4090)** | ~220 FPS | **205–210 FPS** |
+
+All additions rely on **depth-wise and 1×1 operations**, so the measured throughput impact is marginal and the model retains a wide real-time margin.
 
 </details>
 
 ---
 
-<details>
-<summary><b>📌 6. Key Takeaways</b></summary>
+## 📊 Results — Per-Class Performance <sub>(Paper — Tables 4 & 5, test set)</sub>
 
-<br>
+| Class | mAP@50<br><sub>Custom / Baseline</sub> | mAP@50-95<br><sub>Custom / Baseline</sub> | Precision<br><sub>Custom / Baseline</sub> | Recall<br><sub>Custom / Baseline</sub> | F1<br><sub>Custom / Baseline</sub> |
+|-------|:---:|:---:|:---:|:---:|:---:|
+| 🗡️ knife | **0.900** / 0.867 | **0.646** / 0.609 | **0.876** / 0.848 | **0.841** / 0.807 | **0.859** / 0.828 |
+| 🔫 pistol | **0.916** / 0.882 | **0.609** / 0.569 | **0.897** / 0.862 | **0.879** / 0.840 | **0.888** / 0.851 |
+| 🎯 long_gun | **0.903** / 0.881 | **0.575** / 0.554 | **0.880** / 0.859 | **0.883** / 0.848 | **0.882** / 0.853 |
+| 🚫 no_weapon | **0.689** / 0.617 | **0.385** / 0.332 | **0.807** / 0.761 | **0.582** / 0.500 | **0.678** / 0.609 |
+| **All** | **0.852** / 0.812 | **0.553** / 0.516 | **0.865** / 0.833 | **0.800** / 0.747 | **0.831** / 0.788 |
 
-- 🏆 **Winner:** **Arch-6** with auxiliary P2 branch (P2×2 + P3–P5, width scale 0.50)
-- 📈 **Best Improvement:** **+19.53%** on small objects (mAP50-95), **+11.43%** on overall mAP50-95
-- 🔍 **P2 Head is Critical:** All top-performing architectures include a P2 detection head
-- 🔀 **Auxiliary Branches Help:** Dual P2 outputs (Arch-6, 7, 9–11, 16–18) consistently outperform single P2 heads
-- 📏 **Width Scale Matters:** 0.50 width scale outperforms 0.25 in architectures with P2 heads
-- 🏔️ **P6 Head Not Beneficial:** Arch-3's P6 head at stride 64 did not improve small-object detection
-- 🏋️ **Diminishing Returns on Depth:** Arch-4's much deeper backbone (3/5/6/7) did not proportionally improve results
-- 🔧 **BiFPN-style Neck:** Mixed results — beneficial when combined with auxiliary branches (Arch-9) but not alone (Arch-2)
-- ⚡ **A2C2f at P2:** Using attention at the highest resolution (Arch-15) adds compute without significant gains over C3k2
-- 🧪 **20 experiments** × ~3.2h = **~64 hours** of architecture search
+### 📈 Relative Improvements & Attribution <sub>(Paper — Table 5)</sub>
 
-</details>
-
-## 🏋️ Full Dataset Training — Custom Architecture & Custom Loss (YOLOv12s)
-
-After identifying the best architecture (**Arch-6 ★**) and best loss configuration (**A1 + A2 + A3.1 + A4**) through separate ablation studies, we conducted **2 final training runs** on the **full dataset** to measure their individual and combined impact.
-
-<details>
-<summary><b>⚙️ 1. Training Configuration</b></summary>
-
-<br>
-
-| Setting | Value |
-|---------|-------|
-| 📊 **Dataset** | **100%** full dataset (**59,305 images** / **76,705 instances**) |
-| 🔄 **Epochs** | **130** |
-| 📦 **Batch Size** | **48** |
-| 🖼️ **Image Size** | **640×640** |
-| ⏱️ **Training Time** | ~20 hours per run |
-| 🏛️ **Architecture** | YOLOv12s with Arch-6 ★ (P2×2 + P3–P5, width scale 0.50) |
-| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
+| Class | mAP@50 | Precision | Recall | F1 | What drives the gain |
+|-------|:------:|:---------:|:------:|:--:|----------------------|
+| 🗡️ knife | +3.8% | +3.3% | +4.2% | +3.7% | *ZGSmallDetail* (B2) + size-aware curriculum (A1) preserve thin metallic edge features |
+| 🔫 pistol | +3.9% | +4.0% | +4.6% | +4.3% | TAL tuning (A4) improves detection for the largest small-object class |
+| 🎯 long_gun | +2.5% | +2.4% | +4.1% | +3.4% | Already strong at baseline; strip-kernel attention (B2) tightens elongated box fits |
+| 🚫 no_weapon | **+11.6%** | +6.0% | **+16.4%** | **+11.3%** | *ZGGlobalContext* (B3) + *DetectAuxDual* (B4) separate confounders from real weapons |
+| **All** | **+4.9%** | **+3.8%** | **+7.1%** | **+5.5%** | Complementary gains from custom loss (A1, A3, A4) and head modules (B1–B4), each effective in isolation |
 
 ---
 
-### 🧪 Training Runs
+## 📊 Ablation Study — Performance by Object Size <sub>(Paper — Table 6, test set)</sub>
 
-| Run | Architecture | Loss Function | Description |
-|-----|-------------|---------------|-------------|
-| **Run 1** | 🏗️ Arch-6 ★ (Custom) | 🚫 Default (Ultralytics) | Isolates the effect of the custom architecture alone |
-| **Run 2** | 🏗️ Arch-6 ★ (Custom) | ✅ Custom (A1+A2+A3.1+A4) | Combines both custom architecture and custom loss |
+<details>
+<summary><b>🔍 Small Objects (area ≤ 32×32 px)</b> — click to expand</summary>
+
+| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1–A4) | +Architecture<br>(B1–B5) | 🏆 New Model         |
+|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
+| **mAP@50**    | 0.640    | 0.669 (+4.53%)  | 0.631 (−1.41%)   | 0.665 (+3.91%)   | 0.674 (+5.31%)   | 0.681 (+6.41%)                | 0.664 (+3.75%)   | **0.708 (+10.63%)**   |
+| **mAP@50–95** | 0.324    | 0.336 (+3.70%)  | 0.319 (−1.54%)   | 0.341 (+5.25%)   | 0.339 (+4.63%)   | 0.348 (+7.41%)                | 0.334 (+3.09%)   | **0.354 (+9.26%)**    |
+| **Precision** | 0.758    | 0.770 (+1.58%)  | 0.762 (+0.53%)   | 0.766 (+1.06%)   | 0.778 (+2.64%)   | 0.783 (+3.30%)                | 0.769 (+1.45%)   | **0.790 (+4.22%)**    |
+| **Recall**    | 0.585    | 0.622 (+6.32%)  | 0.572 (−2.22%)   | 0.628 (+7.35%)   | 0.625 (+6.84%)   | 0.648 (+10.77%)               | 0.611 (+4.44%)   | **0.660 (+12.82%)**   |
+| **F1-score**  | 0.662    | 0.692 (+4.53%)  | 0.653 (−1.36%)   | 0.694 (+4.83%)   | 0.697 (+5.29%)   | 0.708 (+6.95%)                | 0.682 (+3.02%)   | **0.719 (+8.61%)**    |
 
 </details>
 
----
+<details>
+<summary><b>📦 Medium Objects (32×32 &lt; area ≤ 96×96 px)</b> — click to expand</summary>
+
+| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1–A4) | +Architecture<br>(B1–B5) | 🏆 New Model         |
+|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
+| **mAP@50**    | 0.781    | 0.811 (+3.84%)  | 0.773 (−1.02%)   | 0.807 (+3.33%)   | 0.814 (+4.23%)   | 0.818 (+4.74%)                | 0.797 (+2.05%)   | **0.826 (+5.76%)**    |
+| **mAP@50–95** | 0.445    | 0.464 (+4.27%)  | 0.439 (−1.35%)   | 0.467 (+4.94%)   | 0.465 (+4.49%)   | 0.472 (+6.07%)                | 0.457 (+2.70%)   | **0.480 (+7.87%)**    |
+| **Precision** | 0.816    | 0.838 (+2.70%)  | 0.820 (+0.49%)   | 0.833 (+2.08%)   | 0.845 (+3.55%)   | 0.851 (+4.29%)                | 0.832 (+1.96%)   | **0.860 (+5.39%)**    |
+| **Recall**    | 0.723    | 0.751 (+3.87%)  | 0.714 (−1.24%)   | 0.754 (+4.29%)   | 0.752 (+4.01%)   | 0.763 (+5.53%)                | 0.741 (+2.49%)   | **0.775 (+7.19%)**    |
+| **F1-score**  | 0.767    | 0.792 (+3.26%)  | 0.758 (−1.17%)   | 0.791 (+3.13%)   | 0.796 (+3.78%)   | 0.805 (+4.95%)                | 0.784 (+2.22%)   | **0.815 (+6.26%)**    |
+
+</details>
 
 <details>
-<summary><b>📊 2. Results — Custom Architecture Only (Run 1)</b></summary>
+<summary><b>🟫 Large Objects (area &gt; 96×96 px)</b> — click to expand</summary>
+
+| Metric       | Baseline | +A1             | +A2             | +A3             | +A4             | Custom Loss<br>(A1–A4) | +Architecture<br>(B1–B5) | 🏆 New Model         |
+|:-------------|---------:|:----------------|:-----------------|:-----------------|:-----------------|:------------------------------|:-----------------|:----------------------|
+| **mAP@50**    | 0.848    | 0.858 (+1.18%)  | 0.853 (+0.59%)   | 0.854 (+0.71%)   | 0.862 (+1.65%)   | 0.866 (+2.12%)                | 0.856 (+0.94%)   | **0.872 (+2.83%)**    |
+| **mAP@50–95** | 0.574    | 0.583 (+1.57%)  | 0.578 (+0.70%)   | 0.585 (+1.92%)   | 0.582 (+1.39%)   | 0.591 (+2.96%)                | 0.582 (+1.39%)   | **0.595 (+3.66%)**    |
+| **Precision** | 0.844    | 0.867 (+2.73%)  | 0.851 (+0.83%)   | 0.862 (+2.13%)   | 0.873 (+3.44%)   | 0.880 (+4.27%)                | 0.861 (+2.01%)   | **0.893 (+5.81%)**    |
+| **Recall**    | 0.808    | 0.822 (+1.73%)  | 0.815 (+0.87%)   | 0.825 (+2.10%)   | 0.823 (+1.86%)   | 0.831 (+2.85%)                | 0.818 (+1.24%)   | **0.838 (+3.71%)**    |
+| **F1-score**  | 0.825    | 0.843 (+2.18%)  | 0.832 (+0.85%)   | 0.842 (+2.06%)   | 0.846 (+2.55%)   | 0.854 (+3.52%)                | 0.839 (+1.70%)   | **0.864 (+4.73%)**    |
+
+</details>
+
+> 📌 **Reading the ablation:** every proposed component (A1, A3, A4, B1–B5) helps in isolation; **A2 slightly hurts small/medium objects**, which is why it is disabled in the final model. The full combination is strongest on every metric at every object size.
+
+---
+
+## 🏗️ Architecture Search Summary <sub>(40+ variants — full details in the Supplementary Material)</sub>
+
+<details>
+<summary><b>🧬 What was explored, and what won</b></summary>
 
 <br>
 
-### 🏗️ Arch-6 + Default Loss — Full Dataset (130 epochs)
+Over **40 distinct model variants** were tested. The search covered:
 
-Original YOLOv12s (baseline) vs Custom Architecture (Arch-6) with default loss:
+| Direction | Explored |
+|-----------|----------|
+| 🔍 **Attention** | Insertion point & kernel size of large-kernel attention; self-attention variants |
+| 🔀 **Fusion** | Wide-receptive-field fusion; global & channel context; spatial pyramid pooling |
+| 🧲 **Sampling** | Deformable and dynamic-sampling operators |
+| 📏 **Capacity** | Capacity redistribution; P3 depth/path changes; head tower capacity |
+| 🏔️ **Topology** | Neck topology changes; **P2/five-scale extension** (stride-4 head) |
+| 🖼️ **Resolution** | 640 px vs 800 px vs 960 px input |
+| 🎯 **Heads** | Auxiliary supervision, decoupled heads, alternative classifiers |
 
-<p align="center">
-<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/46ee119c-24e1-421f-bc80-b54f81d9cc39" />
-</p>
+**Outcome:**
 
-<table>
-  <tr>
-    <th align="center" rowspan="2">Metric</th>
-    <th align="center" colspan="5">Original → Custom Arch (Δ Improvement)</th>
-  </tr>
-  <tr>
-    <th align="center">OVERALL</th>
-    <th align="center">🗡️ Knife</th>
-    <th align="center">🎯 Long Gun</th>
-    <th align="center">🚫 Other</th>
-    <th align="center">🔫 Pistol</th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td>0.816 → <b>0.840</b> <sub>(+2.94%)</sub></td>
-    <td>0.875 → <b>0.897</b> <sub>(+2.61%)</sub></td>
-    <td>0.840 → <b>0.890</b> <sub>(+5.90%)</sub></td>
-    <td>0.637 → <b>0.662</b> <sub>(+3.99%)</sub></td>
-    <td>0.911 → <b>0.909</b> <sub>(-0.22%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td>0.525 → <b>0.562</b> <sub>(+7.13%)</sub></td>
-    <td>0.614 → <b>0.665</b> <sub>(+8.45%)</sub></td>
-    <td>0.535 → <b>0.587</b> <sub>(+9.79%)</sub></td>
-    <td>0.346 → <b>0.371</b> <sub>(+7.42%)</sub></td>
-    <td>0.605 → <b>0.624</b> <sub>(+3.28%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Precision</b></td>
-    <td>0.831 → <b>0.871</b> <sub>(+4.80%)</sub></td>
-    <td>0.847 → <b>0.853</b> <sub>(+0.70%)</sub></td>
-    <td>0.827 → <b>0.885</b> <sub>(+7.09%)</sub></td>
-    <td>0.800 → <b>0.841</b> <sub>(+5.08%)</sub></td>
-    <td>0.851 → <b>0.906</b> <sub>(+6.39%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Recall</b></td>
-    <td>0.746 → <b>0.795</b> <sub>(+6.62%)</sub></td>
-    <td>0.845 → <b>0.883</b> <sub>(+4.58%)</sub></td>
-    <td>0.769 → <b>0.828</b> <sub>(+7.64%)</sub></td>
-    <td>0.522 → <b>0.574</b> <sub>(+9.88%)</sub></td>
-    <td>0.847 → <b>0.895</b> <sub>(+5.72%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>F1 Score</b></td>
-    <td>0.786 → <b>0.831</b> <sub>(+5.75%)</sub></td>
-    <td>0.846 → <b>0.868</b> <sub>(+2.60%)</sub></td>
-    <td>0.797 → <b>0.856</b> <sub>(+7.38%)</sub></td>
-    <td>0.632 → <b>0.682</b> <sub>(+7.93%)</sub></td>
-    <td>0.849 → <b>0.900</b> <sub>(+6.05%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.530 → <b>0.562</b> <sub>(+6.06%)</sub></td>
-    <td>0.679 → <b>0.729</b> <sub>(+7.32%)</sub></td>
-    <td>0.426 → <b>0.469</b> <sub>(+10.25%)</sub></td>
-    <td>0.230 → <b>0.244</b> <sub>(+6.05%)</sub></td>
-    <td>0.779 → <b>0.803</b> <sub>(+3.03%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.750 → <b>0.780</b> <sub>(+3.99%)</sub></td>
-    <td>0.819 → <b>0.842</b> <sub>(+2.79%)</sub></td>
-    <td>0.782 → <b>0.829</b> <sub>(+5.93%)</sub></td>
-    <td>0.542 → <b>0.574</b> <sub>(+5.83%)</sub></td>
-    <td>0.849 → <b>0.864</b> <sub>(+1.73%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.828 → <b>0.854</b> <sub>(+3.13%)</sub></td>
-    <td>0.879 → <b>0.910</b> <sub>(+3.58%)</sub></td>
-    <td>0.859 → <b>0.903</b> <sub>(+5.11%)</sub></td>
-    <td>0.642 → <b>0.669</b> <sub>(+4.10%)</sub></td>
-    <td>0.922 → <b>0.924</b> <sub>(+0.13%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.297 → <b>0.329</b> <sub>(+10.84%)</sub></td>
-    <td>0.492 → <b>0.550</b> <sub>(+11.71%)</sub></td>
-    <td>0.229 → <b>0.269</b> <sub>(+17.55%)</sub></td>
-    <td>0.106 → <b>0.117</b> <sub>(+10.26%)</sub></td>
-    <td>0.351 → <b>0.378</b> <sub>(+7.61%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.424 → <b>0.458</b> <sub>(+8.03%)</sub></td>
-    <td>0.551 → <b>0.610</b> <sub>(+10.64%)</sub></td>
-    <td>0.416 → <b>0.456</b> <sub>(+9.79%)</sub></td>
-    <td>0.237 → <b>0.257</b> <sub>(+8.58%)</sub></td>
-    <td>0.484 → <b>0.502</b> <sub>(+3.86%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.550 → <b>0.591</b> <sub>(+7.55%)</sub></td>
-    <td>0.602 → <b>0.665</b> <sub>(+10.46%)</sub></td>
-    <td>0.542 → <b>0.602</b> <sub>(+11.05%)</sub></td>
-    <td>0.372 → <b>0.400</b> <sub>(+7.36%)</sub></td>
-    <td>0.682 → <b>0.694</b> <sub>(+1.67%)</sub></td>
-  </tr>
-</table>
+- 🏆 The best configuration **leaves the YOLOv12s backbone and PAN neck unchanged** (including the 0.50 width multiplier of the "s" scale) and enhances **only the detection head** with the five zero-gated modules (B1–B5)
+- ❌ The **P2/five-scale extension performed below the proposed three-scale design** while sharply increasing compute and memory
+- ❌ Every large-receptive-field variant at P3 **degraded** small-object accuracy → P3 branch restricted to 3×3/5×5 depth-wise kernels
+- ✅ Square-kernel dose–response sweep k ∈ {7, 11, 15} → **k = 11**, with near-flat behavior around it
+- ✅ 640 px input confirmed against 800/960 px alternatives (no improvement)
 
 </details>
 
 ---
 
+## 🎲 Seed Reproducibility Study <sub>(Paper — Table 8; 3 independent seeds per configuration)</sub>
+
+Reporting a single run risks mistaking a lucky seed for a real improvement — a real concern when configurations differ by a few points. Every configuration was trained **3 times** with all other factors fixed (same dataset & split, 640 px, batch 64, deterministic execution):
+
+| Configuration | n | mAP@50 | mAP@50-95 | Precision | Recall | mAP@50 (Small) | mAP@50 (Med.) | mAP@50 (Large) |
+|---------------|:-:|:------:|:---------:|:---------:|:------:|:--------------:|:-------------:|:--------------:|
+| Baseline | 3 | 0.812 (±0.0006) | 0.516 (±0.0011) | 0.833 (±0.0034) | 0.747 (±0.0019) | 0.640 (±0.0102) | 0.781 (±0.0025) | 0.848 (±0.0009) |
+| + Custom Loss | 3 | 0.839 (±0.0007) | 0.539 (±0.0015) | 0.852 (±0.0025) | 0.782 (±0.0017) | 0.681 (±0.0155) | 0.818 (±0.0018) | 0.866 (±0.0001) |
+| + Custom Arch | 3 | 0.845 (±0.0008) | **0.557** (±0.0014) | 0.853 (±0.0094) | 0.780 (±0.0044) | 0.664 (±0.0065) | 0.797 (±0.0022) | 0.856 (±0.0008) |
+| **+ Loss + Arch (Proposed)** | **3** | **0.852 (±0.0002)** | 0.553 (±0.0021) | **0.865 (±0.0031)** | **0.800 (±0.0007)** | **0.708 (±0.0129)** | **0.826 (±0.0021)** | **0.872 (±0.0019)** |
+
+**Key observations:**
+
+- 🎯 mAP@50 varies by **at most ±0.0008** across seeds (±0.0002 for the proposed model), while the configuration gaps are **+2.7 / +3.3 / +4.0 points** — an **order of magnitude larger** than the noise floor. The gains cannot be ascribed to seed selection.
+- ⚖️ At strict mAP@50-95, the **architecture-only** variant is slightly highest (0.557 vs 0.553): the custom loss trades a marginal amount of strict-IoU localization for **substantially higher Recall (0.800 vs 0.780), Precision (0.865 vs 0.853), and small-object mAP@50 (0.708 vs 0.664)** — the operationally critical metrics for surveillance.
+- 🔍 Only the small-object metric shows sizeable variance (std up to ~0.015), as expected from the smaller number of small instances — yet the proposed model's **6.8-point small-object gain still clears the spread**.
+
+---
+
+## 🔶 Controlled Comparison vs YOLO26 <sub>(Paper — Table 7; averages over 3 runs)</sub>
+
+For a fair, reproducible comparison, **YOLO26 ("s" scale, official Ultralytics implementation)** was trained under **exactly the same conditions**: same dataset, same leakage-free split, 640 px input, identical schedule and hyperparameters.
+
+| Metric | Object size | YOLOv12s | YOLOv12s + Custom Loss | 🏆 YOLOv12s + Loss + Arch | YOLO26 |
+|--------|:-----------:|:--------:|:----------------------:|:---------------------------:|:------:|
+| mAP@50 | Small | 0.640 | 0.681 | **0.708** | 0.615 |
+| | Medium | 0.781 | 0.818 | **0.826** | 0.780 |
+| | Large | 0.848 | 0.866 | **0.872** | 0.843 |
+| | All | 0.812 | 0.839 | **0.852** | 0.807 |
+| mAP@50-95 | Small | 0.324 | 0.348 | **0.354** | 0.317 |
+| | Medium | 0.445 | 0.472 | **0.480** | 0.466 |
+| | Large | 0.574 | 0.591 | **0.595** | 0.588 |
+| | All | 0.516 | 0.539 | **0.553** | 0.521 |
+| Precision | All | 0.833 | 0.852 | **0.865** | 0.845 |
+| Recall | All | 0.747 | 0.782 | **0.800** | 0.753 |
+| F1-score | All | 0.788 | 0.816 | **0.831** | 0.796 |
+
+> 🔍 The modified YOLOv12s **outperforms YOLO26** regardless of object dimensionality — the small-object gap (0.708 vs 0.615 mAP@50) is the largest.
+
+---
+
+## 🌍 External Dataset Validation & State-of-the-Art Context <sub>(Paper — Table 9)</sub>
+
+The proposed model, trained **only on our custom dataset**, was evaluated **without retraining** on three publicly available weapon datasets:
+
+| Model / Dataset | Precision | Recall | mAP@50 | Dataset |
+|-----------------|:---------:|:------:|:------:|---------|
+| **New YOLOv12s (ours) — own test set** | **0.865** | **0.800** | **0.852** | 26,528 images (knife, pistol, long_gun, no_weapon) |
+| **New YOLOv12s (ours) — [Zenodo dataset](https://zenodo.org/records/16422779)** | 0.833 | 0.778 | 0.792 | 8,478 images (machete, knife, baseball bat, rifle, gun) |
+| **New YOLOv12s (ours) — [YouTube-GDD](https://github.com/ucas-gyx/youtube-gdd)** | 0.854 | 0.781 | 0.805 | 5,000 images (gun) |
+| **New YOLOv12s (ours) — [Sohas / OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection)** | 0.828 | 0.760 | 0.776 | 5,859 images (pistol, smartphone, knife, coin purse, ticket, card) |
+
 <details>
-<summary><b>📊 3. Results — Custom Architecture + Custom Loss (Run 2)</b></summary>
+<summary><b>📚 Context: prior weapon-detection studies (⚠️ each row uses a different dataset — indicative, not directly comparable)</b></summary>
 
 <br>
 
-### 🏗️ Arch-6 + Custom Loss (A1+A2+A3.1+A4) — Full Dataset (130 epochs)
+| Method | Precision | Recall | mAP@50 | Dataset |
+|--------|:---------:|:------:|:------:|---------|
+| YOLOv7 | 0.852 | 0.617 | 0.33 | 400 images (guns and knives) |
+| YOLOv5l | 0.715 | 0.614 | 0.641 | 2,986 images (pistols) |
+| YOLOv8m | 0.85 | 0.80 | 0.82 | 1,000 images (weapon, no_weapon) |
+| VGG-SSD | 0.87 | 0.866 | 0.87 | 872 images (normal, knife, gun) |
+| Faster R-CNN | — | — | 0.81 | 3,831 images (gun) |
+| YOLOv10n | 0.938 | 0.863 | 0.91 | 9,464 images (pistol/handgun) |
 
-Original YOLOv12s (baseline) vs Custom Architecture + Custom Loss:
-
-<p align="center">
-<img width="2000" height="977" alt="image" src="https://github.com/user-attachments/assets/f6b87e8d-f3c2-440a-8072-b33e794c2e37" />
-</p>
-
-<table>
-  <tr>
-    <th align="center" rowspan="2">Metric</th>
-    <th align="center" colspan="5">Original → Custom Arch + Loss (Δ Improvement)</th>
-  </tr>
-  <tr>
-    <th align="center">OVERALL</th>
-    <th align="center">🗡️ Knife</th>
-    <th align="center">🎯 Long Gun</th>
-    <th align="center">🚫 Other</th>
-    <th align="center">🔫 Pistol</th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td>0.816 → <b>0.865</b> <sub>(+6.09%)</sub></td>
-    <td>0.875 → <b>0.925</b> <sub>(+5.75%)</sub></td>
-    <td>0.840 → <b>0.917</b> <sub>(+9.15%)</sub></td>
-    <td>0.637 → <b>0.682</b> <sub>(+7.17%)</sub></td>
-    <td>0.911 → <b>0.937</b> <sub>(+2.84%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td>0.525 → <b>0.579</b> <sub>(+10.41%)</sub></td>
-    <td>0.614 → <b>0.686</b> <sub>(+11.77%)</sub></td>
-    <td>0.535 → <b>0.605</b> <sub>(+13.15%)</sub></td>
-    <td>0.346 → <b>0.383</b> <sub>(+10.71%)</sub></td>
-    <td>0.605 → <b>0.644</b> <sub>(+6.44%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Precision</b></td>
-    <td>0.831 → <b>0.898</b> <sub>(+8.01%)</sub></td>
-    <td>0.847 → <b>0.879</b> <sub>(+3.78%)</sub></td>
-    <td>0.827 → <b>0.913</b> <sub>(+10.37%)</sub></td>
-    <td>0.800 → <b>0.867</b> <sub>(+8.29%)</sub></td>
-    <td>0.851 → <b>0.933</b> <sub>(+9.65%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Recall</b></td>
-    <td>0.746 → <b>0.819</b> <sub>(+9.88%)</sub></td>
-    <td>0.845 → <b>0.910</b> <sub>(+7.78%)</sub></td>
-    <td>0.769 → <b>0.853</b> <sub>(+10.94%)</sub></td>
-    <td>0.522 → <b>0.592</b> <sub>(+13.25%)</sub></td>
-    <td>0.847 → <b>0.923</b> <sub>(+8.95%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>F1 Score</b></td>
-    <td>0.786 → <b>0.857</b> <sub>(+8.99%)</sub></td>
-    <td>0.846 → <b>0.894</b> <sub>(+5.74%)</sub></td>
-    <td>0.797 → <b>0.882</b> <sub>(+10.66%)</sub></td>
-    <td>0.632 → <b>0.703</b> <sub>(+11.24%)</sub></td>
-    <td>0.849 → <b>0.928</b> <sub>(+9.30%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.530 → <b>0.579</b> <sub>(+9.31%)</sub></td>
-    <td>0.679 → <b>0.751</b> <sub>(+10.60%)</sub></td>
-    <td>0.426 → <b>0.484</b> <sub>(+13.63%)</sub></td>
-    <td>0.230 → <b>0.251</b> <sub>(+9.30%)</sub></td>
-    <td>0.779 → <b>0.827</b> <sub>(+6.19%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.750 → <b>0.804</b> <sub>(+7.17%)</sub></td>
-    <td>0.819 → <b>0.868</b> <sub>(+5.93%)</sub></td>
-    <td>0.782 → <b>0.854</b> <sub>(+9.18%)</sub></td>
-    <td>0.542 → <b>0.592</b> <sub>(+9.07%)</sub></td>
-    <td>0.849 → <b>0.890</b> <sub>(+4.85%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.828 → <b>0.880</b> <sub>(+6.29%)</sub></td>
-    <td>0.879 → <b>0.938</b> <sub>(+6.75%)</sub></td>
-    <td>0.859 → <b>0.930</b> <sub>(+8.33%)</sub></td>
-    <td>0.642 → <b>0.689</b> <sub>(+7.29%)</sub></td>
-    <td>0.922 → <b>0.952</b> <sub>(+3.19%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td>0.297 → <b>0.339</b> <sub>(+14.23%)</sub></td>
-    <td>0.492 → <b>0.567</b> <sub>(+15.13%)</sub></td>
-    <td>0.229 → <b>0.277</b> <sub>(+21.15%)</sub></td>
-    <td>0.106 → <b>0.120</b> <sub>(+13.64%)</sub></td>
-    <td>0.351 → <b>0.390</b> <sub>(+10.90%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td>0.424 → <b>0.472</b> <sub>(+11.34%)</sub></td>
-    <td>0.551 → <b>0.629</b> <sub>(+14.03%)</sub></td>
-    <td>0.416 → <b>0.470</b> <sub>(+13.15%)</sub></td>
-    <td>0.237 → <b>0.265</b> <sub>(+11.90%)</sub></td>
-    <td>0.484 → <b>0.518</b> <sub>(+7.04%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td>0.550 → <b>0.610</b> <sub>(+10.84%)</sub></td>
-    <td>0.602 → <b>0.686</b> <sub>(+13.84%)</sub></td>
-    <td>0.542 → <b>0.621</b> <sub>(+14.45%)</sub></td>
-    <td>0.372 → <b>0.412</b> <sub>(+10.64%)</sub></td>
-    <td>0.682 → <b>0.715</b> <sub>(+4.78%)</sub></td>
-  </tr>
-</table>
+Our model achieves mAP@50 = 0.852 on the **largest and most diverse dataset in the table**, which additionally includes a dedicated `no_weapon` confounder class that makes the task **deliberately harder**. The controlled comparison under identical data, split, and training conditions is the one against the YOLOv12s baseline and YOLO26 above. Retaining **mAP@50 = 0.776–0.805 zero-shot** on three external datasets indicates the learned representations generalize well beyond the training distribution.
 
 </details>
-
----
-
-<details>
-<summary><b>📈 4. Progressive Improvement — All YOLOv12s Configurations</b></summary>
-
-<br>
-
-### 📉 Training Metrics Comparison
-
-<p align="center">
-<img width="1477" height="1125" alt="image" src="https://github.com/user-attachments/assets/c942bae4-310a-4e1c-ac0e-d9454872bcfb" />
-</p>
-
-<p align="center"><sub>Training curves for all 4 YOLOv12s configurations across 130 epochs. Solid lines = EMA smoothed, dotted lines = raw values, ★ = best value per model.</sub></p>
-
-**Key observations from the training curves:**
-
-- 🏆 **V12s-Both** (Arch-6 + Custom Loss) consistently achieves the **highest values** across all 4 metrics
-- 📉 **V12s-Loss** (Custom Loss only) shows **faster early convergence** than V12s-Arch, especially in Precision and Recall
-- 🏗️ **V12s-Arch** (Custom Arch only) demonstrates **steadier improvement** in mAP50-95, reflecting the architecture's strength in spatial localization
-- 📊 **Convergence patterns differ:** Custom Loss improves classification confidence early, while the P2 architecture provides gradual localization gains
-- ⭐ All custom variants significantly outperform the **V12s-Orig** baseline throughout training
-- 📈 **mAP50-95 shows the largest spread** between configurations, confirming this metric best captures the differences between approaches
-
----
-
-### 🏆 Four-Way Comparison: Baseline → Custom Loss → Custom Arch → Custom Arch + Loss
-
-<table>
-  <tr>
-    <th align="center" rowspan="2">Metric</th>
-    <th align="center">🔷 Baseline</th>
-    <th align="center">📉 Custom Loss</th>
-    <th align="center">🏗️ Custom Arch</th>
-    <th align="center">🏆 Custom Arch+Loss</th>
-  </tr>
-  <tr>
-    <th align="center"><sub>Default Arch<br>Default Loss</sub></th>
-    <th align="center"><sub>Default Arch<br>A1+A2+A3.1+A4</sub></th>
-    <th align="center"><sub>Arch-6<br>Default Loss</sub></th>
-    <th align="center"><sub>Arch-6<br>A1+A2+A3.1+A4</sub></th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td align="center">0.816</td>
-    <td align="center">0.857 <sub>(+5.04%)</sub></td>
-    <td align="center">0.840 <sub>(+2.94%)</sub></td>
-    <td align="center"><b>0.865</b> <sub>(+6.09%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td align="center">0.525</td>
-    <td align="center">0.574 <sub>(+9.32%)</sub></td>
-    <td align="center">0.562 <sub>(+7.13%)</sub></td>
-    <td align="center"><b>0.579</b> <sub>(+10.41%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Precision</b></td>
-    <td align="center">0.831</td>
-    <td align="center">0.889 <sub>(+6.94%)</sub></td>
-    <td align="center">0.871 <sub>(+4.80%)</sub></td>
-    <td align="center"><b>0.898</b> <sub>(+8.01%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>Recall</b></td>
-    <td align="center">0.746</td>
-    <td align="center">0.811 <sub>(+8.79%)</sub></td>
-    <td align="center">0.795 <sub>(+6.62%)</sub></td>
-    <td align="center"><b>0.819</b> <sub>(+9.88%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>F1 Score</b></td>
-    <td align="center">0.786</td>
-    <td align="center">0.848 <sub>(+7.91%)</sub></td>
-    <td align="center">0.831 <sub>(+5.75%)</sub></td>
-    <td align="center"><b>0.857</b> <sub>(+8.99%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td align="center">0.530</td>
-    <td align="center">0.574 <sub>(+8.22%)</sub></td>
-    <td align="center">0.562 <sub>(+6.06%)</sub></td>
-    <td align="center"><b>0.579</b> <sub>(+9.31%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td align="center">0.750</td>
-    <td align="center">0.796 <sub>(+6.11%)</sub></td>
-    <td align="center">0.780 <sub>(+3.99%)</sub></td>
-    <td align="center"><b>0.804</b> <sub>(+7.17%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td align="center">0.828</td>
-    <td align="center">0.871 <sub>(+5.24%)</sub></td>
-    <td align="center">0.854 <sub>(+3.13%)</sub></td>
-    <td align="center"><b>0.880</b> <sub>(+6.29%)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small</b></td>
-    <td align="center">0.297</td>
-    <td align="center">0.336 <sub>(+13.10%)</sub></td>
-    <td align="center">0.329 <sub>(+10.84%)</sub></td>
-    <td align="center"><b>0.339</b> <sub>(+14.23%)</sub></td>
-  </tr>
-  <tr>
-    <td>📦 <b>Medium</b></td>
-    <td align="center">0.424</td>
-    <td align="center">0.467 <sub>(+10.23%)</sub></td>
-    <td align="center">0.458 <sub>(+8.03%)</sub></td>
-    <td align="center"><b>0.472</b> <sub>(+11.34%)</sub></td>
-  </tr>
-  <tr>
-    <td>🟫 <b>Large</b></td>
-    <td align="center">0.550</td>
-    <td align="center">0.604 <sub>(+9.74%)</sub></td>
-    <td align="center">0.591 <sub>(+7.55%)</sub></td>
-    <td align="center"><b>0.610</b> <sub>(+10.84%)</sub></td>
-  </tr>
-</table>
-
----
-
-### 📊 Per-Class Best Results (Custom Arch + Loss)
-
-<table>
-  <tr>
-    <th align="center">Metric</th>
-    <th align="center">🗡️ Knife</th>
-    <th align="center">🎯 Long Gun</th>
-    <th align="center">🚫 Other</th>
-    <th align="center">🔫 Pistol</th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td><b>0.925</b> <sub>(+5.75%)</sub></td>
-    <td><b>0.917</b> <sub>(+9.15%)</sub></td>
-    <td><b>0.682</b> <sub>(+7.17%)</sub></td>
-    <td><b>0.937</b> <sub>(+2.84%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td><b>0.686</b> <sub>(+11.77%)</sub></td>
-    <td><b>0.605</b> <sub>(+13.15%)</sub></td>
-    <td><b>0.383</b> <sub>(+10.71%)</sub></td>
-    <td><b>0.644</b> <sub>(+6.44%)</sub></td>
-  </tr>
-  <tr>
-    <td><b>F1 Score</b></td>
-    <td><b>0.894</b> <sub>(+5.74%)</sub></td>
-    <td><b>0.882</b> <sub>(+10.66%)</sub></td>
-    <td><b>0.703</b> <sub>(+11.24%)</sub></td>
-    <td><b>0.928</b> <sub>(+9.30%)</sub></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small mAP50-95</b></td>
-    <td><b>0.567</b> <sub>(+15.13%)</sub></td>
-    <td><b>0.277</b> <sub>(+21.15%)</sub></td>
-    <td><b>0.120</b> <sub>(+13.64%)</sub></td>
-    <td><b>0.390</b> <sub>(+10.90%)</sub></td>
-  </tr>
-</table>
-
-> 🎯 **Biggest per-class gain:** Long Gun small-object mAP50-95 improved by **+21.15%** — the largest single improvement in the entire study.
-
-</details>
-
-
----
-
-<details>
-<summary><b>📌 5. Key Findings</b></summary>
-
-<br>
-
-### 🔬 Architecture vs Loss — Contribution Analysis
-
-<table>
-  <tr>
-    <th align="left">Metric</th>
-    <th align="center">Custom Loss Only<br><sub>(vs Baseline)</sub></th>
-    <th align="center">Custom Arch Only<br><sub>(vs Baseline)</sub></th>
-    <th align="center">Combined<br><sub>(vs Baseline)</sub></th>
-    <th align="center">Synergy<br><sub>(Combined vs Sum)</sub></th>
-  </tr>
-  <tr>
-    <td><b>mAP50</b></td>
-    <td align="center">+5.04%</td>
-    <td align="center">+2.94%</td>
-    <td align="center"><b>+6.09%</b></td>
-    <td align="center"><sub>Near-additive</sub></td>
-  </tr>
-  <tr>
-    <td><b>mAP50-95</b></td>
-    <td align="center">+9.32%</td>
-    <td align="center">+7.13%</td>
-    <td align="center"><b>+10.41%</b></td>
-    <td align="center"><sub>Partial overlap</sub></td>
-  </tr>
-  <tr>
-    <td><b>Precision</b></td>
-    <td align="center">+6.94%</td>
-    <td align="center">+4.80%</td>
-    <td align="center"><b>+8.01%</b></td>
-    <td align="center"><sub>Partial overlap</sub></td>
-  </tr>
-  <tr>
-    <td><b>Recall</b></td>
-    <td align="center">+8.79%</td>
-    <td align="center">+6.62%</td>
-    <td align="center"><b>+9.88%</b></td>
-    <td align="center"><sub>Partial overlap</sub></td>
-  </tr>
-  <tr>
-    <td>🔍 <b>Small mAP50-95</b></td>
-    <td align="center">+13.10%</td>
-    <td align="center">+10.84%</td>
-    <td align="center"><b>+14.23%</b></td>
-    <td align="center"><sub>Partial overlap</sub></td>
-  </tr>
-</table>
-
----
-
-### 💡 Observations
-
-- 🏆 **Best Overall:** **Arch-6 + Custom Loss** achieves the highest performance across **all metrics** and **all object sizes**
-- 📉 **Custom Loss > Custom Arch alone:** The custom loss provides larger overall improvements (+5.04% mAP50) than the custom architecture alone (+2.94% mAP50), but the architecture shines on localization metrics (mAP50-95)
-- 🔄 **Complementary but overlapping:** Combining both yields the best results, but gains are **partially overlapping** — both modifications target small-object detection through different mechanisms
-- 🏗️ **Architecture strength — Localization:** The P2 detection head primarily improves **spatial localization** (mAP50-95: +7.13%) by detecting at higher resolution
-- 📉 **Loss strength — Classification:** The custom loss primarily improves **classification confidence** and **recall** through size-aware weighting and TAL tuning
-- 🎯 **Long Gun benefits most:** Long gun detection improved by **+21.15%** (small mAP50-95) — likely because long guns frequently appear small in CCTV footage
-- 🔫 **Pistol saturating:** Pistol already had the highest baseline mAP50 (0.911) and shows the smallest relative gains, suggesting near-ceiling performance
-- 🚫 **Other (hard negatives) hardest:** The `no_weapon` class remains the most challenging but still improved by **+10.71%** (mAP50-95)
-
----
-
-### 📋 Complete Training Investment (Updated)
-
-<table>
-  <tr>
-    <th align="left">Phase</th>
-    <th align="center">Experiments</th>
-    <th align="center">Time</th>
-  </tr>
-  <tr>
-    <td>🔷 YOLOv12s Baseline (full dataset, 100 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~11h</td>
-  </tr>
-  <tr>
-    <td>🔬 Loss Ablation — Grid Search (17% dataset, 70 epochs)</td>
-    <td align="center">180</td>
-    <td align="center">~216h</td>
-  </tr>
-  <tr>
-    <td>🔬 Loss Ablation — Combinations (17% dataset, 70 epochs)</td>
-    <td align="center">26</td>
-    <td align="center">~31h</td>
-  </tr>
-  <tr>
-    <td>🔷 YOLOv12s Custom Loss (full dataset, 100 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~11h</td>
-  </tr>
-  <tr>
-    <td>🏗️ Architecture Ablation (17% dataset, 130 epochs)</td>
-    <td align="center">20</td>
-    <td align="center">~64h</td>
-  </tr>
-  <tr>
-    <td>🏗️ Arch-6 + Default Loss (full dataset, 130 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~20h</td>
-  </tr>
-  <tr>
-    <td>🏆 Arch-6 + Custom Loss (full dataset, 130 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~20h</td>
-  </tr>
-  <tr>
-    <td>🔶 YOLO26s Baseline (full dataset, 100 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~9h</td>
-  </tr>
-  <tr>
-    <td>🔶 YOLO26s Individual Phases (17% dataset, 70 epochs)</td>
-    <td align="center">4</td>
-    <td align="center">~4h</td>
-  </tr>
-  <tr>
-    <td>🔶 YOLO26s Combinations (17% dataset, 70 epochs)</td>
-    <td align="center">11</td>
-    <td align="center">~11h</td>
-  </tr>
-  <tr>
-    <td>🔶 YOLO26s Custom Loss (full dataset, 100 epochs)</td>
-    <td align="center">1</td>
-    <td align="center">~9h</td>
-  </tr>
-  <tr style="background-color: #d4edda;">
-    <td><b>📊 Grand Total</b></td>
-    <td align="center"><b>247</b></td>
-    <td align="center"><b>~406 hours (~16.9 days)</b></td>
-  </tr>
-</table>
-
-</details>
-
 
 ---
 
 ## 🔍 Detection Comparison — Original vs Custom YOLOv12s
 
-Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline) and our **Custom YOLOv12s** (Arch-6 + Custom Loss). The custom model demonstrates significantly improved detection quality: **higher confidence scores**, **fewer misclassifications** between visually similar classes (e.g., `pistol` vs `other`, `long_gun` vs `other`), and **fewer missed detections** — especially for small and partially occluded weapons.
+Side-by-side prediction comparisons between the **baseline YOLOv12s** and the **proposed model**. The custom model shows higher confidence scores, fewer weapon↔`no_weapon` confusions, and fewer missed detections — especially for small and partially occluded weapons. Figures 8–10 of the paper additionally isolate the **most safety-critical error mode** (actual weapons misclassified as `no_weapon`), which the proposed model reduces relative to the baseline.
 
 <details>
 <summary><b>🖼️ Click to view all detection examples</b></summary>
@@ -3070,7 +682,7 @@ Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline)
   </tr>
   <tr>
     <td align="center">✅ Higher precision — fewer false positives</td>
-    <td align="center">✅ Correct class assignment — no pistol↔other confusion</td>
+    <td align="center">✅ Correct class assignment — reduced weapon↔no_weapon confusion</td>
   </tr>
   <tr>
     <td align="center">✅ Fewer missed detections on small objects</td>
@@ -3081,144 +693,62 @@ Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline)
 <br>
 
 <table>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/81a36b38-f4fc-4e47-a802-8412de4e6e9e" alt="Comparison 1" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/ed016dae-a8f9-4913-8e03-f5316e807cec" alt="Comparison 2" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/7697bce4-9b79-43f2-b933-0c74ce6a6749" alt="Comparison 3" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/e4130d7a-c79b-48b8-a20a-c738221c99e3" alt="Comparison 4" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/10bd416e-95cc-4232-812d-cf2278843326" alt="Comparison 5" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/74129349-7519-4e7f-bbfd-adc9d3a580fe" alt="Comparison 6" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/a5336359-a267-4625-ae5e-22d7e2aeb8a3" alt="Comparison 7" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/a396a200-b4b0-4ef1-9ea9-73adab028473" alt="Comparison 8" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/3d169eaa-c69c-4771-bfb8-3fe2e010f713" alt="Comparison 9" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/7e18de1b-9f26-40e3-89d4-bf3660e63371" alt="Comparison 10" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/acf423f0-2dba-424f-9f95-12069235f39f" alt="Comparison 11" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/3fb02ab3-b4cf-48ec-a6ab-b15eb394fad6" alt="Comparison 12" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/16348eb5-abaa-4011-a3a6-bc19d91007a8" alt="Comparison 13" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/ec725056-a89a-44d3-ba2b-7e3d85b7cd16" alt="Comparison 14" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/aad8b4e1-b4b2-49b3-a2b8-6751e6db13e6" alt="Comparison 15" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/4d58a77f-3c86-428d-89eb-9e47208e56bb" alt="Comparison 16" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/e08675e7-d3d3-45d4-9b1f-8e3800823304" alt="Comparison 17" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/f042fca5-99cc-4b6e-a886-2456b26d1882" alt="Comparison 18" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-        <img src="https://github.com/user-attachments/assets/88d5913a-43f6-4fe0-9c90-fed33ee1ced7" alt="Comparison 18" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/1d837c4c-c5ab-4762-b13b-9a61d8ae4f10" width="100%" />
-    </td>
-  </tr>
-
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/81a36b38-f4fc-4e47-a802-8412de4e6e9e" alt="Comparison 1" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/ed016dae-a8f9-4913-8e03-f5316e807cec" alt="Comparison 2" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/7697bce4-9b79-43f2-b933-0c74ce6a6749" alt="Comparison 3" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/e4130d7a-c79b-48b8-a20a-c738221c99e3" alt="Comparison 4" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/10bd416e-95cc-4232-812d-cf2278843326" alt="Comparison 5" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/74129349-7519-4e7f-bbfd-adc9d3a580fe" alt="Comparison 6" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/a5336359-a267-4625-ae5e-22d7e2aeb8a3" alt="Comparison 7" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/a396a200-b4b0-4ef1-9ea9-73adab028473" alt="Comparison 8" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/3d169eaa-c69c-4771-bfb8-3fe2e010f713" alt="Comparison 9" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/7e18de1b-9f26-40e3-89d4-bf3660e63371" alt="Comparison 10" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/acf423f0-2dba-424f-9f95-12069235f39f" alt="Comparison 11" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/3fb02ab3-b4cf-48ec-a6ab-b15eb394fad6" alt="Comparison 12" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/16348eb5-abaa-4011-a3a6-bc19d91007a8" alt="Comparison 13" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/ec725056-a89a-44d3-ba2b-7e3d85b7cd16" alt="Comparison 14" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/aad8b4e1-b4b2-49b3-a2b8-6751e6db13e6" alt="Comparison 15" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/4d58a77f-3c86-428d-89eb-9e47208e56bb" alt="Comparison 16" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/e08675e7-d3d3-45d4-9b1f-8e3800823304" alt="Comparison 17" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/f042fca5-99cc-4b6e-a886-2456b26d1882" alt="Comparison 18" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/88d5913a-43f6-4fe0-9c90-fed33ee1ced7" alt="Comparison 19" width="100%" /></td></tr>
+  <tr><td align="center"><img src="https://github.com/user-attachments/assets/1d837c4c-c5ab-4762-b13b-9a61d8ae4f10" alt="Comparison 20" width="100%" /></td></tr>
 </table>
-
 
 <br>
 
-### 🔎 Common Issues Fixed by Custom Model
+### 🔎 Common Issues Fixed by the Custom Model
 
 <table>
   <tr>
-    <th align="center">Issue in Original</th>
+    <th align="center">Issue in Baseline</th>
     <th align="center">Fixed in Custom</th>
     <th align="left">Description</th>
   </tr>
   <tr>
     <td align="center">❌</td>
     <td align="center">✅</td>
-    <td><b>Class Confusion (pistol ↔ other):</b> Original frequently misclassifies handheld objects (phones, wallets) as pistols and vice versa. Custom model correctly distinguishes between weapon and non-weapon classes.</td>
+    <td><b>Class confusion (pistol ↔ no_weapon):</b> the baseline frequently misclassifies handheld objects (phones, tools) as pistols and vice versa. <i>ZGGlobalContext</i> (B3) + <i>DetectAuxDual</i> (B4) separate confounders from real weapons.</td>
   </tr>
   <tr>
     <td align="center">❌</td>
     <td align="center">✅</td>
-    <td><b>Class Confusion (long_gun ↔ other):</b> Original mislabels elongated objects as long guns. Custom model maintains correct class boundaries.</td>
+    <td><b>Class confusion (long_gun ↔ no_weapon):</b> the baseline mislabels elongated objects as long guns; the 23-tap strip attention tightens elongated box fits and class boundaries.</td>
   </tr>
   <tr>
     <td align="center">❌</td>
     <td align="center">✅</td>
-    <td><b>Missed Small Detections:</b> Original fails to detect small or distant weapons. Custom model's P2 head (stride 4) captures objects missed at stride 8.</td>
+    <td><b>Missed small detections:</b> the baseline misses small/distant weapons; curriculum weighting (A1), TAL tuning (A4), and <i>ZGSmallDetail</i> (B2) recover them (+12.8% small-object Recall).</td>
   </tr>
   <tr>
     <td align="center">❌</td>
     <td align="center">✅</td>
-    <td><b>Low Confidence Scores:</b> Original produces borderline detections with low confidence. Custom model outputs higher, more decisive confidence scores.</td>
+    <td><b>Low confidence scores:</b> the baseline produces borderline detections; the custom model outputs higher, more decisive scores.</td>
   </tr>
   <tr>
     <td align="center">❌</td>
     <td align="center">✅</td>
-    <td><b>Duplicate / Overlapping Boxes:</b> Original occasionally produces redundant detections on the same object. Custom model provides cleaner, single-box predictions.</td>
+    <td><b>Safety-critical misses:</b> actual weapons misclassified as <code>no_weapon</code> — reduced relative to the baseline (paper Fig. 10).</td>
   </tr>
 </table>
 
@@ -3226,5 +756,99 @@ Side-by-side prediction comparisons between the **Original YOLOv12s** (baseline)
 
 ---
 
+## 🖥️ Hardware & Software Configuration
+
+<details>
+<summary><b>⚙️ Click to expand System Specifications</b></summary>
+
+<br>
+
+| Component | Specification |
+|-----------|---------------|
+| 💻 **Operating System** | Ubuntu 22.04.3 LTS |
+| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
+| 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
+| 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
+| 🐍 **Python** | 3.10.2 |
+| 🔥 **PyTorch** | 2.1.2 |
+| ⚡ **CUDA** | 12.1 |
 
 </details>
+
+---
+
+## 📄 Training Configuration (Reproducibility)
+
+Both the baseline and the custom model (and YOLO26) were trained under **identical settings** to ensure a fair comparison:
+
+<pre>
+# ═══════════════════════════════════════════════════════════════
+# ⚙️ Shared training settings (baseline / custom / YOLO26)
+# ═══════════════════════════════════════════════════════════════
+optimizer: SGD            # selected by the automatic optimizer policy
+lr0: 0.01
+weight_decay: 0.0005
+momentum: 0.9
+batch: 64
+imgsz: 640
+epochs: same for all configurations
+seeds: 3 independent runs per configuration, deterministic execution
+
+# ═══════════════════════════════════════════════════════════════
+# 🏆 Final custom-loss configuration (A1 + A3 + A4; A2 disabled)
+# ═══════════════════════════════════════════════════════════════
+
+# A1 — Dynamic curriculum weighting ✅        (search range [0.1, 1.0])
+alpha_1: 0.7
+alpha_2: 0.4
+small_obj_px: 32          # small-object threshold (area ≤ 32×32)
+
+# A2 — Auxiliary center loss ❌ DISABLED     (search range [0, 0.1];
+lambda_center: 0.0        #  no measurable validation improvement)
+
+# A3 — Adaptive loss clipping ✅             (search range [10, 70], step 1)
+alpha_5: 50               # IoU clipping schedule
+alpha_6: 30
+alpha_7: 25               # DFL clipping schedule
+alpha_8: 15
+
+# A4 — Task-Aligned Assigner ✅              (top-k searched over [2, 25])
+tal_topk: 13              # default: 10
+tal_score_exp: 0.7        # default: 0.5
+tal_iou_exp: 4.0          # default: 6.0
+
+# Loss weights: lambda_box, lambda_DFL, lambda_cls — original YOLOv12 values
+</pre>
+
+> 📌 Detailed hyperparameter-tuning results, the full list of 40+ architecture variants, and the exact split of images into training/validation/test subsets are provided in the **Supplementary Material** and in this repository.
+
+---
+
+## 📚 Resources
+
+| Resource | Link |
+|----------|------|
+| 📦 Weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 |
+| 🚫 No-weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 |
+| 🌍 External eval — Zenodo dataset | https://zenodo.org/records/16422779 |
+| 🌍 External eval — YouTube-GDD | https://github.com/ucas-gyx/youtube-gdd |
+| 🌍 External eval — Sohas / OD-WeaponDetection | https://github.com/ari-dasci/OD-WeaponDetection |
+| 🔶 YOLO26 (Ultralytics) | https://docs.ultralytics.com/models/yolo26/ |
+| ⬇️ Trained weights & results | Google Drive links in the Dataset Summary table above |
+
+---
+
+## 📖 Citation
+
+If you use this dataset or code, please cite the paper:
+
+```bibtex
+@article{catargiu2026weapon,
+  title   = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
+  author  = {Catargiu, Constantin and Ciocoiu, Iulian B.},
+  journal = {IEEE Access},
+  year    = {2026}
+}
+```
+
+<sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.</sub>
