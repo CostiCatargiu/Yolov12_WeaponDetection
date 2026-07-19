@@ -1,6 +1,6 @@
 <h1 align="center">🔫 Real-Time Weapon Detection with Enhanced YOLOv12s & a Custom Dataset</h1>
 
-<p align="center"><sub>Official repository for the paper <b>"Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset"</b> — C. Catargiu & I. B. Ciocoiu, Gheorghe Asachi Technical University of Iasi</sub></p>
+<p align="center"><sub>Official repository for the paper <b>"Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset"</b><br>Constantin Catargiu & Iulian B. Ciocoiu — Gheorghe Asachi Technical University of Iasi, Romania</sub></p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
@@ -19,17 +19,45 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Model-YOLOv12s_Custom-red?style=flat-square" />
-  <img src="https://img.shields.io/badge/Comparison-YOLO26-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Baseline_Comparison-YOLOv12s_·_YOLO26-orange?style=flat-square" />
   <img src="https://img.shields.io/badge/Focus-Small_Object_Detection-purple?style=flat-square" />
-  <img src="https://img.shields.io/badge/Speed-205--210_FPS_(RTX_4090)-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Speed-205–210_FPS_@_RTX_4090-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/Seeds-3_runs_·_mean±std-teal?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
 </p>
+
+---
+
+## ⚡ TL;DR
+
+> **What:** A customized **YOLOv12s** for detecting **small, occluded, low-contrast weapons** in surveillance video, trained on a new **26,528-image / 38,067-instance** public dataset with a **leakage-free** split.
+>
+> **How:** **(i)** a small-object-aware **loss** (curriculum weighting + adaptive clipping + retuned Task-Aligned assignment) and **(ii)** five **zero-gated, append-only modules** in the detection head — the backbone, neck, and P3/P4/P5 layout stay untouched, so every addition starts as an exact identity of the pretrained baseline.
+>
+> **Result:** **mAP@50 0.812 → 0.852 (+4.9%)**, Recall **+7.1%**, small-object mAP@50 **+10.6%**, `no_weapon` confounder class **+11.6%** — consistent across **3 seeds** (gains ≈ 10× the seed noise), at **205–210 FPS** on an RTX 4090. Outperforms **YOLO26s** trained under identical conditions, and transfers zero-shot to 3 external datasets (**mAP@50 0.776–0.805**).
+
+---
+
+## 📚 Table of Contents
+
+| | | |
+|---|---|---|
+| [🏆 Research Highlights](#-research-highlights) | [📖 Overview & Contributions](#-overview--contributions) | [🔬 Method Pipeline](#-method-pipeline-at-a-glance) |
+| [⚡ Dataset](#-dataset-summary) | [🧬 Leakage-Free Split](#-leakage-free-data-split-important) | [📊 Dataset Statistics](#-dataset-split--class-distribution-paper--table-1) |
+| [📉 Part A: Custom Loss](#-proposed-model--part-a-small-object-aware-loss--assignment) | [🏗️ Part B: Head Modules](#%EF%B8%8F-proposed-model--part-b-zero-gated-head-enhancements) | [🧾 Config at a Glance](#-final-configuration-at-a-glance) |
+| [📊 Per-Class Results](#-results--per-class-performance-paper--tables-4--5-test-set) | [🔬 Size Ablation](#-ablation-study--performance-by-object-size-paper--table-6-test-set) | [🧬 Architecture Search](#%EF%B8%8F-architecture-search-summary-40-variants--full-details-in-the-supplementary-material) |
+| [🎲 Seed Reproducibility](#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration) | [🔶 vs YOLO26](#-controlled-comparison-vs-yolo26-paper--table-7-averages-over-3-runs) | [🌍 External Validation](#-external-dataset-validation--state-of-the-art-context-paper--table-9) |
+| [🔍 Visual Comparisons](#-detection-comparison--original-vs-custom-yolov12s) | [🚀 Getting Started](#-getting-started) | [📖 Citation](#-citation) |
+
+---
 
 <div align="center">
 
 ## 🏆 Research Highlights
 
-The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware loss** (A1–A4) and **(ii)** five **lightweight, append-only, zero-gated enhancement modules** in the detection head (B1–B5). Both models were trained on a new **26,528-image / 38,067-instance** custom dataset with a **leakage-free, cluster-based split**. All headline gains are averaged over **3 independent seeds** and exceed seed-to-seed variation by an **order of magnitude**, while preserving **real-time operation (205–210 FPS vs ~220 FPS baseline, RTX 4090)**.
+</div>
+
+The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware loss** (A1–A4) and **(ii)** five **lightweight, append-only, zero-gated enhancement modules** in the detection head (B1–B5). All headline gains are averaged over **3 independent seeds** and exceed seed-to-seed variation by an **order of magnitude**, while preserving **real-time operation**.
 
 <table>
   <tr>
@@ -45,18 +73,20 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
   <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
-      <br><sub>📊 Training metrics ablation study: original YOLOv12s (blue); + (B1–B5) architectural enhancements (orange); + (A1–A4) custom loss (red); combined proposed model (green).</sub>
+      <br><sub>📊 Ablation: baseline (blue); + arch B1–B5 (orange); + loss A1–A4 (red); combined (green)</sub>
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
-      <br><sub>🎯 Confusion matrices on the test set for the new model: a) small; b) medium; c) large; d) all objects.</sub>
+      <br><sub>🎯 Confusion matrices for the new model: a) small; b) medium; c) large; d) all objects</sub>
     </td>
   </tr>
 </table>
 
+<div align="center">
+
 <table>
   <tr>
-    <th align="center" colspan="5">📈 Test-Set Performance (mean over 3 seeds — see Seed Reproducibility)</th>
+    <th align="center" colspan="4">📈 Test-Set Performance (mean over 3 seeds — <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">seed study</a>)</th>
   </tr>
   <tr>
     <th align="center">Metric</th>
@@ -95,7 +125,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
     <td align="center">0.796</td>
   </tr>
   <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP@50</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP@50</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
@@ -116,7 +146,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
     <td align="center">0.843</td>
   </tr>
   <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP@50-95</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP@50-95</b></td>
   </tr>
   <tr>
     <td align="left">🔍 <b>Small</b></td>
@@ -138,39 +168,36 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
   </tr>
 </table>
 
-<sub>🔍 <b>Key findings:</b> Largest relative gains exactly where the design aims — <b>small objects (+10.6% mAP@50, +12.8% Recall)</b> and the <b>no_weapon confounder class (+11.6% mAP@50, +16.4% Recall)</b>. The proposed YOLOv12s also outperforms <b>YOLO26s</b> trained under identical conditions, at every object size.</sub>
+<table>
+  <tr>
+    <th align="center">⚙️ Deployed Params</th>
+    <th align="center">⚡ Throughput (RTX 4090)</th>
+    <th align="center">🎯 Biggest Gains</th>
+  </tr>
+  <tr>
+    <td align="center">9.10 M → <b>11.68 M</b> <sub>(+2.58 M; 0.82 M aux is training-only)</sub></td>
+    <td align="center">~220 FPS → <b>205–210 FPS</b> <sub>(wide real-time margin)</sub></td>
+    <td align="center"><b>Small objects</b> +10.6% mAP@50, +12.8% Recall<br><b>no_weapon</b> +11.6% mAP@50, +16.4% Recall</td>
+  </tr>
+</table>
+
+<sub>🔍 The largest relative gains land exactly where the design aims — small objects and the confounder class — and the proposed YOLOv12s outperforms <b>YOLO26s</b> at every object size.</sub>
 
 </div>
 
 ---
 
-## 📖 Overview
+## 📖 Overview & Contributions
 
-This repository accompanies our research paper on **real-time small-object weapon detection**. We present:
+This repository accompanies our research paper on **real-time small-object weapon detection**. The main contributions:
 
-- 📦 A **custom dataset**: **26,528 images** / **38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, range/tactical footage) and curated web images
-- 🧬 A **leakage-free data split**: perceptual-hash clustering of near-duplicate frames (64-bit dHash, Hamming ≤ 5, union-find → **19,036 clusters**), whole clusters assigned to a single split via stratified greedy 70/15/15 — audited so **no near-duplicate pair crosses a split boundary**
-- 📉 A **small-object-aware loss** (A1–A4): dynamic curriculum weighting, auxiliary center loss, adaptive loss clipping, and small-object-tuned Task-Aligned assignment
-- 🏗️ Five **lightweight, append-only, zero-gated head modules** (B1–B5): *ZGSmallDetail* (P3), *ZGLSKAWideFuseV2* (P4), *ZGLSKAWideFuse* (P5), *ZGGlobalContext* (all levels), and *DetectAuxDual* (training-only auxiliary head) — the standard **P3/P4/P5 layout is retained** (a P2/five-scale extension was tested and rejected)
-- 🔬 An **extensive ablation study**: 40+ architectural variants, loss grid searches, per-size analysis, and a **3-seed reproducibility study** for every headline configuration
-- 🔶 A controlled comparison against **YOLO26** ("s" scale, official Ultralytics implementation) trained under exactly the same dataset, split, schedule, and hyperparameters
-- 🌍 **External-dataset validation** on three public benchmarks without retraining (mAP@50 = 0.776–0.805)
+1. 📦 **A large, realistic, public dataset** — **26,528 images / 38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) plus curated web images, spanning motion blur, varied lighting, occlusion, and dense crowds. Hosted as two companion Roboflow projects forming a single dataset.
+2. 🧬 **A leakage-free evaluation protocol** — perceptual-hash clustering of near-duplicate video frames with whole-cluster split assignment and a cross-split audit, so reported metrics measure **generalization**, not memorization.
+3. 📉 **A small-object-aware loss** (A1–A4) — dynamic curriculum weighting, auxiliary center loss (evaluated, then disabled), adaptive loss clipping, and a small-object-tuned Task-Aligned assigner.
+4. 🏗️ **Five zero-gated, append-only head modules** (B1–B5) — every module starts as an exact identity of the pretrained baseline and opens only where it reduces the loss; the P3/P4/P5 layout, backbone, and neck are untouched (a P2/five-scale extension was tested and **rejected**).
+5. 🔬 **An extensive, honest evaluation** — 40+ architectural variants, loss grid searches, per-size and per-class ablations, a **3-seed reproducibility study**, a **controlled comparison against YOLO26** under identical conditions, and **zero-shot external validation** on three public benchmarks.
 
-### 📑 What You'll Find Below
-
-| Section | Description |
-|---------|-------------|
-| 📊 **Dataset** | Sources, classes, preprocessing, leakage-free split, size statistics |
-| 🏗️ **Proposed Model** | Custom loss (A1–A4) and zero-gated head modules (B1–B5) |
-| 📈 **Results** | Overall & per-class metrics, size-specific ablation, confusion matrices |
-| 🎲 **Seed Reproducibility** | 3-seed mean ± std for all four configurations |
-| 🔶 **YOLO26 Comparison** | Controlled comparison under identical conditions |
-| 🌍 **External Validation** | Zero-shot transfer to 3 public weapon datasets |
-| ⬇️ **Weights & Configs** | Pre-trained weights and full training configurations |
-
----
-
-## 💡 Applications
+### 💡 Applications
 
 | Domain | Use Cases |
 |--------|-----------|
@@ -178,7 +205,39 @@ This repository accompanies our research paper on **real-time small-object weapo
 | 🛡️ **Public Safety** | Transportation hubs, stadiums, schools, public gatherings |
 | 🚪 **Access Control** | Entry point screening, secure facilities, building protection |
 | 🚔 **Law Enforcement** | Real-time threat assessment, evidence analysis, situational awareness |
-| 🤖 **Research & AI** | Benchmark dataset, model training, small-object detection research |
+| 🤖 **Research & AI** | Benchmark dataset, small-object detection research, negative-class design |
+
+---
+
+## 🔬 Method Pipeline at a Glance
+
+```mermaid
+flowchart LR
+    subgraph DATA["📦 Dataset construction"]
+        A["1,200+ YouTube videos<br>+ curated web images"] --> B["Manual annotation<br>26,528 imgs · 38,067 boxes · 4 classes"]
+        B --> C["Preprocess<br>auto-orient · 640×640 · contrast"]
+        C --> D["64-bit dHash → link pairs (Hamming ≤ 5)<br>union-find → 19,036 clusters"]
+        D --> E["Stratified greedy split 70/15/15<br>✅ audited: zero near-duplicate leakage"]
+    end
+```
+
+```mermaid
+flowchart LR
+    subgraph BASE["🔷 Unchanged YOLOv12s (width 0.50)"]
+        BB["Backbone<br>R-ELAN + Area Attention"] --> NK["PAN Neck"]
+    end
+    NK --> M3["P3 (stride 8)<br>🟦 ZGSmallDetail<br><sub>3×3 + 5×5 depth-wise detail</sub>"]
+    NK --> M4["P4 (stride 16)<br>🟨 ZGLSKAWideFuseV2<br><sub>11×11 square + 23-tap strip + detail</sub>"]
+    NK --> M5["P5 (stride 32)<br>🟥 ZGLSKAWideFuse<br><sub>square + strip large-kernel context</sub>"]
+    M3 --> G["🌐 ZGGlobalContext (all levels)<br><sub>SE-style global recalibration, r = 8</sub>"]
+    M4 --> G
+    M5 --> G
+    G --> H["🎯 DetectAuxDual<br><sub>main head on enhanced features<br>aux head on raw features — train-only</sub>"]
+    H --> OUT["Deployed: 3 heads @ 8/16/32<br>11.68 M params · 205–210 FPS"]
+    style BASE fill:#eef4ff,stroke:#4a76c9
+```
+
+<sub>🔧 Every colored module is a <b>zero-gated residual</b> (learnable gate γ initialized to 0): at epoch 0 the network reproduces the pretrained baseline <i>exactly</i>; gates open only where the branch reduces training loss — so the worst realistic outcome is baseline performance.</sub>
 
 ---
 
@@ -195,7 +254,7 @@ This repository accompanies our research paper on **real-time small-object weapo
   </tr>
   <tr>
     <td>🔢 <b>Total Instances</b></td>
-    <td><code>38,067</code> (manually annotated; verified by the second author)</td>
+    <td><code>38,067</code> — annotated manually by the first author, verified by the second</td>
   </tr>
   <tr>
     <td>🏷️ <b>Classes</b></td>
@@ -208,15 +267,15 @@ This repository accompanies our research paper on **real-time small-object weapo
   </tr>
   <tr>
     <td>🎬 <b>Sources</b></td>
-    <td>1,200+ YouTube videos (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) + curated web images</td>
+    <td>1,200+ YouTube videos (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) + curated web images — deliberately mixing viewpoints, resolutions, lighting, and weapon-handling contexts</td>
   </tr>
   <tr>
     <td>🧰 <b>Format</b></td>
-    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized), axis-aligned boxes</td>
+    <td><code>YOLO</code> — <code>class x_center y_center width height</code> (normalized), axis-aligned boxes; one label per weapon type; partially visible/truncated weapons keep their class</td>
   </tr>
   <tr>
     <td>🧬 <b>Split</b></td>
-    <td>70 / 15 / 15 (train/val/test), <b>leakage-free</b> cluster-based split (see below)</td>
+    <td>70 / 15 / 15 (train/val/test), <b>leakage-free</b> cluster-based split (<a href="#-leakage-free-data-split-important">details</a>)</td>
   </tr>
   <tr>
     <td>📜 <b>Usage</b></td>
@@ -239,99 +298,56 @@ This repository accompanies our research paper on **real-time small-object weapo
   </tr>
 </table>
 
----
-
 <details>
-<summary><b>✨ Key Features of the Dataset</b></summary>
+<summary><b>🏷️ Class descriptions — and why <code>no_weapon</code> exists</b></summary>
 
 <br>
 
-- 🎯 **Multi-class Detection** — 4 classes: `knife`, `pistol`, `long_gun`, and `no_weapon`
-- 🎬 **Diverse Sources** — 1,200+ YouTube videos plus curated web images, deliberately mixing viewpoints, resolutions, lighting, and weapon-handling contexts
-- 🌓 **Scene Diversity** — day/night/artificial lighting, close vs distant views, CCTV and handheld footage
-- 💨 **Real-world Challenges** — occlusions, motion blur, dense crowds, cluttered backgrounds
-- ✂️ **Consistent Labeling** — one label per weapon type (every pistol model → `pistol`); partially visible/truncated weapons annotated with the same class as fully visible ones
+- 🗡️ **`knife`** — bladed weapons including knives and similar sharp objects
+- 🔫 **`pistol`** — handguns and short firearms
+- 🎯 **`long_gun`** — rifles, shotguns, and other long-barreled firearms
+- 🚫 **`no_weapon`** — a curated set of visually confusable items: phones, remote controls, selfie sticks, and similarly shaped hand-held tools
+
+**Why an explicit negative class?** It **supervises the decision boundary directly** instead of leaving confounders as unlabeled background (following the *Not-Pistol* precedent of Bhatti et al., IEEE Access 2021), targeting the dominant failure mode of deployed weapon detectors — high false-positive rates on weapon-shaped everyday objects:
+
+✅ Reduces false positives in production &nbsp;·&nbsp; ✅ Improves precision in crowded scenes &nbsp;·&nbsp; ✅ Forces the model to learn the weapon-vs-confounder boundary
+
+</details>
+
+<details>
+<summary><b>🛠️ Preprocessing pipeline (uniform across all three splits)</b></summary>
+
+<br>
+
+| Step | Description | Purpose |
+|:----:|-------------|---------|
+| 🔄 **Auto-Orient** | Rotates the pixel matrix based on orientation metadata | Prevents learning misleading pose variations (sideways weapons, rotated people) |
+| 📐 **Resize** | Uniform resizing to `640×640` px | YOLO training requirement; 640 px confirmed against 800/960 px alternatives (no improvement) |
+| 🌗 **Auto-Adjust Contrast** | Adaptive histogram equalization across the full dynamic range | Emphasizes object boundaries in low-light/high-glare scenes — critical for small objects whose features get lost in shadows |
+
+Applied identically to train/val/test, so training and evaluation share the same input distribution.
 
 </details>
 
 ---
 
-<details>
-<summary><b>🏷️ Class Descriptions — and why <code>no_weapon</code> exists</b></summary>
+## 🧬 Leakage-Free Data Split (important!)
 
-<br>
+Most images originate from video footage, so **successive frames are nearly identical** — a naive per-frame split leaks near-duplicates between train and test and inflates accuracy. Our protocol prevents this:
 
-- 🗡️ **`knife`** — Bladed weapons including knives and similar sharp objects
-- 🔫 **`pistol`** — Handguns and short firearms
-- 🎯 **`long_gun`** — Rifles, shotguns, and other long-barreled firearms
-- 🚫 **`no_weapon`** — A curated set of visually confusable items: phones, remote controls, selfie sticks, and similarly shaped hand-held tools
+| Step | What happens |
+|:----:|--------------|
+| 1️⃣ **Hash** | Every frame → **64-bit perceptual hash** (difference hash) |
+| 2️⃣ **Link** | Image pairs within **Hamming distance ≤ 5** are linked (standard dHash near-duplicate threshold) |
+| 3️⃣ **Cluster** | Connected components via **union-find** → **19,036 clusters** over 26,528 images |
+| 4️⃣ **Assign** | Every **whole cluster** goes to a single split — stratified greedy procedure targeting **70/15/15** for total images *and* every class simultaneously |
+| 5️⃣ **Audit** | Final cross-split check: **no image pair within the threshold crosses a split boundary** ✅ |
 
-### ❓ Why an explicit `no_weapon` class?
-
-An explicit negative class was preferred over leaving such objects as unlabeled background because it **supervises the decision boundary directly** (following the *Not-Pistol* precedent of Bhatti et al., IEEE Access 2021). It directly targets the dominant failure mode of deployed weapon detectors — high false-positive rates on weapon-shaped everyday objects:
-
-- ✅ **Reduces false positives** in production environments
-- ✅ **Improves precision** in crowded and complex scenes
-- ✅ **Forces the model to learn** the boundary between genuine weapons and confounders
-
-</details>
+➡️ Reported metrics reflect **generalization**, not memorized near-duplicates.
 
 ---
 
-<details>
-<summary><b>🛠️ Preprocessing Pipeline</b></summary>
-
-<br>
-
-All images underwent standardized preprocessing, **applied uniformly to all three splits** so training and evaluation share the same input distribution:
-
-<table>
-  <tr>
-    <th align="center">Step</th>
-    <th align="left">Description</th>
-    <th align="left">Purpose</th>
-  </tr>
-  <tr>
-    <td align="center">🔄 <b>Auto-Orient</b></td>
-    <td>Rotates the pixel matrix based on orientation metadata</td>
-    <td>Prevents the model from learning misleading pose variations (sideways weapons, rotated people)</td>
-  </tr>
-  <tr>
-    <td align="center">📐 <b>Resize</b></td>
-    <td>Uniform resizing to <code>640×640</code> px</td>
-    <td>Consistent with YOLO training requirements (640 px confirmed against 800/960 px alternatives — no improvement)</td>
-  </tr>
-  <tr>
-    <td align="center">🌗 <b>Auto-Adjust Contrast</b></td>
-    <td>Adaptive histogram equalization across the full dynamic range</td>
-    <td>Emphasizes object boundaries in low-light/high-glare conditions — critical for small objects whose features get lost in shadows</td>
-  </tr>
-</table>
-
-</details>
-
----
-
-<details>
-<summary><b>🧬 Leakage-Free Data Split (important!)</b></summary>
-
-<br>
-
-Most images originate from video footage, so **successive frames are nearly identical** — a naive per-frame split would leak near-duplicates between train and test, yielding over-optimistic accuracy. Our split prevents this:
-
-1. **Hash** — every frame is reduced to a **64-bit perceptual hash** (difference hash)
-2. **Link** — any two images within **Hamming distance ≤ 5** are linked (a standard threshold for dHash near-duplicate detection)
-3. **Cluster** — connected components extracted via **union-find** → **19,036 clusters** over the 26,528 images
-4. **Assign** — every **whole cluster** goes to a single split via a **stratified greedy procedure** targeting 70/15/15 for the total image count *and* every class simultaneously
-5. **Audit** — a final cross-split check verified that **no image pair within the near-duplicate threshold crosses a split boundary**
-
-➡️ The reported metrics reflect **generalization**, not memorized near-duplicates.
-
-</details>
-
----
-
-### 📊 Dataset Split & Class Distribution <sub>(Paper — Table 1)</sub>
+## 📊 Dataset Split & Class Distribution <sub>(Paper — Table 1)</sub>
 
 | Split | Images | Instances | 🗡️ knife | 🎯 long_gun | 🔫 pistol | 🚫 no_weapon |
 |-------|-------:|----------:|---------:|------------:|----------:|-------------:|
@@ -340,14 +356,14 @@ Most images originate from video footage, so **successive frames are nearly iden
 | Test | 3,978 (15.0%) | 6,111 | 941 (15.4%) | 1,643 (26.9%) | 2,060 (33.7%) | 1,467 (24.0%) |
 | **Total** | **26,528** | **38,067** | **6,158 (16.2%)** | **10,541 (27.7%)** | **13,232 (34.8%)** | **8,136 (21.4%)** |
 
-### 📐 Bounding-Box Size Distribution <sub>(Paper — Table 2; COCO size convention on 640×640 images)</sub>
+### 📐 Bounding-Box Size Distribution <sub>(Paper — Table 2; COCO convention on 640×640 images: small ≤ 32², medium ≤ 96², large > 96² px)</sub>
 
-| Size | Threshold | Split | Small | Medium | Large | Total |
-|------|-----------|-------|------:|-------:|------:|------:|
-| 🔍 Small ≤ 32×32 px · 📦 Medium ≤ 96×96 px · 🟫 Large > 96×96 px | | Train | 2,198 (8.4%) | 5,312 (20.4%) | 18,593 (71.2%) | 26,103 |
-| | | Validation | 475 (8.1%) | 1,087 (18.6%) | 4,291 (73.3%) | 5,853 |
-| | | Test | 499 (8.2%) | 1,167 (19.1%) | 4,445 (72.7%) | 6,111 |
-| | | **Total** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** | **38,067** |
+| Split | Total boxes | 🔍 Small | 📦 Medium | 🟫 Large |
+|-------|------------:|---------:|----------:|---------:|
+| Train | 26,103 | 2,198 (8.4%) | 5,312 (20.4%) | 18,593 (71.2%) |
+| Validation | 5,853 | 475 (8.1%) | 1,087 (18.6%) | 4,291 (73.3%) |
+| Test | 6,111 | 499 (8.2%) | 1,167 (19.1%) | 4,445 (72.7%) |
+| **Total** | **38,067** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** |
 
 ### 📐 Size Distribution per Class <sub>(Paper — Table 3)</sub>
 
@@ -359,55 +375,66 @@ Most images originate from video footage, so **successive frames are nearly iden
 | 🚫 no_weapon | 8,136 | 442 (5.4%) | 1,545 (19.0%) | 6,149 (75.6%) |
 | **Total** | **38,067** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** |
 
-> 📌 **Note:** Small instances are strongly class-dependent — the `pistol` class accounts for **63.8% of all small boxes** (15.3% of pistol instances are small), reflecting that handguns frequently appear small and distant in surveillance footage. This concentration of small, hard instances, together with the heterogeneous `no_weapon` class, is exactly what the loss and architecture design target.
+> 📌 **Why this matters:** small instances are strongly class-dependent — `pistol` alone accounts for **63.8% of all small boxes** (handguns frequently appear small and distant in surveillance footage). This concentration of small, hard instances, together with the heterogeneous `no_weapon` class, is exactly what the loss and architecture design target — and exactly where the largest gains land.
 
 ---
 
 ## 📉 Proposed Model — Part A: Small-Object-Aware Loss & Assignment
 
-Four modifications (A1–A4) to the standard YOLOv12 training objective; hyperparameters tuned by grid search on the validation set.
+Four modifications (A1–A4) to the standard YOLOv12 training objective. All hyperparameters were tuned by **grid search on the validation set**; the ranges and optima below are from the paper.
 
 <details>
-<summary><b>📉 A1 — Dynamic Curriculum Weighting ✅ (enabled)</b></summary>
+<summary><b>📉 A1 — Dynamic Curriculum Weighting ✅ enabled</b></summary>
 
 <br>
 
-Each positive assignment receives a combined weight mixing a **normalized inverse-area term** (favoring small objects) with the **target score**, blended by a curriculum coefficient *α(t)* that transitions from **early area-dominant** to **later balanced** learning. Applied to both the IoU and DFL loss terms.
+**Problem:** after assignment, all positives are weighted roughly equally, so large boxes dominate — their IoU gradients are stronger and small objects get ignored in early optimization.
 
-- Search range for *α₁, α₂*: `[0.1, 1.0]` → **optimal: α₁ = 0.7, α₂ = 0.4**
-- Small-object threshold: area ≤ **32×32 px**
+**Solution:** each positive receives a combined weight mixing a **normalized inverse-area term** (favoring small objects) with the **target score**, blended by a curriculum coefficient *α(t)* transitioning from **early area-dominant** to **later balanced** learning. Applied to both the IoU and DFL loss terms.
+
+| Parameter | Search range | Optimal |
+|-----------|:------------:|:-------:|
+| α₁ | [0.1, 1.0] | **0.7** |
+| α₂ | [0.1, 1.0] | **0.4** |
+| Small-object threshold | — | area ≤ **32×32 px** |
 
 </details>
 
 <details>
-<summary><b>🎯 A2 — Auxiliary Center Loss for Small Objects ❌ (disabled in the final model)</b></summary>
+<summary><b>🎯 A2 — Auxiliary Center Loss for Small Objects ❌ disabled in the final model</b></summary>
 
 <br>
 
-A lightweight **L1 penalty on box centers**, applied only to small targets with a decaying schedule, intended to fix "miss by a few pixels" errors where IoU collapses for tiny boxes.
+**Idea:** IoU collapses for tiny boxes even when centers are close, so add a lightweight **L1 penalty on box centers** (small targets only, decaying schedule) to fix "miss by a few pixels" errors.
 
-- Weight search range for *α₃, α₄*: `[0, 0.1]`
-- **Result:** the tuned weight brought **no measurable improvement** on the validation set → **switched off** in the final model (λ_center = 0). Described for completeness; its individual effect is reported in the ablation (it slightly *hurts* small-object metrics — see Table 6 column +A2).
+**Honest result:** the tuned weight (α₃, α₄ searched in [0, 0.1]) brought **no measurable validation improvement** — and the ablation shows it slightly *hurts* small/medium objects (Table 6, column +A2). It is **switched off** (λ_center = 0) in the final model and documented for completeness.
 
 </details>
 
 <details>
-<summary><b>✂️ A3 — Adaptive Loss Clipping ✅ (enabled)</b></summary>
+<summary><b>✂️ A3 — Adaptive Loss Clipping ✅ enabled</b></summary>
 
 <br>
 
-Per-batch clipping of the IoU and DFL losses with **epoch-dependent ceilings**, preventing gradient explosions from mislabeled data or hard positives — yielding smoother loss curves and more stable convergence.
+**Problem:** mislabeled data or hard positives occasionally produce unstable loss spikes, destabilizing optimization in cluttered security footage.
 
-- Search range for *α₅–α₈*: `[10, 70]` (unity step) → **optimal: α₅ = 50, α₆ = 30, α₇ = 25, α₈ = 15**
+**Solution:** per-batch clipping of the IoU and DFL losses with **epoch-dependent ceilings** — preventing gradient explosions in early training and yielding smoother loss curves.
+
+| Parameter | Search range | Optimal |
+|-----------|:------------:|:-------:|
+| α₅ (IoU) | [10, 70], step 1 | **50** |
+| α₆ (IoU) | [10, 70], step 1 | **30** |
+| α₇ (DFL) | [10, 70], step 1 | **25** |
+| α₈ (DFL) | [10, 70], step 1 | **15** |
 
 </details>
 
 <details>
-<summary><b>🧲 A4 — Assignment Tuned Towards Small Objects (TAL) ✅ (enabled)</b></summary>
+<summary><b>🧲 A4 — Assignment Tuned Towards Small Objects (TAL) ✅ enabled</b></summary>
 
 <br>
 
-The default Task-Aligned Assigner uses a small candidate pool (*k* = 10), which can produce false negatives for small objects when no anchor overlaps the target.
+**Problem:** the default Task-Aligned Assigner uses a small candidate pool (*k* = 10) — for small objects, no anchor may overlap the target, producing false negatives.
 
 | Parameter | YOLOv12 default | Ours | Search range |
 |-----------|:---------------:|:----:|:------------:|
@@ -419,81 +446,96 @@ The retuned exponents better balance classification confidence vs localization q
 
 </details>
 
-> 🏆 **Final loss configuration: A1 + A3 + A4** (A2 evaluated but disabled). λ_box, λ_DFL, λ_cls remain at the original YOLOv12 values.
+> 🏆 **Final loss: A1 + A3 + A4** (A2 evaluated, then disabled). λ_box, λ_DFL, λ_cls keep the original YOLOv12 values.
 
 ---
 
 ## 🏗️ Proposed Model — Part B: Zero-Gated Head Enhancements
 
-> ⚠️ **Design decision:** the intuitive remedy — extending the pyramid with a **stride-4 P2 head** — was tested and **rejected**: it sharply increased compute and memory (160×160 feature maps) while producing **no consistent improvement** over the 3-scale design. The final model **keeps the standard P3/P4/P5 layout** (and the stock YOLOv12s backbone + PAN neck, width 0.50) and enhances **only the detection head**.
+> ⚠️ **Design decision worth knowing:** the "obvious" fix — a **stride-4 P2 head** — was implemented, tested, and **rejected**: it sharply increased compute and memory (160×160 feature maps) with **no consistent improvement** over the 3-scale design. The final model keeps the stock **YOLOv12s backbone + PAN neck (width 0.50)** and the **P3/P4/P5 layout**, and enhances **only the detection head**.
+
+| # | Module | Level | One-line summary | Status |
+|:-:|--------|:-----:|------------------|:------:|
+| B1 | **Zero-gating principle** | all | Every module = residual branch × learnable gate γ (init 0) → exact identity at start, opens only if it reduces loss | design rule |
+| B2 | 🟦 **ZGSmallDetail** | P3 | Parallel 3×3 + 5×5 depth-wise convs → sum → GroupNorm → gated residual; reinforces fine detail that large kernels wash out | ✅ |
+| B2 | 🟨 **ZGLSKAWideFuseV2** | P4 | Expand-then-fuse: square 11×11 large-kernel attention ⊕ hybrid branch (23-tap strip attention + small-kernel detail) | ✅ |
+| B2 | 🟥 **ZGLSKAWideFuse** | P5 | Square + strip large-kernel fusion — broad scene context for the coarsest scale | ✅ |
+| B3 | 🌐 **ZGGlobalContext** | P3–P5 | SE-style global recalibration: GAP → 1×1 bottleneck (r=8) + SiLU → 1×1 expand → zero-gated additive broadcast | ✅ |
+| B4 | 🎓 **DetectAuxDual** | head | Main head on enhanced features + auxiliary head on **raw** neck features (keeps backbone detail); **aux dropped at inference** | ✅ (train-only) |
 
 <details>
-<summary><b>🔧 B1 — Append-Only, Zero-Gated Design Principle</b></summary>
+<summary><b>🔧 B1 — Why zero-gating makes this low-risk</b></summary>
 
 <br>
 
-Every enhancement is inserted as a **residual branch scaled by a learnable gate γ initialized to zero**:
-
-- At the start of training each module is an **exact identity** — the network reproduces the pretrained YOLOv12s baseline exactly (after a one-time remap of the detection-head index)
+- At the start of training each module passes its input **unchanged** — the network reproduces the pretrained YOLOv12s baseline **exactly** (after a one-time remap of the detection-head index), so pretrained detection parameters transfer cleanly
 - Gates open **only where the added branch reduces training loss**
-- Worst realistic outcome = baseline performance → **low-risk strengthening** of small-object detection
-- Each block preserves channel width and spatial resolution, dropping into the existing P3–P5 streams without altering the rest of the network
+- **Worst realistic outcome = baseline performance**
+- Each block preserves channel width and spatial resolution → drops into the existing P3–P5 streams without altering the rest of the network
+- Zero-init gates follow **ReZero / GCNet** practice
 
 </details>
 
 <details>
-<summary><b>🔍 B2 — Scale-Specific Feature Enhancement (ZGSmallDetail · ZGLSKAWideFuseV2 · ZGLSKAWideFuse)</b></summary>
+<summary><b>🔍 B2 — Scale-specific enhancement: what each level needs</b></summary>
 
 <br>
 
-| Level | Module | Structure | Role |
-|-------|--------|-----------|------|
-| **P3** (stride 8) | 🟦 **ZGSmallDetail** | Two parallel depth-wise convs (3×3 + 5×5) → sum → GroupNorm → gated residual | Reinforces fine, high-frequency detail that large-receptive-field fusion washes out — the features small firearms depend on. Every large-receptive-field variant at P3 *degraded* small-object accuracy. |
-| **P4** (stride 16) | 🟨 **ZGLSKAWideFuseV2** | Channel-expanding two-branch block: square large-kernel attention (11×11) ⊕ hybrid branch (23-tap strip attention for elongated objects + small-kernel detail extractor) → concat → project | Preserves medium/large-object context while keeping small-object detail at the fusion source |
-| **P5** (stride 32) | 🟥 **ZGLSKAWideFuse** | Square + strip large-kernel attention fusion | Models the broad spatial context appropriate for the coarsest scale |
+| Level | Need | Module answer |
+|-------|------|---------------|
+| **P3** (stride 8) — where small objects live | Fine, high-frequency detail; every large-receptive-field variant tested here **degraded** small-object accuracy | Only small 3×3/5×5 depth-wise kernels — no large-kernel smoothing |
+| **P4** (stride 16) | Both context *and* detail at the fusion source | Full-width expand-then-fuse: square 11×11 LKA branch ⊕ hybrid branch (23-tap strip attention for elongated objects + small-kernel detail path). Channel-split fusion was rejected — it starved both branches of capacity |
+| **P5** (stride 32) — context dominates | Broad spatial context | Square + strip large-kernel attention fusion |
 
-**Kernel choices validated by sweeps:** square kernel k ∈ {7, 11, 15} → **k = 11** optimal with near-flat behavior around it (not fragile); the **23-tap strip kernel** is motivated by the elongated geometry of knives and long guns and was validated as a standalone branch; channel-split fusion was rejected because it starved both branches of capacity.
+**Validated by sweeps:** square kernel k ∈ {7, 11, 15} → **k = 11** optimal with near-flat behavior around it (choice is not fragile); the **23-tap strip kernel** is motivated by the elongated geometry of knives and long guns and was validated as a standalone branch.
 
 </details>
 
 <details>
-<summary><b>🌐 B3 — Global-Context Recalibration (ZGGlobalContext, all levels)</b></summary>
+<summary><b>🌐 B3 — Global context for the confounder class</b></summary>
 
 <br>
 
-Per-location features lack whole-image context — exactly what the heterogeneous `no_weapon` class needs to be separated from genuine weapons. After scale-specific enhancement, each level passes through a **squeeze-and-excitation-style** block:
-
-`Global Average Pool → 1×1 bottleneck (reduction 8) + SiLU → 1×1 expansion → zero-gated additive broadcast to every location`
-
-At **near-zero cost** this recalibrates each location with an image-wide signal, improving appearance-vs-context discrimination without disturbing per-location detail. (Zero-init gates follow ReZero/GCNet practice.)
+Per-location features lack whole-image context — exactly what the heterogeneous `no_weapon` class needs to be separated from genuine weapons (a phone in a hand vs a pistol in a hand is often a *context* question). At **near-zero cost**, ZGGlobalContext broadcasts an image-wide channel-context vector to every spatial location through a zero-initialized gate, improving appearance-vs-context discrimination without disturbing upstream detail. Result: **+11.6% mAP@50 and +16.4% Recall** on `no_weapon`.
 
 </details>
 
 <details>
-<summary><b>🎓 B4 — Dual-Head Auxiliary Supervision (DetectAuxDual)</b></summary>
+<summary><b>🎓 B4 — Dual-head auxiliary supervision, free at inference</b></summary>
 
 <br>
 
-- **Main head** — supervised on the three context-enhanced feature maps (outputs of B2–B3)
-- **Auxiliary head** — supervised on the **raw, pre-enhancement** P3/P4/P5 neck features; provides a short, direct gradient path that rewards the backbone for preserving high-resolution detail
-- The auxiliary head is **active only during training** and **dropped at inference** → the deployed model runs the three main heads at strides 8/16/32 with **zero added latency**
+Training the head only through enhanced features lets the backbone drift toward coarse, context-dominated features. **DetectAuxDual** supervises a parallel auxiliary head on the **raw, pre-enhancement** P3/P4/P5 features — a short, direct gradient path that rewards the backbone for preserving high-resolution detail. The main path specializes in context; the auxiliary path targets detail. The aux head (0.82 M params) is **dropped at inference** → zero added latency.
 
 </details>
 
-<details>
-<summary><b>⚖️ B5 — Parameter & Speed Budget</b></summary>
-
-<br>
+### ⚖️ Parameter & Speed Budget
 
 | | Baseline YOLOv12s | Proposed (deployed) |
 |---|:---:|:---:|
-| **Parameters (inference)** | 9.10 M | 11.68 M (+2.58 M, +28%, dominated by the P5 fusion block) |
-| **Training-only auxiliary branch** | — | 0.82 M (removed at deployment) |
+| **Parameters (inference)** | 9.10 M | **11.68 M** (+2.58 M, +28% — dominated by the P5 fusion block) |
+| **Training-only aux branch** | — | 0.82 M (removed at deployment) |
 | **Throughput (RTX 4090)** | ~220 FPS | **205–210 FPS** |
 
-All additions rely on **depth-wise and 1×1 operations**, so the measured throughput impact is marginal and the model retains a wide real-time margin.
+All additions use **depth-wise and 1×1 operations only**, so the throughput cost is marginal and a wide real-time margin remains.
 
-</details>
+---
+
+## 🧾 Final Configuration at a Glance
+
+| Component | Enabled | Final values |
+|-----------|:-------:|--------------|
+| 📉 A1 — Curriculum weighting | ✅ | α₁ = 0.7, α₂ = 0.4, small ≤ 32×32 px |
+| 🎯 A2 — Center loss | ❌ | λ_center = 0 (no validation gain; slightly hurts small objects) |
+| ✂️ A3 — Adaptive clipping | ✅ | α₅ = 50, α₆ = 30, α₇ = 25, α₈ = 15 |
+| 🧲 A4 — TAL assignment | ✅ | top-k = 13, score exp = 0.7, IoU exp = 4.0 |
+| 🟦 B2 — ZGSmallDetail (P3) | ✅ | 3×3 + 5×5 depth-wise, GroupNorm, zero-gated |
+| 🟨 B2 — ZGLSKAWideFuseV2 (P4) | ✅ | 11×11 square + 23-tap strip + detail path |
+| 🟥 B2 — ZGLSKAWideFuse (P5) | ✅ | square + strip large-kernel fusion |
+| 🌐 B3 — ZGGlobalContext | ✅ | all levels, reduction r = 8, SiLU |
+| 🎓 B4 — DetectAuxDual | ✅ train-only | aux on raw features, dropped at inference |
+| 🏛️ Backbone / neck / scales | unchanged | stock YOLOv12s, width 0.50, P3/P4/P5 (P2 rejected) |
+| 🖼️ Input resolution | 640 px | confirmed vs 800/960 px (no improvement) |
 
 ---
 
@@ -511,15 +553,15 @@ All additions rely on **depth-wise and 1×1 operations**, so the measured throug
 
 | Class | mAP@50 | Precision | Recall | F1 | What drives the gain |
 |-------|:------:|:---------:|:------:|:--:|----------------------|
-| 🗡️ knife | +3.8% | +3.3% | +4.2% | +3.7% | *ZGSmallDetail* (B2) + size-aware curriculum (A1) preserve thin metallic edge features |
+| 🗡️ knife | +3.8% | +3.3% | +4.2% | +3.7% | *ZGSmallDetail* (B2) + curriculum weighting (A1) preserve thin metallic edge features |
 | 🔫 pistol | +3.9% | +4.0% | +4.6% | +4.3% | TAL tuning (A4) improves detection for the largest small-object class |
 | 🎯 long_gun | +2.5% | +2.4% | +4.1% | +3.4% | Already strong at baseline; strip-kernel attention (B2) tightens elongated box fits |
 | 🚫 no_weapon | **+11.6%** | +6.0% | **+16.4%** | **+11.3%** | *ZGGlobalContext* (B3) + *DetectAuxDual* (B4) separate confounders from real weapons |
-| **All** | **+4.9%** | **+3.8%** | **+7.1%** | **+5.5%** | Complementary gains from custom loss (A1, A3, A4) and head modules (B1–B4), each effective in isolation |
+| **All** | **+4.9%** | **+3.8%** | **+7.1%** | **+5.5%** | Complementary gains from the custom loss (A1, A3, A4) and head modules (B1–B4), each effective in isolation |
 
 ---
 
-## 📊 Ablation Study — Performance by Object Size <sub>(Paper — Table 6, test set)</sub>
+## 🔬 Ablation Study — Performance by Object Size <sub>(Paper — Table 6, test set)</sub>
 
 <details>
 <summary><b>🔍 Small Objects (area ≤ 32×32 px)</b> — click to expand</summary>
@@ -560,18 +602,18 @@ All additions rely on **depth-wise and 1×1 operations**, so the measured throug
 
 </details>
 
-> 📌 **Reading the ablation:** every proposed component (A1, A3, A4, B1–B5) helps in isolation; **A2 slightly hurts small/medium objects**, which is why it is disabled in the final model. The full combination is strongest on every metric at every object size.
+> 📌 **How to read this:** every proposed component (A1, A3, A4, B1–B5) helps in isolation; **A2 slightly hurts small/medium objects** — which is exactly why it is disabled in the final model. The full combination is strongest on every metric at every object size, and gains scale inversely with object size (small +10.6% > medium +5.8% > large +2.8% mAP@50) — the intended behavior.
 
 ---
 
-## 🏗️ Architecture Search Summary <sub>(40+ variants — full details in the Supplementary Material)</sub>
+## 🧬 Architecture Search Summary <sub>(40+ variants — full details in the Supplementary Material)</sub>
 
 <details>
-<summary><b>🧬 What was explored, and what won</b></summary>
+<summary><b>What was explored — and what won</b></summary>
 
 <br>
 
-Over **40 distinct model variants** were tested. The search covered:
+Over **40 distinct model variants** were tested before converging on B1–B5:
 
 | Direction | Explored |
 |-----------|----------|
@@ -585,11 +627,11 @@ Over **40 distinct model variants** were tested. The search covered:
 
 **Outcome:**
 
-- 🏆 The best configuration **leaves the YOLOv12s backbone and PAN neck unchanged** (including the 0.50 width multiplier of the "s" scale) and enhances **only the detection head** with the five zero-gated modules (B1–B5)
-- ❌ The **P2/five-scale extension performed below the proposed three-scale design** while sharply increasing compute and memory
-- ❌ Every large-receptive-field variant at P3 **degraded** small-object accuracy → P3 branch restricted to 3×3/5×5 depth-wise kernels
-- ✅ Square-kernel dose–response sweep k ∈ {7, 11, 15} → **k = 11**, with near-flat behavior around it
-- ✅ 640 px input confirmed against 800/960 px alternatives (no improvement)
+- 🏆 Best configuration **leaves the YOLOv12s backbone and PAN neck unchanged** (incl. the 0.50 width multiplier of the "s" scale) and enhances **only the detection head**
+- ❌ The **P2/five-scale extension performed below the 3-scale design** while sharply increasing compute and memory
+- ❌ Every large-receptive-field variant at P3 **degraded** small-object accuracy → P3 restricted to 3×3/5×5 depth-wise kernels
+- ✅ Square-kernel dose–response sweep k ∈ {7, 11, 15} → **k = 11**, near-flat behavior around the optimum (robust choice)
+- ✅ 640 px input confirmed against 800/960 px (no improvement)
 
 </details>
 
@@ -597,7 +639,7 @@ Over **40 distinct model variants** were tested. The search covered:
 
 ## 🎲 Seed Reproducibility Study <sub>(Paper — Table 8; 3 independent seeds per configuration)</sub>
 
-Reporting a single run risks mistaking a lucky seed for a real improvement — a real concern when configurations differ by a few points. Every configuration was trained **3 times** with all other factors fixed (same dataset & split, 640 px, batch 64, deterministic execution):
+Neural-network training is stochastic — a single run risks mistaking a **lucky seed** for a real improvement, especially when configurations differ by a few points. Every configuration was trained **3×** with all other factors fixed (same dataset & split, 640 px, batch 64, deterministic execution):
 
 | Configuration | n | mAP@50 | mAP@50-95 | Precision | Recall | mAP@50 (Small) | mAP@50 (Med.) | mAP@50 (Large) |
 |---------------|:-:|:------:|:---------:|:---------:|:------:|:--------------:|:-------------:|:--------------:|
@@ -608,9 +650,9 @@ Reporting a single run risks mistaking a lucky seed for a real improvement — a
 
 **Key observations:**
 
-- 🎯 mAP@50 varies by **at most ±0.0008** across seeds (±0.0002 for the proposed model), while the configuration gaps are **+2.7 / +3.3 / +4.0 points** — an **order of magnitude larger** than the noise floor. The gains cannot be ascribed to seed selection.
-- ⚖️ At strict mAP@50-95, the **architecture-only** variant is slightly highest (0.557 vs 0.553): the custom loss trades a marginal amount of strict-IoU localization for **substantially higher Recall (0.800 vs 0.780), Precision (0.865 vs 0.853), and small-object mAP@50 (0.708 vs 0.664)** — the operationally critical metrics for surveillance.
-- 🔍 Only the small-object metric shows sizeable variance (std up to ~0.015), as expected from the smaller number of small instances — yet the proposed model's **6.8-point small-object gain still clears the spread**.
+- 🎯 **Signal ≫ noise:** mAP@50 varies by at most **±0.0008** across seeds (±0.0002 for the proposed model), while configuration gaps are **+2.7 / +3.3 / +4.0 points** — an order of magnitude larger. The gains cannot be ascribed to seed selection.
+- ⚖️ **A deliberate trade-off:** at strict mAP@50-95 the architecture-only variant edges ahead (0.557 vs 0.553); the custom loss trades a sliver of strict-IoU localization for **much higher Recall (0.800 vs 0.780), Precision (0.865 vs 0.853), and small-object mAP@50 (0.708 vs 0.664)** — the operationally critical metrics for surveillance.
+- 🔍 Only the small-object metric shows sizeable variance (std up to ~0.015 — expected, fewer instances), yet the proposed model's **6.8-point small-object gain still clears the spread**.
 
 ---
 
@@ -632,20 +674,20 @@ For a fair, reproducible comparison, **YOLO26 ("s" scale, official Ultralytics i
 | Recall | All | 0.747 | 0.782 | **0.800** | 0.753 |
 | F1-score | All | 0.788 | 0.816 | **0.831** | 0.796 |
 
-> 🔍 The modified YOLOv12s **outperforms YOLO26** regardless of object dimensionality — the small-object gap (0.708 vs 0.615 mAP@50) is the largest.
+> 🔍 The modified YOLOv12s **outperforms YOLO26 at every object size** — the small-object gap (0.708 vs 0.615 mAP@50, **+15% relative**) is the largest.
 
 ---
 
 ## 🌍 External Dataset Validation & State-of-the-Art Context <sub>(Paper — Table 9)</sub>
 
-The proposed model, trained **only on our custom dataset**, was evaluated **without retraining** on three publicly available weapon datasets:
+The proposed model, trained **only on our custom dataset**, was evaluated **zero-shot (no retraining)** on three public weapon datasets:
 
 | Model / Dataset | Precision | Recall | mAP@50 | Dataset |
 |-----------------|:---------:|:------:|:------:|---------|
 | **New YOLOv12s (ours) — own test set** | **0.865** | **0.800** | **0.852** | 26,528 images (knife, pistol, long_gun, no_weapon) |
-| **New YOLOv12s (ours) — [Zenodo dataset](https://zenodo.org/records/16422779)** | 0.833 | 0.778 | 0.792 | 8,478 images (machete, knife, baseball bat, rifle, gun) |
-| **New YOLOv12s (ours) — [YouTube-GDD](https://github.com/ucas-gyx/youtube-gdd)** | 0.854 | 0.781 | 0.805 | 5,000 images (gun) |
-| **New YOLOv12s (ours) — [Sohas / OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection)** | 0.828 | 0.760 | 0.776 | 5,859 images (pistol, smartphone, knife, coin purse, ticket, card) |
+| **↳ [Zenodo dataset](https://zenodo.org/records/16422779)** | 0.833 | 0.778 | 0.792 | 8,478 images (machete, knife, baseball bat, rifle, gun) |
+| **↳ [YouTube-GDD](https://github.com/ucas-gyx/youtube-gdd)** | 0.854 | 0.781 | 0.805 | 5,000 images (gun) |
+| **↳ [Sohas / OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection)** | 0.828 | 0.760 | 0.776 | 5,859 images (pistol, smartphone, knife, coin purse, ticket, card) |
 
 <details>
 <summary><b>📚 Context: prior weapon-detection studies (⚠️ each row uses a different dataset — indicative, not directly comparable)</b></summary>
@@ -661,7 +703,7 @@ The proposed model, trained **only on our custom dataset**, was evaluated **with
 | Faster R-CNN | — | — | 0.81 | 3,831 images (gun) |
 | YOLOv10n | 0.938 | 0.863 | 0.91 | 9,464 images (pistol/handgun) |
 
-Our model achieves mAP@50 = 0.852 on the **largest and most diverse dataset in the table**, which additionally includes a dedicated `no_weapon` confounder class that makes the task **deliberately harder**. The controlled comparison under identical data, split, and training conditions is the one against the YOLOv12s baseline and YOLO26 above. Retaining **mAP@50 = 0.776–0.805 zero-shot** on three external datasets indicates the learned representations generalize well beyond the training distribution.
+Our model reaches mAP@50 = 0.852 on the **largest and most diverse dataset in the table** — which additionally includes a dedicated `no_weapon` confounder class that makes the task **deliberately harder**. The controlled comparison under identical data, split, and training conditions is the one against the YOLOv12s baseline and YOLO26 above. Retaining **mAP@50 = 0.776–0.805 zero-shot** on external data indicates the learned representations generalize well beyond the training distribution.
 
 </details>
 
@@ -669,7 +711,7 @@ Our model achieves mAP@50 = 0.852 on the **largest and most diverse dataset in t
 
 ## 🔍 Detection Comparison — Original vs Custom YOLOv12s
 
-Side-by-side prediction comparisons between the **baseline YOLOv12s** and the **proposed model**. The custom model shows higher confidence scores, fewer weapon↔`no_weapon` confusions, and fewer missed detections — especially for small and partially occluded weapons. Figures 8–10 of the paper additionally isolate the **most safety-critical error mode** (actual weapons misclassified as `no_weapon`), which the proposed model reduces relative to the baseline.
+Side-by-side predictions from the **baseline YOLOv12s** vs the **proposed model**: higher confidence scores, fewer weapon↔`no_weapon` confusions, and fewer missed detections — especially for small and partially occluded weapons. Figures 8–10 of the paper additionally isolate the **most safety-critical error mode** (actual weapons misclassified as `no_weapon`), which the proposed model reduces relative to the baseline.
 
 <details>
 <summary><b>🖼️ Click to view all detection examples</b></summary>
@@ -719,71 +761,49 @@ Side-by-side prediction comparisons between the **baseline YOLOv12s** and the **
 
 ### 🔎 Common Issues Fixed by the Custom Model
 
-<table>
-  <tr>
-    <th align="center">Issue in Baseline</th>
-    <th align="center">Fixed in Custom</th>
-    <th align="left">Description</th>
-  </tr>
-  <tr>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-    <td><b>Class confusion (pistol ↔ no_weapon):</b> the baseline frequently misclassifies handheld objects (phones, tools) as pistols and vice versa. <i>ZGGlobalContext</i> (B3) + <i>DetectAuxDual</i> (B4) separate confounders from real weapons.</td>
-  </tr>
-  <tr>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-    <td><b>Class confusion (long_gun ↔ no_weapon):</b> the baseline mislabels elongated objects as long guns; the 23-tap strip attention tightens elongated box fits and class boundaries.</td>
-  </tr>
-  <tr>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-    <td><b>Missed small detections:</b> the baseline misses small/distant weapons; curriculum weighting (A1), TAL tuning (A4), and <i>ZGSmallDetail</i> (B2) recover them (+12.8% small-object Recall).</td>
-  </tr>
-  <tr>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-    <td><b>Low confidence scores:</b> the baseline produces borderline detections; the custom model outputs higher, more decisive scores.</td>
-  </tr>
-  <tr>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-    <td><b>Safety-critical misses:</b> actual weapons misclassified as <code>no_weapon</code> — reduced relative to the baseline (paper Fig. 10).</td>
-  </tr>
-</table>
+| Issue in Baseline | Fixed | Description |
+|:-----------------:|:-----:|-------------|
+| ❌ | ✅ | **Class confusion (pistol ↔ no_weapon):** handheld objects (phones, tools) misread as pistols and vice versa → *ZGGlobalContext* (B3) + *DetectAuxDual* (B4) separate confounders from real weapons |
+| ❌ | ✅ | **Class confusion (long_gun ↔ no_weapon):** elongated objects mislabeled as long guns → 23-tap strip attention tightens elongated fits and class boundaries |
+| ❌ | ✅ | **Missed small detections:** small/distant weapons missed → curriculum weighting (A1), TAL tuning (A4), and *ZGSmallDetail* (B2) recover them (+12.8% small-object Recall) |
+| ❌ | ✅ | **Low confidence scores:** borderline detections → higher, more decisive scores |
+| ❌ | ✅ | **Safety-critical misses:** actual weapons misclassified as `no_weapon` — reduced vs baseline (paper Fig. 10) |
 
 </details>
 
 ---
 
-## 🖥️ Hardware & Software Configuration
+## 🚀 Getting Started
 
 <details>
-<summary><b>⚙️ Click to expand System Specifications</b></summary>
+<summary><b>⬇️ 1. Get the code, data, and weights</b></summary>
 
 <br>
 
-| Component | Specification |
-|-----------|---------------|
-| 💻 **Operating System** | Ubuntu 22.04.3 LTS |
-| 🎮 **GPU** | NVIDIA RTX 4090 24GB |
-| 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
-| 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
-| 🐍 **Python** | 3.10.2 |
-| 🔥 **PyTorch** | 2.1.2 |
-| ⚡ **CUDA** | 12.1 |
+```bash
+# Clone the repository
+git clone https://github.com/CostiCatargiu/Yolov12_WeaponDetection
+cd Yolov12_WeaponDetection
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+- 📦 **Dataset** — download both companion projects from Roboflow (YOLO format): [WeaponDataset v8](https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8) + [NoGun Dataset](https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2)
+- ⬇️ **Pre-trained weights** — [Original model](https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing) · [Custom model](https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing)
 
 </details>
 
----
+<details>
+<summary><b>🏋️ 2. Reproduce training (shared settings for baseline / custom / YOLO26)</b></summary>
 
-## 📄 Training Configuration (Reproducibility)
+<br>
 
-Both the baseline and the custom model (and YOLO26) were trained under **identical settings** to ensure a fair comparison:
+Both the baseline and the custom model (and YOLO26) were trained under **identical settings** for a fair comparison:
 
 <pre>
 # ═══════════════════════════════════════════════════════════════
-# ⚙️ Shared training settings (baseline / custom / YOLO26)
+# ⚙️ Shared training settings
 # ═══════════════════════════════════════════════════════════════
 optimizer: SGD            # selected by the automatic optimizer policy
 lr0: 0.01
@@ -791,7 +811,7 @@ weight_decay: 0.0005
 momentum: 0.9
 batch: 64
 imgsz: 640
-epochs: same for all configurations
+epochs: identical for all configurations
 seeds: 3 independent runs per configuration, deterministic execution
 
 # ═══════════════════════════════════════════════════════════════
@@ -820,7 +840,33 @@ tal_iou_exp: 4.0          # default: 6.0
 # Loss weights: lambda_box, lambda_DFL, lambda_cls — original YOLOv12 values
 </pre>
 
-> 📌 Detailed hyperparameter-tuning results, the full list of 40+ architecture variants, and the exact split of images into training/validation/test subsets are provided in the **Supplementary Material** and in this repository.
+> 📌 Detailed hyperparameter-tuning results, the full list of 40+ architecture variants, and the exact image-level split assignments are provided in the **Supplementary Material** and in this repository.
+
+</details>
+
+<details>
+<summary><b>🖥️ 3. Hardware & software used in the paper</b></summary>
+
+<br>
+
+| Component | Specification |
+|-----------|---------------|
+| 💻 **Operating System** | Ubuntu 22.04.3 LTS |
+| 🎮 **GPU** | NVIDIA RTX 4090 24GB (CUDA 12.1) |
+| 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
+| 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
+| 🐍 **Python / 🔥 PyTorch** | 3.10.2 / 2.1.2 |
+
+</details>
+
+---
+
+## 🔭 Future Work
+
+- 🌡️ **Multimodal perception** — thermal and depth sensing for low-light or occluded conditions
+- 🎞️ **Temporally aware detection** — motion consistency across video frames
+- 🪶 **Lightweight compression, cross-dataset generalization & domain adaptation** — robustness for edge-device deployment
+- 🏥 Extension toward other applications (e.g., medical imaging) — under investigation
 
 ---
 
@@ -834,7 +880,8 @@ tal_iou_exp: 4.0          # default: 6.0
 | 🌍 External eval — YouTube-GDD | https://github.com/ucas-gyx/youtube-gdd |
 | 🌍 External eval — Sohas / OD-WeaponDetection | https://github.com/ari-dasci/OD-WeaponDetection |
 | 🔶 YOLO26 (Ultralytics) | https://docs.ultralytics.com/models/yolo26/ |
-| ⬇️ Trained weights & results | Google Drive links in the Dataset Summary table above |
+| 📄 YOLOv12 paper | https://arxiv.org/abs/2502.12524 |
+| ⬇️ Trained weights & results | Google Drive links in the [Dataset Summary](#-dataset-summary) |
 
 ---
 
@@ -851,4 +898,4 @@ If you use this dataset or code, please cite the paper:
 }
 ```
 
-<sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.</sub>
+<p align="center"><sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.<br>Questions or issues? Please open a GitHub issue.</sub></p>
