@@ -40,44 +40,6 @@
 
 <table>
   <tr>
-    <th align="center">Phase</th>
-    <th align="center">🧪 Experiments</th>
-    <th align="center">⏱️ Time</th>
-    <th align="center">📊 Dataset</th>
-    <th align="center">Details</th>
-  </tr>
-  <tr>
-    <td align="center"><b>🔬 Loss Ablation</b><br><sub>YOLOv12s</sub></td>
-    <td align="center"><code>206</code></td>
-    <td align="center"><code>~247h</code></td>
-    <td align="center">17%</td>
-    <td align="center"><sub>180 grid search + 26 combinations</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><b>🏗️ Arch Ablation</b><br><sub>YOLOv12s</sub></td>
-    <td align="center"><code>20</code></td>
-    <td align="center"><code>~64h</code></td>
-    <td align="center">17%</td>
-    <td align="center"><sub>20 architecture variants</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><b>🔶 Loss Transfer</b><br><sub>YOLO26s</sub></td>
-    <td align="center"><code>15</code></td>
-    <td align="center"><code>~15h</code></td>
-    <td align="center">17%</td>
-    <td align="center"><sub>4 individual + 11 combinations</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><b>🏋️ Full Dataset</b><br><sub>Final Trainings</sub></td>
-    <td align="center"><code>6</code></td>
-    <td align="center"><code>~80h</code></td>
-    <td align="center">100%</td>
-    <td align="center"><sub>2 baselines + 2 custom loss + 2 custom arch</sub></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
       <br><sub>🏗️ Custom YOLOv12s Architecture <br></sub>
@@ -102,112 +64,86 @@
 
 <table>
   <tr>
-    <th align="center" colspan="5">📈 Performance Improvements</th>
+    <th align="center" colspan="4">📈 Performance Improvements</th>
   </tr>
   <tr>
     <th align="center">Metric</th>
     <th align="center">🔷 YOLOv12s<br><sub>Baseline → Custom Loss</sub></th>
     <th align="center">🧪 YOLOv12s<br><sub>Baseline → Custom Loss+Arch</sub></th>
-    <th align="center">🔶 YOLO26s<br><sub>Baseline → Custom Loss</sub></th>
-    <th align="center">⚔️ Custom Loss<br><sub>YOLO26s → YOLOv12s</sub></th>
+    <th align="center">⚔️ Baseline<br><sub>YOLO26s vs YOLOv12s</sub></th>
   </tr>
-
   <tr>
     <td align="left"><b>mAP50</b></td>
-    <td align="center">0.816 → <b>0.857</b> <sub>(+5.04%)</sub></td>
-    <td align="center">0.816 → <b>0.865</b> <sub>(+6.00%)</sub></td>
-    <td align="center">0.782 → <b>0.828</b> <sub>(+5.88%)</sub></td>
-    <td align="center">0.828 → <b>0.857</b> <sub>(+3.43%)</sub></td>
+    <td align="center">0.812 → <b>0.839</b> <sub>(+3.33%)</sub></td>
+    <td align="center">0.812 → <b>0.852</b> <sub>(+4.93%)</sub></td>
+    <td align="center">0.807 vs <b>0.812</b></td>
   </tr>
-
   <tr>
     <td align="left"><b>mAP50-95</b></td>
-    <td align="center">0.525 → <b>0.574</b> <sub>(+9.32%)</sub></td>
-    <td align="center">0.525 → <b>0.585</b> <sub>(+11.43%)</sub></td>
-    <td align="center">0.502 → <b>0.555</b> <sub>(+10.53%)</sub></td>
-    <td align="center">0.555 → <b>0.574</b> <sub>(+3.29%)</sub></td>
+    <td align="center">0.516 → <b>0.539</b> <sub>(+4.46%)</sub></td>
+    <td align="center">0.516 → <b>0.553</b> <sub>(+7.17%)</sub></td>
+    <td align="center">0.521 vs <b>0.516</b></td>
   </tr>
-
   <tr>
     <td align="left"><b>Precision</b></td>
-    <td align="center">0.831 → <b>0.889</b> <sub>(+6.94%)</sub></td>
-    <td align="center">0.831 → <b>0.902</b> <sub>(+8.54%)</sub></td>
-    <td align="center">0.792 → <b>0.863</b> <sub>(+8.94%)</sub></td>
-    <td align="center">0.863 → <b>0.889</b> <sub>(+2.98%)</sub></td>
+    <td align="center">0.833 → <b>0.852</b> <sub>(+2.28%)</sub></td>
+    <td align="center">0.833 → <b>0.865</b> <sub>(+3.84%)</sub></td>
+    <td align="center">0.845 vs <b>0.833</b></td>
   </tr>
-
   <tr>
     <td align="left"><b>Recall</b></td>
-    <td align="center">0.746 → <b>0.811</b> <sub>(+8.79%)</sub></td>
-    <td align="center">0.746 → <b>0.825</b> <sub>(+10.59%)</sub></td>
-    <td align="center">0.698 → <b>0.776</b> <sub>(+11.14%)</sub></td>
-    <td align="center">0.776 → <b>0.811</b> <sub>(+4.59%)</sub></td>
+    <td align="center">0.747 → <b>0.782</b> <sub>(+4.69%)</sub></td>
+    <td align="center">0.747 → <b>0.800</b> <sub>(+7.10%)</sub></td>
+    <td align="center">0.753 vs <b>0.747</b></td>
   </tr>
-
   <tr>
     <td align="left"><b>F1 Score</b></td>
-    <td align="center">0.786 → <b>0.848</b> <sub>(+7.91%)</sub></td>
-    <td align="center">0.786 → <b>0.862</b> <sub>(+9.67%)</sub></td>
-    <td align="center">0.742 → <b>0.817</b> <sub>(+10.10%)</sub></td>
-    <td align="center">0.817 → <b>0.848</b> <sub>(+3.82%)</sub></td>
+    <td align="center">0.788 → <b>0.816</b> <sub>(+3.55%)</sub></td>
+    <td align="center">0.788 → <b>0.831</b> <sub>(+5.46%)</sub></td>
+    <td align="center">0.796 vs <b>0.788</b></td>
   </tr>
-
   <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50</b></td>
   </tr>
-
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.530 → <b>0.590</b> <sub>(+11.32%)</sub></td>
-    <td align="center">0.530 → <b>0.608</b> <sub>(+14.72%)</sub></td>
-    <td align="center">0.498 → <b>0.542</b> <sub>(+8.98%)</sub></td>
-    <td align="center">0.542 → <b>0.590</b> <sub>(+8.86%)</sub></td>
+    <td align="center">0.640 → <b>0.681</b> <sub>(+6.41%)</sub></td>
+    <td align="center">0.640 → <b>0.708</b> <sub>(+10.62%)</sub></td>
+    <td align="center">0.615 vs <b>0.640</b></td>
   </tr>
-
   <tr>
     <td align="left">📦 <b>Medium</b></td>
-    <td align="center">0.750 → <b>0.796</b> <sub>(+6.11%)</sub></td>
-    <td align="center">0.750 → <b>0.812</b> <sub>(+8.27%)</sub></td>
-    <td align="center">0.718 → <b>0.765</b> <sub>(+6.51%)</sub></td>
-    <td align="center">0.765 → <b>0.796</b> <sub>(+4.06%)</sub></td>
+    <td align="center">0.781 → <b>0.818</b> <sub>(+4.74%)</sub></td>
+    <td align="center">0.781 → <b>0.826</b> <sub>(+5.76%)</sub></td>
+    <td align="center">0.780 vs <b>0.781</b></td>
   </tr>
-
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.828 → <b>0.865</b> <sub>(+4.47%)</sub></td>
-    <td align="center">0.828 → <b>0.874</b> <sub>(+5.56%)</sub></td>
-    <td align="center">0.796 → <b>0.842</b> <sub>(+5.76%)</sub></td>
-    <td align="center">0.842 → <b>0.865</b> <sub>(+2.73%)</sub></td>
+    <td align="center">0.848 → <b>0.866</b> <sub>(+2.12%)</sub></td>
+    <td align="center">0.848 → <b>0.872</b> <sub>(+2.83%)</sub></td>
+    <td align="center">0.843 vs <b>0.848</b></td>
   </tr>
-
   <tr>
-    <td colspan="5" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
+    <td colspan="4" align="center"><b>🔍 Size-Specific mAP50-95</b></td>
   </tr>
-
   <tr>
     <td align="left">🔍 <b>Small</b></td>
-    <td align="center">0.297 → <b>0.355</b> <sub>(+19.53%)</sub></td>
-    <td align="center">0.297 → <b>0.372</b> <sub>(+25.25%)</sub></td>
-    <td align="center">0.276 → <b>0.316</b> <sub>(+14.55%)</sub></td>
-    <td align="center">0.316 → <b>0.355</b> <sub>(+12.34%)</sub></td>
+    <td align="center">0.324 → <b>0.348</b> <sub>(+7.41%)</sub></td>
+    <td align="center">0.324 → <b>0.354</b> <sub>(+9.26%)</sub></td>
+    <td align="center">0.317 vs <b>0.324</b></td>
   </tr>
-
   <tr>
     <td align="left">📦 <b>Medium</b></td>
-    <td align="center">0.424 → <b>0.467</b> <sub>(+10.23%)</sub></td>
-    <td align="center">0.424 → <b>0.485</b> <sub>(+14.38%)</sub></td>
-    <td align="center">0.402 → <b>0.448</b> <sub>(+11.30%)</sub></td>
-    <td align="center">0.448 → <b>0.467</b> <sub>(+4.24%)</sub></td>
+    <td align="center">0.445 → <b>0.472</b> <sub>(+6.07%)</sub></td>
+    <td align="center">0.445 → <b>0.480</b> <sub>(+7.87%)</sub></td>
+    <td align="center">0.466 vs <b>0.445</b></td>
   </tr>
-
   <tr>
     <td align="left">🟫 <b>Large</b></td>
-    <td align="center">0.550 → <b>0.597</b> <sub>(+8.55%)</sub></td>
-    <td align="center">0.550 → <b>0.604</b> <sub>(+9.82%)</sub></td>
-    <td align="center">0.524 → <b>0.584</b> <sub>(+11.59%)</sub></td>
-    <td align="center">0.584 → <b>0.597</b> <sub>(+2.23%)</sub></td>
+    <td align="center">0.574 → <b>0.591</b> <sub>(+2.96%)</sub></td>
+    <td align="center">0.574 → <b>0.595</b> <sub>(+3.66%)</sub></td>
+    <td align="center">0.588 vs <b>0.574</b></td>
   </tr>
-
 </table>
 
 
