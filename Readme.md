@@ -224,43 +224,39 @@ To validate the generalization capability of our custom models, we evaluated bot
     <th align="center">Images</th>
   </tr>
   <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
+    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
     <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
-    <td align="center"><code>0.8545</code></td>
-    <td align="center"><code>0.7982</code></td>
-    <td align="center"><code>0.8254</code></td>
-    <td align="center"><code>0.8121</code></td>
-    <td align="center"><code>0.5217</code></td>
+    <td align="center"><code>0.833</code></td>
+    <td align="center"><code>0.778</code></td>
+    <td align="center"><code>0.792</code></td>
+    <td align="center">—</td>
+    <td align="center">—</td>
     <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
     <td align="center"><code>8,478</code></td>
   </tr>
   <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
     <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
-    <td align="center"><code>0.8761</code></td>
-    <td align="center"><code>0.8014</code></td>
-    <td align="center"><code>0.8371</code></td>
-    <td align="center"><code>0.8262</code></td>
-    <td align="center"><code>0.5469</code></td>
+    <td align="center"><code>0.854</code></td>
+    <td align="center"><code>0.781</code></td>
+    <td align="center"><code>0.805</code></td>
+    <td align="center">—</td>
+    <td align="center">—</td>
     <td align="center"><sub>gun</sub></td>
     <td align="center"><code>5,000</code></td>
   </tr>
   <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
     <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
-    <td align="center"><code>0.8489</code></td>
-    <td align="center"><code>0.7803</code></td>
-    <td align="center"><code>0.8132</code></td>
-    <td align="center"><code>0.7951</code></td>
-    <td align="center"><code>0.5323</code></td>
-    <td align="center"><sub>pistol, smartphone, knife, monedero, billete, tarjeta</sub></td>
+    <td align="center"><code>0.828</code></td>
+    <td align="center"><code>0.760</code></td>
+    <td align="center"><code>0.776</code></td>
+    <td align="center">—</td>
+    <td align="center">—</td>
+    <td align="center"><sub>pistol, smartphone, knife, coin purse, ticket, card</sub></td>
     <td align="center"><code>5,859</code></td>
   </tr>
+  <tr><td colspan="9"><hr/></td></tr>
   <tr>
-    <td colspan="9" align="center"><b>─────────────────────────────────────</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
+    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
     <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
     <td align="center"><code>0.8124</code></td>
     <td align="center"><code>0.7588</code></td>
@@ -271,7 +267,6 @@ To validate the generalization capability of our custom models, we evaluated bot
     <td align="center"><code>8,478</code></td>
   </tr>
   <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
     <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
     <td align="center"><code>0.8390</code></td>
     <td align="center"><code>0.7685</code></td>
@@ -282,7 +277,6 @@ To validate the generalization capability of our custom models, we evaluated bot
     <td align="center"><code>5,000</code></td>
   </tr>
   <tr>
-    <td align="center"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
     <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
     <td align="center"><code>0.8115</code></td>
     <td align="center"><code>0.7462</code></td>
