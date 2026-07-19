@@ -210,7 +210,6 @@
 To validate the generalization capability of our custom models, we evaluated both **YOLOv12s_custom** and **YOLO26s_custom** on **3 external datasets** that were **not used during training**. The results demonstrate that our models generalize well across diverse weapon detection benchmarks, achieving satisfactory performance on unseen data distributions.
 
 <div align="center">
-
 <table>
   <tr>
     <th align="center">Model</th>
@@ -228,7 +227,7 @@ To validate the generalization capability of our custom models, we evaluated bot
     <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
     <td align="center"><code>0.833</code></td>
     <td align="center"><code>0.778</code></td>
-    <td align="center">—</td>
+    <td align="center"><code>0.805</code></td>
     <td align="center"><code>0.792</code></td>
     <td align="center">—</td>
     <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
@@ -238,7 +237,7 @@ To validate the generalization capability of our custom models, we evaluated bot
     <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
     <td align="center"><code>0.854</code></td>
     <td align="center"><code>0.781</code></td>
-    <td align="center">—</td>
+    <td align="center"><code>0.816</code></td>
     <td align="center"><code>0.805</code></td>
     <td align="center">—</td>
     <td align="center"><sub>gun</sub></td>
@@ -248,7 +247,7 @@ To validate the generalization capability of our custom models, we evaluated bot
     <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
     <td align="center"><code>0.828</code></td>
     <td align="center"><code>0.760</code></td>
-    <td align="center">—</td>
+    <td align="center"><code>0.793</code></td>
     <td align="center"><code>0.776</code></td>
     <td align="center">—</td>
     <td align="center"><sub>pistol, smartphone, knife, coin purse, ticket, card</sub></td>
