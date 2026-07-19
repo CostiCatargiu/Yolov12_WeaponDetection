@@ -213,82 +213,78 @@ To validate the generalization capability of our custom models, we evaluated bot
 
 <table>
   <tr>
-    <th align="center">Method</th>
+    <th align="center">Model</th>
+    <th align="center">Dataset</th>
     <th align="center">Precision</th>
     <th align="center">Recall</th>
-    <th align="center">mAP@50</th>
-    <th align="center">Dataset</th>
+    <th align="center">F1 Score</th>
+    <th align="center">mAP50</th>
+    <th align="center">mAP50-95</th>
+    <th align="center">Classes</th>
+    <th align="center">Images</th>
   </tr>
   <tr>
-    <td align="center">YOLOv7 [30]</td>
-    <td align="center"><code>0.852</code></td>
-    <td align="center"><code>0.617</code></td>
-    <td align="center"><code>0.330</code></td>
-    <td align="center"><sub>400 images (guns and knives)</sub></td>
-  </tr>
-  <tr>
-    <td align="center">YOLOv5l [31]</td>
-    <td align="center"><code>0.715</code></td>
-    <td align="center"><code>0.614</code></td>
-    <td align="center"><code>0.641</code></td>
-    <td align="center"><sub>2,986 images (pistols)</sub></td>
-  </tr>
-  <tr>
-    <td align="center">YOLOv8m [32]</td>
-    <td align="center"><code>0.850</code></td>
-    <td align="center"><code>0.800</code></td>
-    <td align="center"><code>0.820</code></td>
-    <td align="center"><sub>1,000 images (weapon, no_weapon)</sub></td>
-  </tr>
-  <tr>
-    <td align="center">VGG SSD [33]</td>
-    <td align="center"><code>0.870</code></td>
-    <td align="center"><code>0.866</code></td>
-    <td align="center"><code>0.870</code></td>
-    <td align="center"><sub>872 images (normal, knife, gun)</sub></td>
-  </tr>
-  <tr>
-    <td align="center">Faster R-CNN [34]</td>
-    <td align="center">—</td>
-    <td align="center">—</td>
-    <td align="center"><code>0.810</code></td>
-    <td align="center"><sub>3,831 images (gun)</sub></td>
-  </tr>
-  <tr>
-    <td align="center">YOLOv10n [24]</td>
-    <td align="center"><code>0.938</code></td>
-    <td align="center"><code>0.863</code></td>
-    <td align="center"><code>0.910</code></td>
-    <td align="center"><sub>9,464 images (pistol/handgun)</sub></td>
-  </tr>
-  <tr><td colspan="5"><hr/></td></tr>
-  <tr>
-    <td align="center"><b>New YOLOv12s (ours)</b> — custom dataset</td>
-    <td align="center"><code>0.865</code></td>
-    <td align="center"><code>0.800</code></td>
-    <td align="center"><code>0.852</code></td>
-    <td align="center"><sub>26,528 images (knife, pistol, long_gun, no_weapon)</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><b>New YOLOv12s (ours)</b> — dataset [37]</td>
+    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLOv12s-Custom-red?style=flat-square" /></td>
+    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
     <td align="center"><code>0.833</code></td>
     <td align="center"><code>0.778</code></td>
+    <td align="center">—</td>
     <td align="center"><code>0.792</code></td>
-    <td align="center"><sub>8,478 images (machete, knife, baseball bat, rifle, gun)</sub></td>
+    <td align="center">—</td>
+    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
+    <td align="center"><code>8,478</code></td>
   </tr>
   <tr>
-    <td align="center"><b>New YOLOv12s (ours)</b> — dataset [38]</td>
+    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
     <td align="center"><code>0.854</code></td>
     <td align="center"><code>0.781</code></td>
+    <td align="center">—</td>
     <td align="center"><code>0.805</code></td>
-    <td align="center"><sub>5,000 images (gun)</sub></td>
+    <td align="center">—</td>
+    <td align="center"><sub>gun</sub></td>
+    <td align="center"><code>5,000</code></td>
   </tr>
   <tr>
-    <td align="center"><b>New YOLOv12s (ours)</b> — dataset [39]</td>
+    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
     <td align="center"><code>0.828</code></td>
     <td align="center"><code>0.760</code></td>
+    <td align="center">—</td>
     <td align="center"><code>0.776</code></td>
-    <td align="center"><sub>5,859 images (pistol, smartphone, knife, coin purse, ticket, card)</sub></td>
+    <td align="center">—</td>
+    <td align="center"><sub>pistol, smartphone, knife, coin purse, ticket, card</sub></td>
+    <td align="center"><code>5,859</code></td>
+  </tr>
+  <tr><td colspan="9"><hr/></td></tr>
+  <tr>
+    <td align="center" rowspan="3"><img src="https://img.shields.io/badge/YOLO26s-Custom-orange?style=flat-square" /></td>
+    <td align="center"><a href="https://zenodo.org/records/16422779">Zenodo Dataset</a></td>
+    <td align="center"><code>0.8124</code></td>
+    <td align="center"><code>0.7588</code></td>
+    <td align="center"><code>0.7847</code></td>
+    <td align="center"><code>0.7400</code></td>
+    <td align="center"><code>0.5008</code></td>
+    <td align="center"><sub>machete, knife, baseball bat, rifle, gun</sub></td>
+    <td align="center"><code>8,478</code></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/ucas-gyx/youtube-gdd">YouTube-GDD</a></td>
+    <td align="center"><code>0.8390</code></td>
+    <td align="center"><code>0.7685</code></td>
+    <td align="center"><code>0.8022</code></td>
+    <td align="center"><code>0.7500</code></td>
+    <td align="center"><code>0.5250</code></td>
+    <td align="center"><sub>gun</sub></td>
+    <td align="center"><code>5,000</code></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/ari-dasci/OD-WeaponDetection">Sohas Weapon</a></td>
+    <td align="center"><code>0.8115</code></td>
+    <td align="center"><code>0.7462</code></td>
+    <td align="center"><code>0.7775</code></td>
+    <td align="center"><code>0.7300</code></td>
+    <td align="center"><code>0.5110</code></td>
+    <td align="center"><sub>pistol, smartphone, knife, monedero, billete, tarjeta</sub></td>
+    <td align="center"><code>5,859</code></td>
   </tr>
 </table>
 
