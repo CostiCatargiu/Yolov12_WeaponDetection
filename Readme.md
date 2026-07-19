@@ -83,17 +83,20 @@
       <br><sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★)<br>5-head detection with auxiliary P2 branch at stride 4</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/71a54fad-b482-489c-9a17-5fb3f0d7b1fa" />
+      <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+" />
       <br><sub>📈 Training metrics — Baseline vs Custom Loss + Arch</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/b05740ac-27c8-41df-a467-d9eabc07486d" />
+      <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
+" />
       <br><sub>📊 FIGURE 3. Training metrics ablation study: original YOLOv12s (blue); YOLOv12s + (B1–B5) architectural enhancements (orange); YOLOv12s + (A1–A4) custom loss modifications (red); new model — YOLOv12s + combined proposed modifications (green).</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/278e3270-9edf-4004-9d9a-a87eab3a3b89" />
+      <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
+ />
       <br><sub>🎯 FIGURE 5. Confusion matrices on the test set for the new model: a) small objects; b) medium objects; c) large objects; d) all objects.</sub>
     </td>
   </tr>
