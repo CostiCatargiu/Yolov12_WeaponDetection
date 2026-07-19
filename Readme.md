@@ -79,8 +79,9 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/443110c9-86ee-4ec7-adf5-8192c026cf4b" />
-      <br><sub>🏗️ Custom YOLOv12s Architecture (Arch-6 ★)<br>5-head detection with auxiliary P2 branch at stride 4</sub>
+      <img width="100%" alt="Custom YOLOv12s Architecture (Arch-6)" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
+ />
+      <br><sub>🏗️ Custom YOLOv12s Architecture <br></sub>
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="YOLOv12s Ablation Study Training Metrics" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
@@ -92,12 +93,12 @@
     <td align="center" width="50%">
       <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
 " />
-      <br><sub>📊 FIGURE 3. Training metrics ablation study: original YOLOv12s (blue); YOLOv12s + (B1–B5) architectural enhancements (orange); YOLOv12s + (A1–A4) custom loss modifications (red); new model — YOLOv12s + combined proposed modifications (green).</sub>
+      <br><sub>📊 Training metrics ablation study: original YOLOv12s (blue); YOLOv12s + (B1–B5) architectural enhancements (orange); YOLOv12s + (A1–A4) custom loss modifications (red); new model — YOLOv12s + combined proposed modifications (green).</sub>
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
  />
-      <br><sub>🎯 FIGURE 5. Confusion matrices on the test set for the new model: a) small objects; b) medium objects; c) large objects; d) all objects.</sub>
+      <br><sub>🎯 Confusion matrices on the test set for the new model: a) small objects; b) medium objects; c) large objects; d) all objects.</sub>
     </td>
   </tr>
 </table>
