@@ -184,21 +184,33 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
   <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Custom YOLOv12s Architecture" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
-      <br><sub>🏗️ Modified YOLOv12s architecture — block diagram and structure of the new head modules (paper Fig. 3)</sub>
+      <br><sub>🏗️ Modified YOLOv12s architecture — block diagram and structure of the new head modules.</sub>
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="Training Metrics — Baseline vs Custom Loss + Arch" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
-      <br><sub>📈 Learning dynamics on train & validation sets (paper Fig. 5)</sub>
+      <br><sub>📈 The structure of the new head modules. </sub>
     </td>
   </tr>
-  <tr>
+    <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
       <br><sub>📊 Ablation (paper Fig. 4): baseline (blue); + arch B1–B5 (orange); + loss A1–A4 (red); combined (green) — loss components L<sub>IoU</sub>, L<sub>DFL</sub>, L<sub>cls</sub> and validation metrics</sub>
     </td>
     <td align="center" width="50%">
+      <img width="100%" alt="Training Metrics — Baseline vs Custom Loss + Arch" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+      <br><sub>📈 Learning dynamics on train & validation sets. </sub>
+    </td>
+  </tr>
+  <img width="709" height="600" alt="image" src="https://github.com/user-attachments/assets/5e3d0927-f28c-4c19-b13c-9dad054a6cb1" />
+
+  <tr>
+    <td align="center" width="50%">
       <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
-      <br><sub>🎯 Confusion matrices for the new model (paper Fig. 7): a) small; b) medium; c) large; d) all objects — "background" counts FP/FN</sub>
+      <br><sub>🎯 Confusion matrices for the original model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN</sub>
+    </td>
+    <td align="center" width="50%">
+      <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
+      <br><sub>🎯 Confusion matrices for the new model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN</sub>
     </td>
   </tr>
 </table>
