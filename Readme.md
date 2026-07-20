@@ -372,14 +372,14 @@ quadrantChart
     quadrant-2 Small-object specialist
     quadrant-3 Needs work
     quadrant-4 Strict-localization specialist
-    Baseline YOLOv12s: [0.30, 0.28]
-    YOLO26s: [0.32, 0.20]
-    Custom Loss only: [0.55, 0.55]
-    Custom Arch only: [0.70, 0.42]
-    Proposed Model: [0.63, 0.85]
+    Baseline YOLOv12s: [0.00, 0.27]
+    YOLO26s: [0.12, 0.00]
+    Custom Loss only: [0.56, 0.71]
+    Custom Arch only: [1.00, 0.53]
+    Proposed Model: [0.90, 1.00]
 ```
 
-<sub>📍 Illustrative placement of the five trained configurations on the two axes that matter most for surveillance: strict localization (mAP@50-95) and small-object detection (small mAP@50). The <b>Proposed</b> model is the only configuration that lands solidly in the "best of both worlds" quadrant — see the <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">exact seed-averaged numbers</a> for the underlying values.</sub>
+<sub>📍 Each point is the seed-averaged value from the <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">reproducibility table</a> below, min-max normalized across these 5 runs on each axis (0 = lowest of the five, 1 = highest — <b>not</b> an absolute 0–100% scale). The real spread is narrow: mAP@50-95 ranges only 0.516–0.557 and small-object mAP@50 only 0.615–0.708 across all five configurations, so treat the quadrant boundaries as relative rankings rather than large categorical gaps. Two things worth noting: <b>Custom Arch alone actually has the highest raw mAP@50-95 (0.557)</b> of any configuration, edging out the full Proposed model (0.553); the <b>Proposed model wins on every other metric</b> (Recall, Precision, small-object mAP@50) by a wider margin, which is why it remains the preferred configuration overall.</sub>
 
 ---
 
