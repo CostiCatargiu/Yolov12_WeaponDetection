@@ -187,8 +187,8 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
       <br><sub>🏗️ Modified YOLOv12s architecture — block diagram and structure of the new head modules.</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
-      <br><sub>📈 Learning dynamics on train & validation sets.</sub>
+      <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/ace0ef75-aa30-4321-8d83-e6756517edb8" />
+      <br><sub>📈 New modules description. </sub>
     </td>
   </tr>
   <tr>
@@ -197,13 +197,13 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
       <br><sub>📊 Ablation (paper Fig. 4): baseline (blue); + arch B1–B5 (orange); + loss A1–A4 (red); combined (green) — loss components L<sub>IoU</sub>, L<sub>DFL</sub>, L<sub>cls</sub> and validation metrics.</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Additional Training Metrics" src="https://github.com/user-attachments/assets/5e3d0927-f28c-4c19-b13c-9dad054a6cb1" />
-      <br><sub>📉 [Add caption here]</sub>
+      <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+      <br><sub>📈 Learning dynamics on train & validation sets.</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="Confusion Matrix — Original Model" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
+      <img width="100%" alt="Confusion Matrix — Original Model" src="https://github.com/user-attachments/assets/d0d92972-4281-46ab-b1d9-8edfeb116733" />
       <br><sub>🎯 Confusion matrices for the original model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN.</sub>
     </td>
     <td align="center" width="50%">
