@@ -365,9 +365,9 @@ flowchart LR
 
 ```mermaid
 quadrantChart
-    title Small-object mAP@50 vs overall mAP@50-95
-    x-axis Lower mAP@50-95 --> Higher mAP@50-95
-    y-axis Lower small-object mAP@50 --> Higher small-object mAP@50
+    title Small-object mAP50 vs overall mAP50-95
+    x-axis Lower mAP50-95 --> Higher mAP50-95
+    y-axis Lower small-object mAP50 --> Higher small-object mAP50
     quadrant-1 Best of both worlds
     quadrant-2 Small-object specialist
     quadrant-3 Needs work
