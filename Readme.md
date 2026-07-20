@@ -361,26 +361,6 @@ flowchart LR
 
 <sub>🔧 Every colored module is a <b>zero-gated residual</b> (learnable gate γ initialized to 0): at epoch 0 the network reproduces the pretrained baseline <i>exactly</i>; gates open only where the branch reduces training loss — so the worst realistic outcome is baseline performance.</sub>
 
-### 🧭 Where Each Configuration Lands
-
-```mermaid
-quadrantChart
-    title Small-object mAP@50 vs overall mAP@50-95
-    x-axis Lower mAP@50-95 --> Higher mAP@50-95
-    y-axis Lower small-object mAP@50 --> Higher small-object mAP@50
-    quadrant-1 Best of both worlds
-    quadrant-2 Small-object specialist
-    quadrant-3 Needs work
-    quadrant-4 Strict-localization specialist
-    Baseline YOLOv12s: [0.30, 0.28]
-    YOLO26s: [0.32, 0.20]
-    Custom Loss only: [0.55, 0.55]
-    Custom Arch only: [0.70, 0.42]
-    Proposed (Loss+Arch): [0.63, 0.85]
-```
-
-<sub>📍 Illustrative placement of the five trained configurations on the two axes that matter most for surveillance: strict localization (mAP@50-95) and small-object detection (small mAP@50). The <b>Proposed</b> model is the only configuration that lands solidly in the "best of both worlds" quadrant — see the <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">exact seed-averaged numbers</a> for the underlying values.</sub>
-
 ---
 
 ## ⚡ Dataset Summary
