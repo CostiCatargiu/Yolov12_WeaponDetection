@@ -187,30 +187,34 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
       <br><sub>🏗️ Modified YOLOv12s architecture — block diagram and structure of the new head modules.</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Training Metrics — Baseline vs Custom Loss + Arch" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
-      <br><sub>📈 The structure of the new head modules. </sub>
+      <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+      <br><sub>📈 Learning dynamics on train & validation sets.</sub>
     </td>
   </tr>
-    <tr>
-    <td align="center" width="50%">
-      <img width="100%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
-      <br><sub>📊 Ablation (paper Fig. 4): baseline (blue); + arch B1–B5 (orange); + loss A1–A4 (red); combined (green) — loss components L<sub>IoU</sub>, L<sub>DFL</sub>, L<sub>cls</sub> and validation metrics</sub>
-    </td>
-    <td align="center" width="50%">
-      <img width="100%" alt="Training Metrics — Baseline vs Custom Loss + Arch" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
-      <br><sub>📈 Learning dynamics on train & validation sets. </sub>
-    </td>
-  </tr>
-  <img width="709" height="600" alt="image" src="https://github.com/user-attachments/assets/5e3d0927-f28c-4c19-b13c-9dad054a6cb1" />
-
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
-      <br><sub>🎯 Confusion matrices for the original model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN</sub>
+      <img width="100%" alt="Ablation Study Metrics" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
+      <br><sub>📊 Ablation (paper Fig. 4): baseline (blue); + arch B1–B5 (orange); + loss A1–A4 (red); combined (green) — loss components L<sub>IoU</sub>, L<sub>DFL</sub>, L<sub>cls</sub> and validation metrics.</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
-      <br><sub>🎯 Confusion matrices for the new model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN</sub>
+      <img width="100%" alt="Additional Training Metrics" src="https://github.com/user-attachments/assets/5e3d0927-f28c-4c19-b13c-9dad054a6cb1" />
+      <br><sub>📉 [Add caption here]</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt="Confusion Matrix — Original Model" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
+      <br><sub>🎯 Confusion matrices for the original model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img width="100%" alt="Confusion Matrix — New Model" src="https://github.com/user-attachments/assets/REPLACE_WITH_NEW_MODEL_IMAGE_ID" />
+      <br><sub>🎯 Confusion matrices for the new model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <img width="70%" alt="Leakage-free Data Splitting Procedure" src="https://github.com/user-attachments/assets/e98d745a-d72d-4dfc-b720-35799ba10fc7" />
+      <br><sub>🧩 Leakage-free splitting procedure. Step 1: each frame is reduced to a 64-bit perceptual hash; frames within Hamming distance 5 are linked, and connected components form clusters of mutually near-identical frames. Step 2: each cluster is assigned to a single split.</sub>
     </td>
   </tr>
 </table>
