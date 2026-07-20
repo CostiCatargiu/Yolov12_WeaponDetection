@@ -1213,9 +1213,9 @@ val:   data/val/images
 test:  data/test/images
 names:
   0: knife
-  1: pistol
-  2: long_gun
-  3: no_weapon
+  1: long_gun
+  2: no_weapon
+  3: pistol
 ```
 
 Merge the images/labels from both downloads into one dataset root (`images/` + `labels/`) before splitting, remapping the `no_weapon` label index to `3` if Roboflow exported it as `0`.
