@@ -207,7 +207,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
       <br><sub>🎯 Confusion matrices for the original model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN.</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Confusion Matrix — New Model" src="https://github.com/user-attachments/assets/REPLACE_WITH_NEW_MODEL_IMAGE_ID" />
+      <img width="100%" alt="Confusion Matrix — New Model" src="https://github.com/user-attachments/assets/dbc2db6a-18f0-492e-bf2a-98595b2a178b" />
       <br><sub>🎯 Confusion matrices for the new model: a) small; b) medium; c) large; d) all objects — "background" counts FP/FN.</sub>
     </td>
   </tr>
