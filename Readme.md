@@ -348,14 +348,14 @@ flowchart LR
     subgraph BASE["🔷 Unchanged YOLOv12s (width 0.50)"]
         BB["Backbone<br>R-ELAN + Area Attention"] --> NK["PAN Neck"]
     end
-    NK --> M3["P3 (stride 8)<br>🟦 ZGSmallDetail<br><sub>3×3 + 5×5 depth-wise detail</sub>"]
-    NK --> M4["P4 (stride 16)<br>🟨 ZGLSKAWideFuseV2<br><sub>11×11 square + 23-tap strip + detail</sub>"]
-    NK --> M5["P5 (stride 32)<br>🟥 ZGLSKAWideFuse<br><sub>square + strip large-kernel context</sub>"]
-    M3 --> G["🌐 ZGGlobalContext (all levels)<br><sub>SE-style global recalibration, r = 8</sub>"]
+    NK --> M3["P3 stride 8<br>🟦 ZGSmallDetail<br>3x3 + 5x5 depth-wise detail"]
+    NK --> M4["P4 stride 16<br>🟨 ZGLSKAWideFuseV2<br>11x11 square + 23-tap strip + detail"]
+    NK --> M5["P5 stride 32<br>🟥 ZGLSKAWideFuse<br>square + strip large-kernel context"]
+    M3 --> G["🌐 ZGGlobalContext all levels<br>SE-style global recalibration, r = 8"]
     M4 --> G
     M5 --> G
-    G --> H["🎯 DetectAuxDual<br><sub>main head on enhanced features<br>aux head on raw features — train-only</sub>"]
-    H --> OUT["Deployed: 3 heads @ 8/16/32<br>11.68 M params · 205–210 FPS"]
+    G --> H["🎯 DetectAuxDual<br>main head on enhanced features<br>aux head on raw features, train-only"]
+    H --> OUT["Deployed: 3 heads at strides 8/16/32<br>11.68M params, 205-210 FPS"]
     style BASE fill:#eef4ff,stroke:#4a76c9
 ```
 
@@ -376,7 +376,7 @@ quadrantChart
     YOLO26s: [0.32, 0.20]
     Custom Loss only: [0.55, 0.55]
     Custom Arch only: [0.70, 0.42]
-    Proposed (Loss+Arch): [0.63, 0.85]
+    Proposed Model: [0.63, 0.85]
 ```
 
 <sub>📍 Illustrative placement of the five trained configurations on the two axes that matter most for surveillance: strict localization (mAP@50-95) and small-object detection (small mAP@50). The <b>Proposed</b> model is the only configuration that lands solidly in the "best of both worlds" quadrant — see the <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">exact seed-averaged numbers</a> for the underlying values.</sub>
@@ -502,33 +502,20 @@ Most images originate from video footage, so **successive frames are nearly iden
 | Test | 3,978 (15.0%) | 6,111 | 941 (15.4%) | 1,643 (26.9%) | 2,060 (33.7%) | 1,467 (24.0%) |
 | **Total** | **26,528** | **38,067** | **6,158 (16.2%)** | **10,541 (27.7%)** | **13,232 (34.8%)** | **8,136 (21.4%)** |
 
-<table>
-<tr>
-<td width="50%">
-
 ```mermaid
-pie showData
-    title Instances per class (38,067 total)
+pie title Instances per class (38,067 total)
     "pistol" : 13232
     "long_gun" : 10541
     "knife" : 6158
     "no_weapon" : 8136
 ```
 
-</td>
-<td width="50%">
-
 ```mermaid
-pie showData
-    title Images per split (26,528 total)
-    "Train (70.0%)" : 18577
-    "Validation (15.0%)" : 3973
-    "Test (15.0%)" : 3978
+pie title Images per split (26,528 total)
+    "Train" : 18577
+    "Validation" : 3973
+    "Test" : 3978
 ```
-
-</td>
-</tr>
-</table>
 
 ### 📐 Bounding-Box Size Distribution <sub>(Paper — Table 2; COCO convention, computed on the 640×640 resized images from normalized w×h areas: small ≤ 32², medium ≤ 96², large > 96² px)</sub>
 
@@ -542,11 +529,10 @@ pie showData
 The dataset is dominated by large objects (~72%), with ~20% medium and only ~8% small instances — **consistent across all three splits**, so no split is systematically easier.
 
 ```mermaid
-pie showData
-    title Bounding-box size distribution (38,067 boxes)
-    "Large > 96×96 px (71.8%)" : 27329
-    "Medium 32-96 px (19.9%)" : 7566
-    "Small ≤ 32×32 px (8.3%)" : 3172
+pie title Bounding-box size distribution (38,067 boxes)
+    "Large > 96x96 px" : 27329
+    "Medium 32-96 px" : 7566
+    "Small under 32x32 px" : 3172
 ```
 
 ### 📐 Size Distribution per Class <sub>(Paper — Table 3)</sub>
