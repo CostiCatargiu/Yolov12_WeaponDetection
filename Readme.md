@@ -135,8 +135,9 @@
 | [📏 Evaluation Protocol](#-evaluation-protocol) | [📊 Per-Class Results](#-results--per-class-performance-paper--tables-4--5-test-set) | [🔬 Size Ablation](#-ablation-study--performance-by-object-size-paper--table-6-test-set) |
 | [🧬 Architecture Search](#-architecture-search-summary-40-variants--full-details-in-the-supplementary-material) | [🎲 Seed Reproducibility](#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration) | [🔶 vs YOLO26](#-controlled-comparison-vs-yolo26-paper--table-7-averages-over-3-runs) |
 | [🌍 External Validation](#-external-dataset-validation--state-of-the-art-context-paper--table-9) | [🩺 Error Analysis](#-error-analysis--what-the-baseline-gets-wrong-paper--figures-810) | [🔍 Visual Comparisons](#-detection-comparison--original-vs-custom-yolov12s) |
-| [🚀 Getting Started](#-getting-started) | [❓ FAQ](#-faq) | [✅ Reproducibility Checklist](#-reproducibility-checklist) |
-| [⚠️ Limitations](#%EF%B8%8F-limitations--future-work) | [📚 Resources](#-resources) | [📖 Citation](#-citation) |
+| [🚀 Getting Started](#-getting-started) | [🧭 How To Reproduce](#-how-to-reproduce--step-by-step-walkthrough) | [❓ FAQ](#-faq) |
+| [✅ Reproducibility Checklist](#-reproducibility-checklist) | [⚠️ Limitations](#%EF%B8%8F-limitations--future-work) | [📚 Resources](#-resources) |
+| [📖 Citation](#-citation) | | |
 
 ---
 
@@ -1155,6 +1156,270 @@ tal_iou_exp: 4.0          # default: 6.0
 | 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
 | 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
 | 🐍 **Python / 🔥 PyTorch** | 3.10.2 / 2.1.2 |
+
+</details>
+
+---
+
+## 🧭 How To Reproduce — Step-by-Step Walkthrough
+
+This is the end-to-end recipe to go from a clean machine to a trained model that matches the paper. It follows the exact workflow used in the study: **download the data → rebuild the leakage-free split → install our custom loss → install our custom modules → apply our hyperparameters → launch our training script**. Baseline, custom model, and YOLO26 all use the *same* data, split, schedule, and hyperparameters — only the loss/architecture toggles change.
+
+> 📌 **Before you start:** clone this repo and install dependencies (see [Getting Started](#-getting-started)). All paths below assume you are in the repository root and that Ultralytics is installed in your environment. An **editable checkout is recommended** (`pip install -e .` on a local Ultralytics clone) so you can edit the package files in place and keep your edits version-controlled.
+>
+> ```bash
+> git clone https://github.com/CostiCatargiu/Yolov12_WeaponDetection
+> cd Yolov12_WeaponDetection
+> pip install -r requirements.txt
+> ```
+
+<details open>
+<summary><b>⬇️ Step 1 — Download the datasets from Roboflow</b></summary>
+
+<br>
+
+The dataset is hosted as **two companion Roboflow projects that together form a single dataset**. Download **both** in **YOLOv8 / YOLO (PyTorch TXT)** format and merge them:
+
+| Project | Link | Contents |
+|---------|------|----------|
+| 📦 **WeaponDataset v8** | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 | `knife`, `pistol`, `long_gun` |
+| 🚫 **NoGun Dataset** | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 | `no_weapon` confounder class |
+
+Either **use the Roboflow download UI** (choose *YOLOv8* format → *download zip to computer*) or the Python SDK:
+
+```bash
+pip install roboflow
+```
+
+```python
+from roboflow import Roboflow
+rf = Roboflow(api_key="YOUR_API_KEY")   # from your Roboflow account settings
+
+# WeaponDataset v8 (knife / pistol / long_gun)
+rf.workspace("gundetectiondataset").project("weapondataset-oi2g3") \
+  .version(8).download("yolov8", location="data/weapondataset")
+
+# NoGun dataset (no_weapon)
+rf.workspace("gundetectiondataset").project("nogun") \
+  .version(2).download("yolov8", location="data/nogun")
+```
+
+✅ **Important:** keep the **class-index ordering consistent** across both projects so the four classes map to a single `data.yaml`:
+
+```yaml
+# data/data.yaml
+train: data/train/images
+val:   data/val/images
+test:  data/test/images
+names:
+  0: knife
+  1: pistol
+  2: long_gun
+  3: no_weapon
+```
+
+Merge the images/labels from both downloads into one dataset root (`images/` + `labels/`) before splitting, remapping the `no_weapon` label index to `3` if Roboflow exported it as `0`.
+
+</details>
+
+<details open>
+<summary><b>🧬 Step 2 — Recreate the leakage-free split (same 70/15/15 as the paper)</b></summary>
+
+<br>
+
+Do **not** use a random per-frame split — most frames come from video, so a random split leaks near-duplicates across train/test and inflates every metric. Reproduce the **exact protocol** from the [Leakage-Free Data Split](#-leakage-free-data-split-important) section:
+
+| Step | Action | Setting |
+|:----:|--------|---------|
+| 1️⃣ | Hash every image with a **64-bit difference hash (dHash)** | 64-bit |
+| 2️⃣ | Link image pairs within **Hamming distance ≤ 5** | threshold = 5 |
+| 3️⃣ | Form clusters via **union-find** (connected components) | → 19,036 clusters |
+| 4️⃣ | Assign **whole clusters** to splits with a **stratified greedy** target of **70/15/15** — for the total image count *and* every class | 70 / 15 / 15 |
+| 5️⃣ | **Audit**: verify no near-duplicate pair crosses a split boundary | must be zero |
+
+Minimal reference implementation (dHash + union-find + greedy assignment):
+
+```python
+import imagehash                    # pip install imagehash
+from PIL import Image
+from pathlib import Path
+
+# 1) 64-bit dHash for every image
+hashes = {p: imagehash.dhash(Image.open(p)) for p in Path("data/images").glob("*.jpg")}
+
+# 2) link pairs with Hamming distance <= 5, 3) union-find into clusters
+parent = {p: p for p in hashes}
+def find(x):
+    while parent[x] != x:
+        parent[x] = parent[parent[x]]; x = parent[x]
+    return x
+def union(a, b): parent[find(a)] = find(b)
+
+paths = list(hashes)
+for i, a in enumerate(paths):
+    for b in paths[i+1:]:
+        if (hashes[a] - hashes[b]) <= 5:      # Hamming distance
+            union(a, b)
+
+clusters = {}
+for p in paths:
+    clusters.setdefault(find(p), []).append(p)
+
+# 4) stratified greedy assignment of WHOLE clusters -> 70/15/15
+#    (assign each cluster to the split furthest below its per-class quota)
+# 5) audit: assert no cross-split pair has Hamming distance <= 5
+```
+
+> 📎 The **exact image-level split assignments used in the paper are published in the Supplementary Material / this repository** — use them directly if you want a bit-for-bit reproduction instead of regenerating the split.
+
+Organize the result into the standard Ultralytics layout and point `data.yaml` at it:
+
+```
+data/
+├── data.yaml
+├── train/  (images/ + labels/)   # 70%
+├── val/    (images/ + labels/)   # 15%
+└── test/   (images/ + labels/)   # 15%
+```
+
+</details>
+
+<details open>
+<summary><b>📉 Step 3 — Install the custom loss into Ultralytics</b></summary>
+
+<br>
+
+Copy the contents of **[`CustomLoss.py`](./CustomLoss.py)** into the Ultralytics loss module so the trainer picks up the small-object-aware loss (A1 curriculum weighting + A3 adaptive clipping + A4 tuned TAL assignment; **A2 center loss stays disabled**).
+
+1. Locate the Ultralytics loss file in your environment:
+
+   ```bash
+   python -c "import ultralytics, os; print(os.path.join(os.path.dirname(ultralytics.__file__), 'utils', 'loss.py'))"
+   ```
+
+   This prints the path to `ultralytics/utils/loss.py`.
+
+2. **Copy our custom loss** from `CustomLoss.py` into that file — replace the detection-loss class / assignment logic with ours (curriculum weighting on IoU+DFL, adaptive clipping ceilings, and the retuned Task-Aligned Assigner). Keep a backup of the original first:
+
+   ```bash
+   cp "$(python -c "import ultralytics,os;print(os.path.join(os.path.dirname(ultralytics.__file__),'utils','loss.py'))")" loss.py.bak
+   ```
+
+3. The loss-side knobs (TAL `top-k`, score/IoU exponents, clipping ceilings, curriculum α's) are all read from the hyperparameter file in Step 5, so you don't hard-code them here.
+
+> ⚠️ **Editable install recommended.** If Ultralytics is installed as a normal package, edits live inside `site-packages`. Prefer `pip install -e .` on a local Ultralytics checkout so your edits are version-controlled and survive reinstalls.
+
+</details>
+
+<details open>
+<summary><b>🏗️ Step 4 — Install the custom modules into Ultralytics (nn/modules)</b></summary>
+
+<br>
+
+Copy the five zero-gated head modules from **[`ultralytics_modules/`](./ultralytics_modules)** into Ultralytics' neural-network modules so they can be referenced by name from the model YAML:
+
+- 🟦 `ZGSmallDetail` (P3) &nbsp;·&nbsp; 🟨 `ZGLSKAWideFuseV2` (P4) &nbsp;·&nbsp; 🟥 `ZGLSKAWideFuse` (P5) &nbsp;·&nbsp; 🌐 `ZGGlobalContext` (all levels) &nbsp;·&nbsp; 🎓 `DetectAuxDual` (train-only head)
+
+1. Locate the Ultralytics modules directory:
+
+   ```bash
+   python -c "import ultralytics, os; print(os.path.join(os.path.dirname(ultralytics.__file__), 'nn', 'modules'))"
+   ```
+
+2. **Copy our module definitions** from `ultralytics_modules/` into `ultralytics/nn/modules/` (e.g. add the blocks to `block.py` / `head.py`, or drop in a new file).
+
+3. **Register the modules** so the YAML parser can find them:
+   - Export the new class names in `ultralytics/nn/modules/__init__.py`
+   - Import and whitelist them in the model-parser (`ultralytics/nn/tasks.py`) so `parse_model` recognizes the new layer names used in the architecture YAML.
+
+4. Use **[`Architectures_ablation.yaml`](./Architectures_ablation.yaml)** as the model definition — it wires the modules onto the unchanged YOLOv12s backbone + PAN neck at the P3/P4/P5 heads (backbone/neck/scales untouched; P2 head intentionally omitted). Point your training config at this YAML.
+
+> 🔧 Every module is a **zero-gated residual** (gate γ initialized to 0): at epoch 0 the network is an exact identity of the pretrained baseline, so a mis-wire degrades gracefully to baseline rather than breaking training. If a module name isn't recognized, you missed the registration in `__init__.py` / `tasks.py` in step 3.
+
+</details>
+
+<details open>
+<summary><b>⚙️ Step 5 — Apply our training hyperparameters</b></summary>
+
+<br>
+
+Use **[`TrainingHyperparameters.yaml`](./TrainingHyperparameters.yaml)** — it contains the shared schedule and the final custom-loss configuration (A1 + A3 + A4 on; A2 off). These are the same values reported in [Final Configuration at a Glance](#-final-configuration-at-a-glance):
+
+```yaml
+# shared schedule (baseline / custom / YOLO26 all identical)
+optimizer: SGD
+lr0: 0.01
+weight_decay: 0.0005
+momentum: 0.9
+batch: 64
+imgsz: 640
+
+# A1 — curriculum weighting ✅
+alpha_1: 0.7
+alpha_2: 0.4
+small_obj_px: 32
+
+# A2 — center loss ❌ disabled
+lambda_center: 0.0
+
+# A3 — adaptive loss clipping ✅
+alpha_5: 50    # IoU ceiling start
+alpha_6: 30    # IoU ceiling end
+alpha_7: 25    # DFL ceiling start
+alpha_8: 15    # DFL ceiling end
+
+# A4 — Task-Aligned Assigner ✅
+tal_topk: 13
+tal_score_exp: 0.7
+tal_iou_exp: 4.0
+
+# lambda_box / lambda_DFL / lambda_cls: original YOLOv12 values
+```
+
+For the paper's headline numbers, run **3 independent seeds** per configuration with deterministic execution and report **mean ± std**.
+
+</details>
+
+<details open>
+<summary><b>🚀 Step 6 — Launch training with our script</b></summary>
+
+<br>
+
+Run **[`TrainingScript.py`](./TrainingScript.py)**, pointing it at your merged dataset (`data.yaml`), the architecture YAML from Step 4, and the hyperparameters from Step 5:
+
+```bash
+python TrainingScript.py \
+  --data   data/data.yaml \
+  --model  Architectures_ablation.yaml \
+  --hyp    TrainingHyperparameters.yaml \
+  --imgsz  640 \
+  --batch  64 \
+  --seed   0            # repeat with 3 seeds for mean ± std
+```
+
+> 💡 Adjust the flag names to match `TrainingScript.py` if it exposes them differently — the essentials are: **our data + our architecture YAML + our hyperparameters**.
+
+**To reproduce each row of the 2×2 ablation** (loss × architecture), toggle the two contributions:
+
+| Configuration | Loss (Step 3) | Modules (Step 4) |
+|---------------|:-------------:|:----------------:|
+| Baseline | stock YOLOv12s loss | none |
+| + Custom Loss | ✅ `CustomLoss.py` | none |
+| + Custom Arch | stock loss | ✅ `ultralytics_modules/` |
+| **Proposed** | ✅ `CustomLoss.py` | ✅ `ultralytics_modules/` |
+
+</details>
+
+<details>
+<summary><b>✅ Sanity checks — did it work?</b></summary>
+
+<br>
+
+- **Split audit passes** — no image pair with Hamming distance ≤ 5 crosses a train/val/test boundary.
+- **Modules load** — training starts without an "unknown module" error (if it fails, revisit the `__init__.py` / `tasks.py` registration in Step 4).
+- **Zero-gating confirmed** — at epoch 0, validation metrics ≈ the pretrained baseline (gates start closed).
+- **Ballpark results** — the proposed model should land near **mAP@50 ≈ 0.852**, **Recall ≈ 0.800**, **small-object mAP@50 ≈ 0.708** on the test set (mean over 3 seeds), at **~205–210 FPS** on an RTX 4090.
+- **Prefer exact reproduction?** — download the published image-level split assignments and the provided weights (`OriginalModel.pt`, `CustomModel.pt`) instead of regenerating from scratch.
 
 </details>
 
