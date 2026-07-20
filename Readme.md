@@ -93,6 +93,58 @@ Conventional video-surveillance deployments typically rely on human operators mo
 
 ---
 
+### 3.1 Overview of Results
+
+*Figure 0a. Zero-gated head modules within the modified YOLOv12s architecture.*
+
+<p align="center">
+<img width="70%" alt="Custom YOLOv12s Architecture" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
+</p>
+
+*Figure 0b. Training and validation curves, baseline versus proposed model.*
+
+<p align="center">
+<img width="70%" alt="Training Metrics" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
+</p>
+
+*Figure 0c. Training-metric ablation: baseline; architecture-only (B1–B5); loss-only (A1–A4); combined proposed model.*
+
+<p align="center">
+<img width="70%" alt="Training metrics ablation study" src="https://github.com/user-attachments/assets/5c9a0a20-b825-4158-a6cf-df2d29d57889" />
+</p>
+
+*Figure 0d. Confusion matrices for the proposed model, by object size: (a) small, (b) medium, (c) large, (d) all objects.*
+
+<p align="center">
+<img width="70%" alt="Confusion matrices on the test set" src="https://github.com/user-attachments/assets/a7abec2d-644a-4faf-afd7-68ca44f547fd" />
+</p>
+
+**Table 0a. Test-set performance, mean over three seeds (full protocol in Section 7.4).**
+
+| Metric | YOLOv12s: baseline → + custom loss | YOLOv12s: baseline → + loss + architecture (proposed) | YOLO26s (identical data, split, schedule) |
+|---|:---:|:---:|:---:|
+| mAP@50 | 0.812 → 0.839 (+3.3%) | 0.812 → **0.852** (+4.9%) | 0.807 |
+| mAP@50-95 | 0.516 → 0.539 (+4.5%) | 0.516 → **0.553** (+7.2%) | 0.521 |
+| Precision | 0.833 → 0.852 (+2.3%) | 0.833 → **0.865** (+3.8%) | 0.845 |
+| Recall | 0.747 → 0.782 (+4.7%) | 0.747 → **0.800** (+7.1%) | 0.753 |
+| F1-score | 0.788 → 0.816 (+3.6%) | 0.788 → **0.831** (+5.5%) | 0.796 |
+| mAP@50, small objects | 0.640 → 0.681 (+6.4%) | 0.640 → **0.708** (+10.6%) | 0.615 |
+| mAP@50, medium objects | 0.781 → 0.818 (+4.7%) | 0.781 → **0.826** (+5.8%) | 0.780 |
+| mAP@50, large objects | 0.848 → 0.866 (+2.1%) | 0.848 → **0.872** (+2.8%) | 0.843 |
+| mAP@50-95, small objects | 0.324 → 0.348 (+7.4%) | 0.324 → **0.354** (+9.3%) | 0.317 |
+| mAP@50-95, medium objects | 0.445 → 0.472 (+6.1%) | 0.445 → **0.480** (+7.9%) | 0.466 |
+| mAP@50-95, large objects | 0.574 → 0.591 (+3.0%) | 0.574 → **0.595** (+3.7%) | 0.588 |
+
+**Table 0b. Deployment footprint and principal findings.**
+
+| Deployed parameters | Throughput (RTX 4090) | Largest relative gains |
+|:---:|:---:|---|
+| 9.10M → 11.68M (+2.58M; 0.82M auxiliary branch is training-only) | approximately 220 → 205–210 FPS | Small objects: +10.6% mAP@50, +12.8% recall. `no_weapon` class: +11.6% mAP@50, +16.4% recall |
+
+The largest relative improvements occur precisely where the design is targeted — small objects and the `no_weapon` confounder class — and the proposed model outperforms YOLO26s at every object size while retaining a substantial real-time margin. The increase in recall is achieved without a corresponding reduction in precision.
+
+---
+
 ## 4. Dataset
 
 ### 4.1 Composition and sourcing
@@ -334,7 +386,11 @@ Five modules (denoted B1–B5) modify only the detection head; the backbone, nec
 
 </details>
 
-### 5.5 Parameter and throughput budget
+### 5.5 Design rationale summary
+
+The head-enhancement design can be summarized by four properties: (i) it is a safe superset of the baseline, since zero-gating preserves the pretrained initialization and every addition can only improve or leave unchanged the network's behavior; (ii) it applies per-scale specialization, retaining fine detail where small objects are represented (P3) and broader context where they are not (P4/P5); (iii) it supplies global scene context at every level, which the context-dependent `no_weapon` class specifically requires; and (iv) it preserves backbone detail through auxiliary supervision at no inference-time cost.
+
+### 5.6 Parameter and throughput budget
 
 | | Baseline YOLOv12s | Proposed (deployed) |
 |---|:---:|:---:|
@@ -344,7 +400,7 @@ Five modules (denoted B1–B5) modify only the detection head; the backbone, nec
 
 All added modules rely exclusively on depth-wise and 1×1 convolutions, limiting the parameter and latency overhead; the measured throughput reduction is modest and the deployed model retains a substantial real-time margin.
 
-### 5.6 Method pipeline
+### 5.7 Method pipeline
 
 *Figure 4. Dataset construction and split assignment.*
 
@@ -378,7 +434,7 @@ flowchart LR
 
 Each colored module is a zero-gated residual branch: at initialization, the network is functionally identical to the pretrained baseline, and gates open only where a branch is found to reduce training loss.
 
-### 5.7 Final configuration summary
+### 5.8 Final configuration summary
 
 | Component | Status | Final values |
 |---|:---:|---|
@@ -632,6 +688,8 @@ pip install -r requirements.txt
 
 The dataset is distributed as two companion Roboflow projects in YOLO format: [WeaponDataset v8](https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8) and [NoGun Dataset](https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2).
 
+Pre-trained weights are provided for both the baseline and the proposed model: [baseline weights](https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing) and [proposed-model weights](https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing).
+
 ### 8.2 Training configuration
 
 All configurations (baseline, proposed model, and YOLO26) were trained under the shared settings below, with the loss-specific parameters applied only to configurations that include the custom loss.
@@ -744,6 +802,8 @@ No. All imagery was collected from publicly accessible sources, and the dataset 
 |---|---|
 | Weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 |
 | No-weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 |
+| Pre-trained weights — baseline model | https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing |
+| Pre-trained weights — proposed model | https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing |
 | External evaluation — Zenodo dataset | https://zenodo.org/records/16422779 |
 | External evaluation — YouTube-GDD | https://github.com/ucas-gyx/youtube-gdd |
 | External evaluation — Sohas / OD-WeaponDetection | https://github.com/ari-dasci/OD-WeaponDetection |
