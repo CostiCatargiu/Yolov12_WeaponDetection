@@ -37,6 +37,91 @@
 >
 > **Result:** **mAP@50 0.812 → 0.852 (+4.9%)**, mAP@50-95 **+7.2%**, Recall **+7.1%**, small-object mAP@50 **+10.6%**, `no_weapon` confounder class **+11.6%** — consistent across **3 independent seeds** (gains ≈ 10× the seed-to-seed noise), at **205–210 FPS** (vs ~220 FPS baseline) on an RTX 4090. Outperforms **YOLO26s** trained under identical conditions **at every object size**, and transfers **zero-shot** to 3 external public datasets (**mAP@50 0.776–0.805**).
 
+<div align="center">
+
+### 🔢 By the Numbers
+
+<table>
+<tr>
+<td align="center" width="16%">
+
+**26,528**
+<br><sub>images</sub>
+
+</td>
+<td align="center" width="16%">
+
+**38,067**
+<br><sub>labeled instances</sub>
+
+</td>
+<td align="center" width="16%">
+
+**19,036**
+<br><sub>dedup clusters</sub>
+
+</td>
+<td align="center" width="16%">
+
+**+4.9%**
+<br><sub>mAP@50 vs baseline</sub>
+
+</td>
+<td align="center" width="16%">
+
+**+10.6%**
+<br><sub>small-object mAP@50</sub>
+
+</td>
+<td align="center" width="16%">
+
+**205–210**
+<br><sub>FPS @ RTX 4090</sub>
+
+</td>
+</tr>
+<tr>
+<td align="center">
+
+**40+**
+<br><sub>architectures tested</sub>
+
+</td>
+<td align="center">
+
+**3× / 3×**
+<br><sub>seeds × 2×2 ablation</sub>
+
+</td>
+<td align="center">
+
+**5**
+<br><sub>zero-gated modules</sub>
+
+</td>
+<td align="center">
+
+**+2.58 M**
+<br><sub>params (+28%)</sub>
+
+</td>
+<td align="center">
+
+**3**
+<br><sub>external datasets, 0-shot</sub>
+
+</td>
+<td align="center">
+
+**4**
+<br><sub>classes</sub>
+
+</td>
+</tr>
+</table>
+
+</div>
+
 ---
 
 ## 📚 Table of Contents
@@ -276,6 +361,26 @@ flowchart LR
 
 <sub>🔧 Every colored module is a <b>zero-gated residual</b> (learnable gate γ initialized to 0): at epoch 0 the network reproduces the pretrained baseline <i>exactly</i>; gates open only where the branch reduces training loss — so the worst realistic outcome is baseline performance.</sub>
 
+### 🧭 Where Each Configuration Lands
+
+```mermaid
+quadrantChart
+    title Small-object mAP@50 vs overall mAP@50-95
+    x-axis Lower mAP@50-95 --> Higher mAP@50-95
+    y-axis Lower small-object mAP@50 --> Higher small-object mAP@50
+    quadrant-1 Best of both worlds
+    quadrant-2 Small-object specialist
+    quadrant-3 Needs work
+    quadrant-4 Strict-localization specialist
+    Baseline YOLOv12s: [0.30, 0.28]
+    YOLO26s: [0.32, 0.20]
+    Custom Loss only: [0.55, 0.55]
+    Custom Arch only: [0.70, 0.42]
+    Proposed (Loss+Arch): [0.63, 0.85]
+```
+
+<sub>📍 Illustrative placement of the five trained configurations on the two axes that matter most for surveillance: strict localization (mAP@50-95) and small-object detection (small mAP@50). The <b>Proposed</b> model is the only configuration that lands solidly in the "best of both worlds" quadrant — see the <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">exact seed-averaged numbers</a> for the underlying values.</sub>
+
 ---
 
 ## ⚡ Dataset Summary
@@ -397,6 +502,34 @@ Most images originate from video footage, so **successive frames are nearly iden
 | Test | 3,978 (15.0%) | 6,111 | 941 (15.4%) | 1,643 (26.9%) | 2,060 (33.7%) | 1,467 (24.0%) |
 | **Total** | **26,528** | **38,067** | **6,158 (16.2%)** | **10,541 (27.7%)** | **13,232 (34.8%)** | **8,136 (21.4%)** |
 
+<table>
+<tr>
+<td width="50%">
+
+```mermaid
+pie showData
+    title Instances per class (38,067 total)
+    "pistol" : 13232
+    "long_gun" : 10541
+    "knife" : 6158
+    "no_weapon" : 8136
+```
+
+</td>
+<td width="50%">
+
+```mermaid
+pie showData
+    title Images per split (26,528 total)
+    "Train (70.0%)" : 18577
+    "Validation (15.0%)" : 3973
+    "Test (15.0%)" : 3978
+```
+
+</td>
+</tr>
+</table>
+
 ### 📐 Bounding-Box Size Distribution <sub>(Paper — Table 2; COCO convention, computed on the 640×640 resized images from normalized w×h areas: small ≤ 32², medium ≤ 96², large > 96² px)</sub>
 
 | Split | Total boxes | 🔍 Small | 📦 Medium | 🟫 Large |
@@ -407,6 +540,14 @@ Most images originate from video footage, so **successive frames are nearly iden
 | **Total** | **38,067** | **3,172 (8.3%)** | **7,566 (19.9%)** | **27,329 (71.8%)** |
 
 The dataset is dominated by large objects (~72%), with ~20% medium and only ~8% small instances — **consistent across all three splits**, so no split is systematically easier.
+
+```mermaid
+pie showData
+    title Bounding-box size distribution (38,067 boxes)
+    "Large > 96×96 px (71.8%)" : 27329
+    "Medium 32-96 px (19.9%)" : 7566
+    "Small ≤ 32×32 px (8.3%)" : 3172
+```
 
 ### 📐 Size Distribution per Class <sub>(Paper — Table 3)</sub>
 
@@ -684,6 +825,15 @@ For results to be interpreted correctly, the paper fixes the following measureme
 
 ### 📈 Relative Improvements & Attribution <sub>(Paper — Table 5)</sub>
 
+```
+🚫 no_weapon   +11.6% mAP@50  ████████████████████████████████████████
+🔫 pistol       +3.9% mAP@50  █████████████
+🗡️ knife        +3.8% mAP@50  █████████████
+🎯 long_gun     +2.5% mAP@50  ████████
+```
+
+<sub>The confounder class — the paper's stated hardest case — receives ~3× the mAP@50 gain of any weapon class.</sub>
+
 | Class | mAP@50 | Precision | Recall | F1 | What drives the gain |
 |-------|:------:|:---------:|:------:|:--:|----------------------|
 | 🗡️ knife | +3.8% | +3.3% | +4.2% | +3.7% | *ZGSmallDetail* (B2) + curriculum weighting (A1) preserve thin metallic edge features |
@@ -697,6 +847,16 @@ For results to be interpreted correctly, the paper fixes the following measureme
 ---
 
 ## 🔬 Ablation Study — Performance by Object Size <sub>(Paper — Table 6, test set)</sub>
+
+### 📊 At a Glance — mAP@50 Gain, New Model vs Baseline
+
+```
+🔍 Small   (0.640 → 0.708)  ████████████████████████████████████████  +10.63%
+📦 Medium  (0.781 → 0.826)  ███████████████████████                    +5.76%
+🟫 Large   (0.848 → 0.872)  ███████████                                 +2.83%
+```
+
+<sub>Gains scale inversely with object size — exactly the intended behavior of a small-object-targeted design. Full per-metric breakdown below.</sub>
 
 <details>
 <summary><b>🔍 Small Objects (area ≤ 32×32 px)</b> — click to expand</summary>
@@ -783,6 +943,17 @@ Neural-network training is stochastic — weight initialization, batch ordering,
 | + Custom Loss | 3 | 0.839 (±0.0007) | 0.539 (±0.0015) | 0.852 (±0.0025) | 0.782 (±0.0017) | 0.681 (±0.0155) | 0.818 (±0.0018) | 0.866 (±0.0001) |
 | + Custom Arch | 3 | 0.845 (±0.0008) | **0.557** (±0.0014) | 0.853 (±0.0094) | 0.780 (±0.0044) | 0.664 (±0.0065) | 0.797 (±0.0022) | 0.856 (±0.0008) |
 | **+ Loss + Arch (Proposed)** | **3** | **0.852 (±0.0002)** | 0.553 (±0.0021) | **0.865 (±0.0031)** | **0.800 (±0.0007)** | **0.708 (±0.0129)** | **0.826 (±0.0021)** | **0.872 (±0.0019)** |
+
+```
+mAP@50 — mean of 3 seeds (gap between bars ≫ seed-to-seed noise, std ≤ ±0.0008)
+
+Baseline               0.812  ████████████████████████████████████████
++ Custom Loss           0.839  ██████████████████████████████████████████
++ Custom Arch            0.845  ███████████████████████████████████████████
+Proposed (Loss+Arch)      0.852  █████████████████████████████████████████████
+```
+
+<sub>Configuration gaps (+2.7 to +4.0 points) are ~10× larger than any seed's standard deviation — the improvements cannot be explained by seed variance.</sub>
 
 **Key observations:**
 
