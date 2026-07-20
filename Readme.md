@@ -1200,7 +1200,6 @@ No — all frames were collected from publicly accessible sources and the datase
 - [x] Headline results reported as **mean ± std over 3 seeds** with deterministic execution
 - [x] Evaluation conventions fixed (F1-optimal operating point for tables; conf = 0.25 / IoU ≥ 0.5 for confusion matrices)
 - [x] Parameter counts and FPS measured and reported (deployed vs training-only)
-- [x] Pre-trained weights released (Google Drive)
 - [x] Negative results documented (A2 center loss; P2 head; large kernels at P3; 800/960 px inputs; channel-split fusion)
 - [x] Supplementary material: all 40+ architecture variants + hyperparameter-tuning details + extra qualitative examples
 
@@ -1234,7 +1233,6 @@ No — all frames were collected from publicly accessible sources and the datase
 | 🌍 External eval — Sohas / OD-WeaponDetection | https://github.com/ari-dasci/OD-WeaponDetection |
 | 🔶 YOLO26 (Ultralytics) | https://docs.ultralytics.com/models/yolo26/ |
 | 📄 YOLOv12 paper | https://arxiv.org/abs/2502.12524 |
-| ⬇️ Trained weights & results | Google Drive links in the [Dataset Summary](#-dataset-summary) |
 
 ---
 
