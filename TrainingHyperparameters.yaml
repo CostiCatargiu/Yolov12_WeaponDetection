@@ -78,7 +78,7 @@ warmup_epochs: 3.0
 warmup_momentum: 0.8
 warmup_bias_lr: 0.0
 box: 7.5
-cls: 0.5
+cls: 1.2
 dfl: 1.5
 pose: 12.0
 kobj: 1.0
@@ -111,23 +111,26 @@ save_dir: /home/constantin/Doctorat/YoloLib/YoloModels/YoloV12/runs/detect/train
 # ═══════════════════════════════════════════════════════════════
 
 # Phase A1: Alpha Scheduling ✅
-alpha_start: 0.9
-alpha_end: 0.4
-small_obj_px: 32
+alpha_start: 0.7
+alpha_end: 0.3
+alpha_min:0.2
+alpha_max:0.8
+small_obj_px:40
+small_obj_boost:2.5
 
 # Phase A2: Center Loss ✅
-center_loss_weight_init: 0.05
-center_loss_weight_min: 0.01
+center_loss_weight_init: 0.00
+center_loss_weight_min: 0.00
 
 # Phase A3.1: IoU Clipping ✅
-iou_clip_start: 6
-iou_clip_end: 2
+iou_clip_start: 50.0
+iou_clip_end: 20.0
 
 # Phase A3.2: DFL Clipping ❌ (Disabled / Not applicable to YOLO26s)
-dfl_clip_start: 100.0
-dfl_clip_end: 100.0
+dfl_clip_start: 25.0
+dfl_clip_end: 10.0
 
 # Phase A4: TAL Alpha-Beta ✅ (YOLOv12s) / Default (YOLO26s)
-tal_topk: 20        # YOLOv12s: 20, YOLO26s: 10 (default)
-tal_alpha: 1        # YOLOv12s: 1, YOLO26s: 0.5 (default)
-tal_beta: 7         # YOLOv12s: 7, YOLO26s: 6.0 (default)
+tal_topk: 13        # YOLOv12s: 20, YOLO26s: 10 (default)
+tal_alpha: 0.7       # YOLOv12s: 1, YOLO26s: 0.5 (default)
+tal_beta: 4         # YOLOv12s: 7, YOLO26s: 6.0 (default)

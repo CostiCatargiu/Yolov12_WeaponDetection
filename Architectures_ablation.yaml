@@ -1,0 +1,4813 @@
+# ============================================================================
+# Enhanced YOLOv12s — Weapon Detection: Architecture Search Reference
+# Paper: Catargiu & Ciocoiu, "Real-Time Weapon Detection Using Enhanced
+#        YOLOv12 Models and a Custom Dataset" (IEEE Access).
+#
+# Companion reference for Section IV-B ("over 40 distinct model variants were
+# tested"). Each entry is a structurally DISTINCT model graph; training-recipe
+# -only runs (loss / TAL / SWA / seed) are collapsed onto the architecture they
+# share. Every variant = baseline YOLOv12s backbone+neck with append-only,
+# zero-gated (gamma=0, identity-at-init) enhancement modules on the head.
+#
+# Base model : YOLOv12s (yolov12s.pt), scale s [0.50,0.50,1024], 640x640, nc=4
+# Classes    : 0 knife, 1 pistol, 2 long_gun, 3 no_weapon
+# Custom modules defined in: ultralytics/nn/modules/{block.py, head.py, conv.py}
+#   registered in ultralytics/nn/tasks.py parse_model(); see gated_blocks.py
+#   for the zero-gated design rationale + identity-at-init self-test.
+# PROPOSED final model (paper's 'Custom architecture B1-B5') = run r38_globalctx_70:
+#   ZGSmallDetail@P3 + ZGLSKAWideFuseV2@P4 + ZGLSKAWideFuse@P5 + ZGGlobalContext x3 + DetectAuxDual
+# Distinct architectures: 123   |   Custom modules used: 48
+# Generated: 2026-07-20
+# ============================================================================
+
+module_glossary:
+  C2fASPP: "C2f block with Atrous Spatial Pyramid Pooling (multi-dilation context) at P3."
+  C2fLSKA: "C2f with Large Separable Kernel Attention (LSKA)."
+  C2fLSKA_MultiScale: "C2fLSKA variant fusing multiple kernel scales (5x5 + 9x9)."
+  C2fLSKA_Residual: "C2fLSKA variant with an added residual connection."
+  C2fLSKA_Weapon: "Weapon-optimized C2fLSKA (multi-scale + residual) variant."
+  C2fSE: "C2f block with Squeeze-Excitation channel attention (early P3 exploration)."
+  DetectAux: "Detect with a TRAIN-ONLY auxiliary detection head (deep supervision)."
+  DetectAuxDual: "Detect with DUAL-PATH auxiliary supervision (detail teacher)."
+  DetectAuxDualDeepP3: "DetectAuxDual with DEEPER P3 head towers (round 40)."
+  DetectCGC: "Detect with Context-Gated Classification (CGC) — zero-gated head."
+  DetectCosine: "Detect with a COSINE/prototype classification head (round 28)."
+  DetectDecoupled: "Task-decoupled head: box and cls read SEPARATE feature maps."
+  DetectDecoupledAux: "Decoupled box/cls head + train-only auxiliary deep supervision (rounds 24 + 20)."
+  DetectDecoupledCosine: "DetectDecoupled (separate box/cls features) + cosine cls scoring (round 28)."
+  DetectDecoupledObj: "Round 26 -- the SYNTHESIS: decoupled cls pathway + softened objectness."
+  DetectDeepCls: "Detect with a DEEPER classification tower (4 blocks vs the stock 2)."
+  DetectLKACls: "Detect with a per-scale, zero-gated Large-Kernel-Attention cls branch."
+  DetectMultiProto: "Detect with a MIXTURE (multi-prototype) classification head (round 30)."
+  DetectObj: "Detect + explicit objectness (foreground/background) branch."
+  DetectSmallCls: "Detect with a per-scale, zero-gated SMALL-kernel (local-detail) cls branch."
+  DetectWideCls: "Detect with a WIDER classification tower (2x cls channels, stock depth)."
+  DySample: "Dynamic content-aware upsampler (DySample, ICCV 2023), 'lp' style."
+  SPPF: "Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv5 by Glenn Jocher."
+  WeightedConcat: "Round 19 -- BiFPN-style learnable weighted fusion (drop-in for Concat)."
+  ZGDCN: "Zero-gated Deformable Convolution — ADAPTIVE spatial context."
+  ZGDSConv: "Zero-gated Dynamic Snake Convolution — shape prior for elongated objects."
+  ZGGC: "Zero-gated Global Context block (GCNet-style) — for P5 / large objects."
+  ZGGatherContext: "Global CROSS-SCALE context injected into the finest level -- AXIS: gather- distribute neck (Gold-YOLO-style global fusion vs the local PAN)."
+  ZGGlobalContext: "Global-context block (GCNet / non-local-lite) -- AXIS: global context modeling."
+  ZGGlobalContext2: "globalctx + max-pool branch (avg+max global descriptor) -- the last-arch refinement of the round-38 winner."
+  ZGLSKA: "Zero-gated large-kernel context branch."
+  ZGLSKACompactFuse: "Round 16 — WideFuse shape, but swap the elongated strip-23 branch for a COMPACT multi-scale SMALL-kernel branch (k3/dilation1 + k5/dilation2)."
+  ZGLSKAExpand: "Round 11 [idea 4] — capacity-expanded k11: is k11 RF-limited or capacity-limited?"
+  ZGLSKAGCFuse: "Round 14 — fuse k_sq LKA (local, proven) with GCNet-style global context, full-width streams (WideFuse structure), one gamma."
+  ZGLSKAMultiDil: "Round 10 — single-branch multi-scale LKA: k7/dilation2 AND k11/dilation3 fused into one attention map under one gamma, instead of picking one k."
+  ZGLSKARefine: "Round 11 [idea 3] — sequential local-refinement after the proven k11 branch."
+  ZGLSKASG: "Spatially-gated ZGLSKA -- round 9, built on the round-7 dose-response winner."
+  ZGLSKASelectFuse: "Round 17 — spatially content-ADAPTIVE receptive-field routing @ P4-BU."
+  ZGLSKAStripFuse: "Round 10 — fuse the two best single-branch shapes (k11 square + strip23) in ONE gated branch via channel-split, instead of stacking two gates."
+  ZGLSKAWideFuse: "Round 11 [idea 2] — fuse k11 (square) + strip23 WITHOUT channel-starvation."
+  ZGLSKAWideFuse3: "Round 15 — WideFuse + a NEW small-receptive-field detail branch, one gamma."
+  ZGLSKAWideFuseV2: "Round 31 -- The Hybrid Branch WideFuse."
+  ZGMHSA: "Zero-gated multi-head self-attention — intended for P5 (20x20 tokens)."
+  ZGP2Fuse: "Zero-gated P2 -> P3 detail fusion (small-object enrichment)."
+  ZGSE: "Zero-gated Squeeze-Excitation."
+  ZGSmallDetail: "Round 30 — zero-gated small-kernel detail guard for P3 features."
+  ZGStar: "Zero-gated STAR block — multiplicative feature mixing (StarNet, 2024)."
+  ZGStrip: "Zero-gated SEPARABLE strip-kernel attention (1xk + kx1) — for elongated objects."
+
+architectures:
+  - id: arch_001
+    name: "arch_p3_attn_70"
+    description: "P3 attention enabled (simplest change)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + P3 Head Attention
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, True, 4]]          # 14 — P3 with ATTENTION
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_002
+    name: "arch_ld_70"
+    description: "LD-Redistribute: P5->P3 capacity shift"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + LD-Redistribute (P5->P3 capacity shift)
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 3, C3k2,  [512, False, 0.25]]      # P3: 2->3 reps
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 2, A2C2f, [1024, True, 1]]         # P5: 4->2 reps
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 3, A2C2f, [256, False, -1]]        # P3 head: 2->3 reps
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_003
+    name: "arch_p3_attn_ld_70"
+    description: "P3 attention + LD-Redistribute combined"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + P3 Attention + LD-Redistribute
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 3, C3k2,  [512, False, 0.25]]      # P3: 2->3 reps
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 2, A2C2f, [1024, True, 1]]         # P5: 4->2 reps
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 3, A2C2f, [256, True, 4]]          # P3: 3 reps + ATTENTION
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_004
+    name: "arch_deep_p3_bidi_70"
+    description: "Deep P3 + Bidirectional P4 (most complex)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + Deep P3 + Bidirectional P4
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 3, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 3, A2C2f, [256, False, -1]]        # 14 — Deep P3 (3 reps)
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+
+        - [[11, 17], 1, Concat, [1]]              # 18 — bidi P4 merge
+        - [-1, 1, Conv, [512, 1, 1]]              # 19 — project back
+
+        - [17, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 22
+
+        - [[14, 19, 22], 1, Detect, [nc]]
+
+  - id: arch_005
+    name: "arch_spp_p3_70"
+    description: "[1/6] SPP at P3 head — multi-scale pooling (HIGHEST CONFIDENCE)"
+    components: [SPPF]
+    model_yaml: |
+      # SPP at P3 Head — multi-scale context for small objects
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 1, SPPF, [256, 5]]                 # 14 — SPP at P3 head (k=5)
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_006
+    name: "arch_deeper_p3_backbone_70"
+    description: "[2/6] Deeper P3 backbone (4 reps) — more feature capacity"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # Deeper P3 Backbone — 4 reps (2x depth)
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 4, C3k2,  [512, False, 0.25]]      # 4 — P3: 2→4 reps (DOUBLED)
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_007
+    name: "arch_se_p3_70"
+    description: "[3/6] SE at P3 head — channel attention filtering"
+    components: [C2fSE]
+    model_yaml: |
+      # SE at P3 Head — channel attention for small objects
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fSE, [256, False]]            # 14 — SE at P3 head
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_008
+    name: "arch_aspp_p3_70"
+    description: "[4/6] ASPP at P3 head — atrous pyramid"
+    components: [C2fASPP]
+    model_yaml: |
+      # ASPP at P3 Head — atrous spatial pyramid for multi-scale
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fASPP, [256, False]]          # 14 — ASPP at P3 head
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_009
+    name: "arch_dense_p3p4_70"
+    description: "[5/6] Dense skip P3↔P4 — bidirectional flow"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # Dense Skip P3↔P4 — bidirectional feature flow
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4 — P3 backbone
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6 — P4 backbone
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        # --- Top-down ---
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+
+        # --- Bottom-up with DENSE skip from P3 ---
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11, 4], 1, Concat, [1]]           # 16 — concat P4_td + P4_bu + P3_backbone (DENSE)
+        - [-1, 1, Conv, [512, 1, 1]]              # 17 — project back to 512ch
+        - [-1, 2, A2C2f, [512, False, -1]]        # 18 — P4 bottom-up
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 21 — P5
+
+        - [[14, 18, 21], 1, Detect, [nc]]
+
+  - id: arch_010
+    name: "arch_dual_p3_70"
+    description: "[6/6] Dual-path P3 — lightweight + heavy merged (HIGHEST RISK)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # Dual-Path P3 Head — lightweight + heavy branches
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]               # 13 — concat for P3
+
+        # Dual path split
+        - [-1, 1, A2C2f, [128, False, 1]]         # 14 — Path A: lightweight (1 rep, 128ch)
+        - [13, 3, A2C2f, [256, False, 3]]         # 15 — Path B: heavy (3 reps, 256ch)
+
+        # Merge paths
+        - [[14, 15], 1, Concat, [1]]              # 16 — concat both paths (128+256=384ch)
+        - [-1, 1, Conv, [256, 1, 1]]              # 17 — project to standard 256ch
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 20
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 23
+
+        - [[17, 20, 23], 1, Detect, [nc]]
+
+  - id: arch_011
+    name: "arch_zg_p45_70"
+    description: "[1/6] ZG LSKA@P4 + GC@P5 — zero-init gates, P3 untouched"
+    components: [ZGLSKA, ZGGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [17, 1, ZGLSKA, [512, 7]]               # 21 — gated LSKA on P4 (zero-init)
+        - [20, 1, ZGGC,   [1024, 8]]              # 22 — gated global context on P5 (zero-init)
+        - [[14, 21, 22], 1, Detect, [nc]]         # 23 — P3 raw, P4/P5 gated
+
+  - id: arch_012
+    name: "arch_zg_p4_70"
+    aliases: [zg_p4_960_70, zg_p4_fixdet_70]
+    description: "[2/6] ZG LSKA@P4 only — proven block, right scale, gated"
+    components: [ZGLSKA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [17, 1, ZGLSKA, [512, 7]]               # 21 — gated LSKA on P4 only
+        - [[14, 21, 20], 1, Detect, [nc]]         # P3 raw, P4 gated, P5 raw
+
+  - id: arch_013
+    name: "arch_zg_gc_p5_70"
+    description: "[3/6] ZG GC@P5 only — global context for large objects"
+    components: [ZGGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [20, 1, ZGGC, [1024, 8]]                # 21 — gated global context on P5 only
+        - [[14, 17, 21], 1, Detect, [nc]]         # P3 raw, P4 raw, P5 gated
+
+  - id: arch_014
+    name: "arch_zg_se_p45_70"
+    description: "[4/6] ZG SE@P4+P5 — cheapest gated control"
+    components: [ZGSE]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [17, 1, ZGSE, [512, 8]]                 # 21 — gated SE on P4
+        - [20, 1, ZGSE, [1024, 8]]                # 22 — gated SE on P5
+        - [[14, 21, 22], 1, Detect, [nc]]
+
+  - id: arch_015
+    name: "arch_zg_all_70"
+    description: "[5/6] ZG P3(k5)+P4(k7)+P5(GC) — gated everywhere"
+    components: [ZGLSKA, ZGGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [14, 1, ZGLSKA, [256, 5]]               # 21 — gated LSKA on P3, gentle 5x5
+        - [17, 1, ZGLSKA, [512, 7]]               # 22 — gated LSKA on P4
+        - [20, 1, ZGGC,   [1024, 8]]              # 23 — gated global context on P5
+        - [[21, 22, 23], 1, Detect, [nc]]
+
+  - id: arch_016
+    name: "arch_zg_mhsa_p5_70"
+    description: "[6/6] ZG MHSA@P5 — gated global self-attention"
+    components: [ZGMHSA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (pretrained, unchanged)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (pretrained, unchanged)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (pretrained, unchanged)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (pretrained, unchanged)
+
+        - [20, 1, ZGMHSA, [1024, 4]]              # 21 — gated MHSA on P5 (zero-init)
+        - [[14, 17, 21], 1, Detect, [nc]]
+
+  - id: arch_017
+    name: "arch_p2_aux_70"
+    description: "Architecture variant (rearranged baseline modules)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # Arch-6: P2 Auxiliary — 5 det heads, dedicated aux at P2
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv, [64, 3, 2]]
+        - [-1, 1, Conv, [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2, [256, False, 0.25]]
+        - [-1, 1, Conv, [256, 3, 2, 1, 4]]
+        - [-1, 3, C3k2, [512, False, 0.25]]
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv, [1024, 3, 2]]
+        - [-1, 5, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 2], 1, Concat, [1]]
+        - [-1, 2, C3k2, [128, False, 0.25]]
+
+        - [-1, 1, C3k2, [128, True]]
+        - [17, 1, Conv, [128, 3, 1]]
+
+        - [-1, 1, Conv, [128, 3, 2]]
+        - [[-1, 14], 1, Concat, [1]]
+        - [-1, 2, C3k2, [256, False, 0.25]]
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 3, C3k2, [1024, True]]
+
+        - [[18, 19, 22, 25, 28], 1, Detect, [nc]]
+
+  - id: arch_018
+    name: "arch_p5_attn_70"
+    description: "P5 head: C3k2 → A2C2f attention (consistency fix)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + P5 Head A2C2f Attention (replace C3k2)
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [1024, True, 1]]         # 20 — A2C2f with ATTENTION (was C3k2)
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_019
+    name: "arch_ska_70"
+    aliases: [arch_ska_k5_70]
+    description: "[2/6] SKA at P3 with 5x5 kernel (smaller, gentler)"
+    components: [C2fLSKA]
+    model_yaml: |
+      # YOLOv12s + SKA (LSKA at P3 head)
+      # LSKA = Large Separable Kernel Attention — 7x7 decomposed kernel
+      # Captures wider spatial context at P3 for small/medium objects
+      # Proven on luggage dataset — never tested on weapons
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA, [256, False]]          # 14 — LSKA at P3 (large kernel context)
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_020
+    name: "arch_ska_p5_70"
+    description: "SKA at P3 + P5 A2C2f attention (both improvements)"
+    components: [C2fLSKA]
+    model_yaml: |
+      # YOLOv12s + SKA at P3 + P5 A2C2f Attention
+      # Combines both: LSKA at P3 for medium objects + A2C2f attention at P5 for large
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA, [256, False]]          # 14 — LSKA at P3
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [1024, True, 1]]         # 20 — A2C2f with ATTENTION (was C3k2)
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_021
+    name: "arch_deeper_p3_70"
+    description: "Backbone P3: 2→3 reps (no P5 reduction)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + Deeper Backbone P3 (no P5 reduction)
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 3, C3k2,  [512, False, 0.25]]      # 4 — P3: 2→3 reps
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # P5 unchanged (4 reps)
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_022
+    name: "arch_p5_attn_deeper_p3_70"
+    description: "Both: P5 A2C2f + deeper P3"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      # YOLOv12s + P5 A2C2f Attention + Deeper P3
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 3, C3k2,  [512, False, 0.25]]      # 4 — P3: 2→3 reps
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # P5 unchanged
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [1024, True, 1]]         # 20 — A2C2f with ATTENTION (was C3k2)
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_023
+    name: "arch_ska_residual_70"
+    description: "[1/6] SKA Residual — gate preserves small features"
+    components: [C2fLSKA_Residual]
+    model_yaml: |
+      # SKA Residual — learnable gate preserves small object features
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA_Residual, [256, False]]  # 14 — Residual LSKA at P3
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_024
+    name: "arch_ska_multiscale_70"
+    description: "[3/6] SKA MultiScale — 5x5+9x9 adapts to weapon shape"
+    components: [C2fLSKA_MultiScale]
+    model_yaml: |
+      # SKA MultiScale — 5x5 for compact + 9x9 for elongated weapons
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA_MultiScale, [256, False]]  # 14 — Multi-scale LSKA at P3
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_025
+    name: "arch_ska_p4_70"
+    aliases: [r6_ska_p4_70]
+    description: "[2/2] C2fLSKA replacement @ P4 — replace-vs-gate ablation"
+    components: [C2fLSKA]
+    model_yaml: |
+      # SKA at P4 — LSKA moved from P3 to P4 bottom-up
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11 — P4 top-down (unchanged)
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 (unchanged, protects small)
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA, [512, False]]          # 17 — LSKA at P4 bottom-up
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_026
+    name: "arch_ska_weapon_70"
+    description: "[5/6] SKA Weapon — multi-scale + residual (full)"
+    components: [C2fLSKA_Weapon]
+    model_yaml: |
+      # SKA Weapon — multi-scale kernels + residual gate (full optimization)
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA_Weapon, [256, False]]  # 14 — Weapon-optimized LSKA at P3
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_027
+    name: "arch_ska_p4td_70"
+    description: "[6/6] SKA at P4 top-down — enrich features before P3"
+    components: [C2fLSKA]
+    model_yaml: |
+      # SKA at P4 top-down — LSKA at layer 11
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, C2fLSKA, [512, False]]          # 11 — LSKA at P4 top-down
+
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 (unchanged, protects small)
+
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (unchanged)
+
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+
+        - [[14, 17, 20], 1, Detect, [nc]]
+
+  - id: arch_028
+    name: "base_960_70"
+    aliases: [r4_cls15_70, r4_vfl_70, r4_long_cos_70, r4_satal_70]
+    description: "[1/4] Baseline @ 960 — resolution is the small-object lever"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]      # 2 — P2 backbone (160x160)
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, Detect, [nc]]         # 21 — stock YOLOv12s
+
+  - id: arch_029
+    name: "zg_p2fuse_70"
+    description: "[4/4] ZG P2->P3 fusion @ 640 + detect-remap"
+    components: [ZGP2Fuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]      # 2 — P2 backbone (160x160)
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 2], 1, ZGP2Fuse, []]              # 21 — P2 (160x160) detail -> P3, gated
+        - [[21, 17, 20], 1, Detect, [nc]]         # 22
+
+  - id: arch_030
+    name: "p5context_besttal_70"
+    aliases: [r35_p5context_70, r36_p5ctx_seed1_70, r36_full_symmetric_arch_only_70]
+    description: "[1/2] Full symmetric: detail@P3 + widefuse@P4 + context@P5 — 80% confidence"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_031
+    name: "r10_k11_p4td_70"
+    description: "[1/3] k11 relocated to P4 top-down (layer 11, pre-fusion) -- ~40% confidence"
+    components: [ZGLSKA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]       # 9
+        - [[-1, 6], 1, Concat, [1]]                         # 10
+        - [-1, 2, A2C2f, [512, False, -1]]                  # 11 — P4 top-down
+        - [-1, 1, ZGLSKA, [512, 11]]                        # 12 — gated k11 @ P4 top-down (relocated)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]        # 13
+        - [[-1, 4], 1, Concat, [1]]                         # 14
+        - [-1, 2, A2C2f, [256, False, -1]]                  # 15 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]                        # 16
+        - [[-1, 12], 1, Concat, [1]]                        # 17 — concat with GATED layer 12 (was 11)
+        - [-1, 2, A2C2f, [512, False, -1]]                  # 18 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]                        # 19
+        - [[-1, 8], 1, Concat, [1]]                         # 20
+        - [-1, 2, C3k2, [1024, True]]                       # 21 — P5 head
+        - [[15, 18, 21], 1, Detect, [nc]]                   # 22 — Detect (P3, P4, P5)
+
+  - id: arch_032
+    name: "r10_lskastripfuse_70"
+    description: "[2/3] ZGLSKAStripFuse: k11+strip23 channel-split fusion @ P4 -- ~30% confidence"
+    components: [ZGLSKAStripFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAStripFuse, [512, 11, 23]]  # 21 — gated k11+strip23 fusion @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_033
+    name: "r10_lskamultidil_70"
+    description: "[3/3] ZGLSKAMultiDil: k7/dil2 + k11/dil3 fused @ P4 -- ~25% confidence"
+    components: [ZGLSKAMultiDil]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAMultiDil, [512, 7, 2, 11, 3]]  # 21 — gated multi-dilation LKA @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_034
+    name: "r11_dual_p3p4_70"
+    description: "[1/4] keep r6 k11@P4-BU + ADD independent k7 @ P3 head -- ~35-40% confidence"
+    components: [ZGLSKA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 11]]     # 21 — gated k11 @ P4 bottom-up (= r6, unchanged)
+        - [14, 1, ZGLSKA, [256, 7]]      # 22 — NEW: independent gated k7 @ P3 head
+        - [[22, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_035
+    name: "r11_widefuse_70"
+    aliases: [r11_widefuse_70_seed1]
+    description: "[2/2] r11_widefuse_70 EXACT architecture (ZGLSKAWideFuse[512,11,23]@P4-BU), seed=1 -- variance probe (r11 had the largest test-vs-val gap of rounds 11-14, concentrated in 'other')"
+    components: [ZGLSKAWideFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — gated wide-fuse k11+strip23 @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_036
+    name: "r11_refine_70"
+    description: "[3/4] ZGLSKARefine: k11 + depthwise k3 local refinement, same gamma -- ~25-30% confidence"
+    components: [ZGLSKARefine]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKARefine, [512, 11, 3]]  # 21 — gated k11 + local refine @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_037
+    name: "r11_expand_70"
+    description: "[4/4] ZGLSKAExpand: k11 with 2x channel-expanded branch -- ~25% confidence"
+    components: [ZGLSKAExpand]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAExpand, [512, 11, 2]]  # 21 — gated capacity-expanded k11 @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_038
+    name: "r12_widefuse_ksmall_70"
+    description: "[1/3] widefuse @ P4-BU, strip23 -> strip3 (multi-scale fusion) -- ~30-35% confidence"
+    components: [ZGLSKAWideFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 3]]  # 21 — gated wide-fuse k11+strip3 @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_039
+    name: "r12_widefuse_p3gc_70"
+    description: "[2/3] widefuse@P4 (unchanged) + ZGGC global-context @ P3 head -- ~25-30% confidence"
+    components: [ZGLSKAWideFuse, ZGGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — gated wide-fuse k11+strip23 @ P4 (= r11 winner)
+        - [14, 1, ZGGC, [256, 8]]                 # 22 — NEW: gated global-context @ P3 head
+        - [[22, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_040
+    name: "r12_dualwidefuse_70"
+    description: "[3/3] widefuse@P4 (unchanged) + widefuse[256,7,3] @ P3 head -- ~20-25% confidence"
+    components: [ZGLSKAWideFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — gated wide-fuse k11+strip23 @ P4 (= r11 winner)
+        - [14, 1, ZGLSKAWideFuse, [256, 7, 3]]    # 22 — NEW: gated wide-fuse k7+strip3 @ P3 head
+        - [[22, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_041
+    name: "r13_widefuse_lkacls_70"
+    description: "[1/3] r11_widefuse_70 (79.40, unchanged) + DetectLKACls[k=11] head -- ~35-40% confidence"
+    components: [ZGLSKAWideFuse, DetectLKACls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]     # 21 — gated wide-fuse k11+strip23 @ P4 (= r11 winner, unchanged)
+        - [[14, 21, 20], 1, DetectLKACls, [nc, 11]]  # 22 — NEW: per-scale gated k11 LKA on cls branch only
+
+  - id: arch_042
+    name: "r13_r6_lkacls_70"
+    description: "[2/3] r6_zgp4_k11_70 (79.19, unchanged) + DetectLKACls[k=11] head -- consistency check vs run 1 -- ~35-40% confidence"
+    components: [ZGLSKA, DetectLKACls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 11]]                 # 21 — gated k11 @ P4 bottom-up (= r6, unchanged)
+        - [[14, 21, 20], 1, DetectLKACls, [nc, 11]]  # 22 — NEW: per-scale gated k11 LKA on cls branch only
+
+  - id: arch_043
+    name: "r13_widefuse_cgc_70"
+    description: "[3/3] r11_widefuse_70 (79.40, unchanged) + DetectCGC head -- mechanism comparison vs run 1 -- ~20-25% confidence"
+    components: [ZGLSKAWideFuse, DetectCGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — gated wide-fuse k11+strip23 @ P4 (= r11 winner, unchanged)
+        - [[14, 21, 20], 1, DetectCGC, [nc]]      # 22 — gated global-context (P5-pooled) cls branch
+
+  - id: arch_044
+    name: "r14_widefuse_gcfuse_70"
+    description: "[1/4] NEW ZGLSKAGCFuse: k11 LKA + global-context (SHARED feature) @ P4-BU -- ~25-30% confidence"
+    components: [ZGLSKAGCFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAGCFuse, [512, 11, 8]]  # 21 — NEW: gated fuse k11 LKA + global-context @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_045
+    name: "r14_widefuse_p2fuse_70"
+    description: "[3/4] widefuse@P4 (unchanged) + ZGP2Fuse (P2 detail -> Detect P3) -- ~30-35% confidence"
+    components: [ZGP2Fuse, ZGLSKAWideFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 2], 1, ZGP2Fuse, []]              # 21 — NEW: gated P2(stride4) detail -> P3 Detect input
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 22 — gated wide-fuse k11+strip23 @ P4 (= r11 winner, unchanged)
+        - [[21, 22, 20], 1, Detect, [nc]]
+
+  - id: arch_046
+    name: "r15_widefuse3_70"
+    aliases: [r17_widefuse3_70]
+    description: "[1/2] NEW ZGLSKAWideFuse3: WideFuse (k11 LKA + strip23) + NEW k3 small-RF detail branch, 3-way fuse, ONE gamma @ P4-BU -- strict generalization of r11_widefuse_70 -- ~30-35% confidence"
+    components: [ZGLSKAWideFuse3]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse3, [512, 11, 23, 3]]  # 21 — NEW: 3-branch gated fuse (k11 LKA + strip23 + k3 detail) @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_047
+    name: "r16_widefuse_smallcls_70"
+    description: "[1/2] r11_widefuse_70 backbone UNCHANGED + NEW DetectSmallCls head: zero-gated k3 small-detail refinement on cls branch only (opposite regime from round-13's failed k11 DetectLKACls) -- ~30-35% confidence"
+    components: [ZGLSKAWideFuse, DetectSmallCls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — proven WideFuse @ P4 (= r11_widefuse_70, unchanged)
+        - [[14, 21, 20], 1, DetectSmallCls, [nc, 3]]  # NEW: zero-gated k3 small-kernel cls-branch refinement
+
+  - id: arch_048
+    name: "r16_compactfuse_70"
+    description: "[2/2] NEW ZGLSKACompactFuse @ P4-BU: k11 ZGLKA + compact k3/dilation1+k5/dilation2 multiscale branch, REPLACES WideFuse's strip-23 branch -- tests whether strip-23 itself is the binding constraint on 'other'-small -- ~20-25% confidence"
+    components: [ZGLSKACompactFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKACompactFuse, [512, 11, 3, 1, 5, 2]]  # 21 — NEW: k11 LKA + compact k3/k5 multiscale fuse @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_049
+    name: "r17_selectfuse_70"
+    description: "[1/2] INNOVATION ZGLSKASelectFuse: per-location softmax router over k11 LKA + strip23 + k3 (same branches as WideFuse3, spatial routing instead of static concat) @ P4-BU -- ~25-30% confidence"
+    components: [ZGLSKASelectFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKASelectFuse, [512, 11, 23, 3]]  # 21 — per-location router over k11 LKA + strip23 + k3 detail @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_050
+    name: "r18_p2head_70"
+    description: "[1/5] stock + P2 (stride-4) head, plain Detect, lightweight C3k2 @ P2 -- scale-only control: does small-object resolution alone help?"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [14, 1, nn.Upsample, [None, 2, "nearest"]]  # 21 — P3 -> stride 4
+        - [[-1, 2], 1, Concat, [1]]                    # 22 — cat backbone P2 (layer 2)
+        - [-1, 2, C3k2, [128, False]]                  # 23 — P2 detect feature (stride 4, lightweight)
+        - [[23, 14, 17, 20], 1, Detect, [nc]]          # 24 — Detect P2,P3,P4,P5
+
+  - id: arch_051
+    name: "r18_p2deepcls_70"
+    description: "[2/5] stock + P2 head + DetectDeepCls -- THE smart one: small-object RESOLUTION + cls CAPACITY together (small-'other' fails on both: AR0.86/AP0.29)"
+    components: [DetectDeepCls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [14, 1, nn.Upsample, [None, 2, "nearest"]]  # 21 — P3 -> stride 4
+        - [[-1, 2], 1, Concat, [1]]                    # 22 — cat backbone P2 (layer 2)
+        - [-1, 2, C3k2, [128, False]]                  # 23 — P2 detect feature (stride 4, lightweight)
+        - [[23, 14, 17, 20], 1, DetectDeepCls, [nc]]   # 24 — 4-scale Detect, deeper cls tower
+
+  - id: arch_052
+    name: "r18_deepcls_70"
+    description: "[3/5] stock + DetectDeepCls (cls tower 2->4 blocks) -- cls capacity at normal scales; decomposes run 2 (scale vs cls vs interaction)"
+    components: [DetectDeepCls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectDeepCls, [nc]]  # 21 — cls tower 2 -> 4 blocks
+
+  - id: arch_053
+    name: "r18_widecls_70"
+    description: "[4/5] stock + DetectWideCls (cls tower 2x width) -- depth-vs-width ablation vs run 3"
+    components: [DetectWideCls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectWideCls, [nc]]  # 21 — cls tower 2x width
+
+  - id: arch_054
+    name: "r18_widefuse_deepcls_70"
+    description: "[5/5] r11_widefuse backbone + DetectDeepCls -- does cls capacity stack on the best backbone?"
+    components: [ZGLSKAWideFuse, DetectDeepCls]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]  # 21 — gated wide-fuse @ P4 (= r11, unchanged)
+        - [[14, 21, 20], 1, DetectDeepCls, [nc]]  # 22 — deeper cls tower on top
+
+  - id: arch_055
+    name: "r19_bifpn_70"
+    description: "[1/3] BiFPN-lite neck: WeightedConcat fusion + 3-way edge @ P4 -- learnable multi-scale fusion, yolov12s/640"
+    components: [WeightedConcat]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 9
+        - [[-1, 6], 1, WeightedConcat, [1, 2]]            # 10 — weighted cat backbone P4
+        - [-1, 2, A2C2f, [512, False, -1]]                # 11 — P4 top-down
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 12
+        - [[-1, 4], 1, WeightedConcat, [1, 2]]            # 13 — weighted cat backbone P3
+        - [-1, 2, A2C2f, [256, False, -1]]                # 14 — P3 head (detect)
+        - [-1, 1, Conv, [256, 3, 2]]                      # 15
+        - [[-1, 11, 6], 1, WeightedConcat, [1, 3]]        # 16 — BiFPN 3-way: P3-down + P4-td + backbone-P4
+        - [-1, 2, A2C2f, [512, False, -1]]                # 17 — P4 bottom-up (detect)
+        - [-1, 1, Conv, [512, 3, 2]]                      # 18
+        - [[-1, 8], 1, WeightedConcat, [1, 2]]            # 19 — weighted cat backbone P5
+        - [-1, 2, C3k2, [1024, True]]                     # 20 — P5 head (detect)
+        - [[14, 17, 20], 1, Detect, [nc]]                 # 21
+
+  - id: arch_056
+    name: "r19_bifpn_widefuse_70"
+    description: "[2/3] BiFPN neck + r11_widefuse @ P4 -- does the best module stack on the new fusion topology?"
+    components: [WeightedConcat, ZGLSKAWideFuse]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 9
+        - [[-1, 6], 1, WeightedConcat, [1, 2]]            # 10
+        - [-1, 2, A2C2f, [512, False, -1]]                # 11 — P4 top-down
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 12
+        - [[-1, 4], 1, WeightedConcat, [1, 2]]            # 13
+        - [-1, 2, A2C2f, [256, False, -1]]                # 14 — P3 head (detect)
+        - [-1, 1, Conv, [256, 3, 2]]                      # 15
+        - [[-1, 11, 6], 1, WeightedConcat, [1, 3]]        # 16 — BiFPN 3-way @ P4
+        - [-1, 2, A2C2f, [512, False, -1]]                # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]                      # 18
+        - [[-1, 8], 1, WeightedConcat, [1, 2]]            # 19
+        - [-1, 2, C3k2, [1024, True]]                     # 20 — P5 head (detect)
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]          # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, Detect, [nc]]                 # 22
+
+  - id: arch_057
+    name: "r19_doubleneck_70"
+    description: "[3/3] CONTROL: stock PAN iterated twice (plain Concat) -- isolates 'more fusion depth' from 'learnable weighting' (second pass trains fresh -> 120 ep)"
+    components: []   # stock YOLOv12s graph
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 9
+        - [[-1, 6], 1, Concat, [1]]                       # 10
+        - [-1, 2, A2C2f, [512, False, -1]]                # 11 — P4 top-down (pass 1)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 12
+        - [[-1, 4], 1, Concat, [1]]                       # 13
+        - [-1, 2, A2C2f, [256, False, -1]]                # 14 — P3 (pass 1)
+        - [-1, 1, Conv, [256, 3, 2]]                      # 15
+        - [[-1, 11], 1, Concat, [1]]                      # 16
+        - [-1, 2, A2C2f, [512, False, -1]]                # 17 — P4 bottom-up (pass 1)
+        - [-1, 1, Conv, [512, 3, 2]]                      # 18
+        - [[-1, 8], 1, Concat, [1]]                       # 19
+        - [-1, 2, C3k2, [1024, True]]                     # 20 — P5 (pass 1)
+        # ---- second fusion pass ----
+        - [20, 1, nn.Upsample, [None, 2, "nearest"]]      # 21
+        - [[-1, 17], 1, Concat, [1]]                      # 22
+        - [-1, 2, A2C2f, [512, False, -1]]                # 23 — P4 top-down (pass 2)
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]      # 24
+        - [[-1, 14], 1, Concat, [1]]                      # 25
+        - [-1, 2, A2C2f, [256, False, -1]]                # 26 — P3 (pass 2, detect)
+        - [-1, 1, Conv, [256, 3, 2]]                      # 27
+        - [[-1, 23], 1, Concat, [1]]                      # 28
+        - [-1, 2, A2C2f, [512, False, -1]]                # 29 — P4 (pass 2, detect)
+        - [-1, 1, Conv, [512, 3, 2]]                      # 30
+        - [[-1, 20], 1, Concat, [1]]                      # 31
+        - [-1, 2, C3k2, [1024, True]]                     # 32 — P5 (pass 2, detect)
+        - [[26, 29, 32], 1, Detect, [nc]]                 # 33
+
+  - id: arch_058
+    name: "r20_aux_70"
+    description: "[1/1] DetectAux: train-only auxiliary detection head (deep supervision), dropped at inference -- aux_weight=0.25"
+    components: [DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectAux, [nc]]      # 21 — main + train-only auxiliary head
+
+  - id: arch_059
+    name: "r21_aux_w50_70"
+    description: "[1/4] stock + DetectAux aux_weight=0.50 -- weight sweep point"
+    components: [DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectAux, [nc, 0.5]]   # 21 — aux_weight=0.5
+
+  - id: arch_060
+    name: "r21_aux_w100_70"
+    description: "[2/4] stock + DetectAux aux_weight=1.00 -- weight sweep point (max)"
+    components: [DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectAux, [nc, 1.0]]   # 21 — aux_weight=1.0
+
+  - id: arch_061
+    name: "r21_widefuse_aux_70"
+    description: "[3/4] widefuse @ P4 + DetectAux aux_weight=0.25 -- stack best backbone + aux"
+    components: [ZGLSKAWideFuse, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]    # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectAux, [nc, 0.25]]  # 22 — aux_weight=0.25
+
+  - id: arch_062
+    name: "r21_widefuse_aux_w50_70"
+    aliases: [r23_waux_topk15b3_70, r23_waux_tal07_70, r29_r21_control]
+    description: "[1/2] widefuse+aux@0.5  x  TAL topk15/a0.5/b3.0 + cls1.2 (= v5_topk15_beta3 TAL, best 80.45)"
+    components: [ZGLSKAWideFuse, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]    # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectAux, [nc, 0.5]]   # 22 — aux_weight=0.5
+
+  - id: arch_063
+    name: "r22_widefuse_aux_w75_70"
+    description: "[1/2] widefuse @ P4 + DetectAux aux_weight=0.75"
+    components: [ZGLSKAWideFuse, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]     # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectAux, [nc, 0.75]]   # 22 — aux_weight=0.75
+
+  - id: arch_064
+    name: "r22_widefuse_aux_w100_70"
+    description: "[2/2] widefuse @ P4 + DetectAux aux_weight=1.00"
+    components: [ZGLSKAWideFuse, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]     # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectAux, [nc, 1.0]]    # 22 — aux_weight=1.0
+
+  - id: arch_065
+    name: "r24_decoupled_70"
+    description: "[1/2] DetectDecoupled — box uses main neck, cls uses dedicated cls pathway"
+    components: [DetectDecoupled]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (box)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (box)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (box)
+
+        - [14, 1, C3k2, [256, False]]                       # 21 — cls_p3 (dedicated)
+        - [17, 1, C3k2, [512, False]]                       # 22 — cls_p4
+        - [20, 1, C3k2, [1024, True]]                       # 23 — cls_p5
+        - [[14, 17, 20, 21, 22, 23], 1, DetectDecoupled, [nc]]  # 24 — box: 14/17/20, cls: 21/22/23
+
+  - id: arch_066
+    name: "r24_obj_70"
+    description: "[2/2] DetectObj — explicit objectness branch, score=sigmoid(cls+obj) (precision/FP suppression)"
+    components: [DetectObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head (box)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up (box)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head (box)
+
+        - [[14, 17, 20], 1, DetectObj, [nc]]                # 21 — + objectness branch
+
+  - id: arch_067
+    name: "r25_widefuse_obj_70"
+    description: "[1/2] widefuse + DetectObj (objectness/FP suppression on the best backbone)"
+    components: [ZGLSKAWideFuse, DetectObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — gated wide-fuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectObj, [nc]]        # 22 — + objectness branch
+
+  - id: arch_068
+    name: "r25_widefuse_decoupled_70"
+    description: "[2/2] widefuse + DetectDecoupled (dedicated cls pathway on the best backbone)"
+    components: [ZGLSKAWideFuse, DetectDecoupled]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — gated wide-fuse @ P4 (= r11, box P4)
+        - [14, 1, C3k2, [256, False]]               # 22 — cls_p3 (dedicated)
+        - [21, 1, C3k2, [512, False]]               # 23 — cls_p4 (from widefuse output)
+        - [20, 1, C3k2, [1024, True]]               # 24 — cls_p5
+        - [[14, 21, 20, 22, 23, 24], 1, DetectDecoupled, [nc]]  # 25 — box: 14/21/20, cls: 22/23/24
+
+  - id: arch_069
+    name: "r26_widefuse_obj_b50_70"
+    description: "[1/4] widefuse + DetectObj beta=0.50 (softened objectness)"
+    components: [ZGLSKAWideFuse, DetectObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — widefuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectObj, [nc, 0.5]]   # 22 — objectness, beta=0.5
+
+  - id: arch_070
+    name: "r26_widefuse_obj_b30_70"
+    description: "[2/4] widefuse + DetectObj beta=0.30 (milder)"
+    components: [ZGLSKAWideFuse, DetectObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — widefuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectObj, [nc, 0.3]]   # 22 — objectness, beta=0.3
+
+  - id: arch_071
+    name: "r26_widefuse_decoupledobj_70"
+    description: "[3/4] widefuse + DetectDecoupledObj beta=0.50 -- SYNTHESIS (decoupled cls + softened obj)"
+    components: [ZGLSKAWideFuse, DetectDecoupledObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — widefuse @ P4 (box P4)
+        - [14, 1, C3k2, [256, False]]               # 22 — cls_p3 (dedicated)
+        - [21, 1, C3k2, [512, False]]               # 23 — cls_p4
+        - [20, 1, C3k2, [1024, True]]               # 24 — cls_p5
+        - [[14, 21, 20, 22, 23, 24], 1, DetectDecoupledObj, [nc, 0.5]]  # 25
+
+  - id: arch_072
+    name: "r26_stock_obj_b50_70"
+    description: "[4/4] stock + DetectObj beta=0.50 -- gate/isolation for softened objectness"
+    components: [DetectObj]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectObj, [nc, 0.5]]   # 21 — objectness, beta=0.5
+
+  - id: arch_073
+    name: "r27_dualneck_stock_70"
+    description: "[1/2] stock backbone + dual neck (separate box & cls feature pyramids)"
+    components: [DetectDecoupled]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4 — backbone P3
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6 — backbone P4
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8 — backbone P5
+
+      head:
+        # ---- BOX neck (standard PAN) ----
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 9
+        - [[-1, 6], 1, Concat, [1]]                     # 10
+        - [-1, 2, A2C2f, [512, False, -1]]             # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 12
+        - [[-1, 4], 1, Concat, [1]]                     # 13
+        - [-1, 2, A2C2f, [256, False, -1]]             # 14 — box-P3
+        - [-1, 1, Conv, [256, 3, 2]]                   # 15
+        - [[-1, 11], 1, Concat, [1]]                    # 16
+        - [-1, 2, A2C2f, [512, False, -1]]             # 17 — box-P4
+        - [-1, 1, Conv, [512, 3, 2]]                   # 18
+        - [[-1, 8], 1, Concat, [1]]                     # 19
+        - [-1, 2, C3k2, [1024, True]]                  # 20 — box-P5
+        # ---- CLS neck (parallel, dedicated to classification) ----
+        - [8, 1, nn.Upsample, [None, 2, "nearest"]]    # 21
+        - [[-1, 6], 1, Concat, [1]]                     # 22
+        - [-1, 2, C3k2, [512, False, 0.25]]            # 23 — cls-P4-td
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 24
+        - [[-1, 4], 1, Concat, [1]]                     # 25
+        - [-1, 2, C3k2, [256, False, 0.25]]            # 26 — cls-P3
+        - [-1, 1, Conv, [256, 3, 2]]                   # 27
+        - [[-1, 23], 1, Concat, [1]]                    # 28
+        - [-1, 2, C3k2, [512, False, 0.25]]            # 29 — cls-P4
+        - [-1, 1, Conv, [512, 3, 2]]                   # 30
+        - [[-1, 8], 1, Concat, [1]]                     # 31
+        - [-1, 2, C3k2, [1024, True]]                  # 32 — cls-P5
+        - [[14, 17, 20, 26, 29, 32], 1, DetectDecoupled, [nc]]   # 33
+
+  - id: arch_074
+    name: "r27_dualneck_widefuse_70"
+    description: "[2/2] widefuse backbone + dual neck (best backbone + full cls decoupling)"
+    components: [ZGLSKAWideFuse, DetectDecoupled]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4 — backbone P3
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6 — backbone P4
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8 — backbone P5
+
+      head:
+        # ---- BOX neck (standard PAN) ----
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 9
+        - [[-1, 6], 1, Concat, [1]]                     # 10
+        - [-1, 2, A2C2f, [512, False, -1]]             # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 12
+        - [[-1, 4], 1, Concat, [1]]                     # 13
+        - [-1, 2, A2C2f, [256, False, -1]]             # 14 — box-P3
+        - [-1, 1, Conv, [256, 3, 2]]                   # 15
+        - [[-1, 11], 1, Concat, [1]]                    # 16
+        - [-1, 2, A2C2f, [512, False, -1]]             # 17 — box-P4 (raw)
+        - [-1, 1, Conv, [512, 3, 2]]                   # 18
+        - [[-1, 8], 1, Concat, [1]]                     # 19
+        - [-1, 2, C3k2, [1024, True]]                  # 20 — box-P5
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]       # 21 — box-P4 (widefuse = r11)
+        # ---- CLS neck (parallel, dedicated to classification) ----
+        - [8, 1, nn.Upsample, [None, 2, "nearest"]]    # 22
+        - [[-1, 6], 1, Concat, [1]]                     # 23
+        - [-1, 2, C3k2, [512, False, 0.25]]            # 24 — cls-P4-td
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 25
+        - [[-1, 4], 1, Concat, [1]]                     # 26
+        - [-1, 2, C3k2, [256, False, 0.25]]            # 27 — cls-P3
+        - [-1, 1, Conv, [256, 3, 2]]                   # 28
+        - [[-1, 24], 1, Concat, [1]]                    # 29
+        - [-1, 2, C3k2, [512, False, 0.25]]            # 30 — cls-P4
+        - [-1, 1, Conv, [512, 3, 2]]                   # 31
+        - [[-1, 8], 1, Concat, [1]]                     # 32
+        - [-1, 2, C3k2, [1024, True]]                  # 33 — cls-P5
+        - [[14, 21, 20, 27, 30, 33], 1, DetectDecoupled, [nc]]   # 34
+
+  - id: arch_075
+    name: "r28_cosine_stock_70"
+    description: "[1/3] stock + DetectCosine (cosine/prototype cls -- isolate the scoring change)"
+    components: [DetectCosine]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectCosine, [nc]]    # 21 — cosine/prototype cls
+
+  - id: arch_076
+    name: "r28_cosine_widefuse_70"
+    description: "[2/3] widefuse + DetectCosine (best backbone + cosine scoring)"
+    components: [ZGLSKAWideFuse, DetectCosine]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — widefuse @ P4 (= r11)
+        - [[14, 21, 20], 1, DetectCosine, [nc]]     # 22 — cosine/prototype cls
+
+  - id: arch_077
+    name: "r28_decoupled_cosine_70"
+    description: "[3/3] widefuse + DetectDecoupledCosine -- COMBO: decoupled cls features + cosine scoring"
+    components: [ZGLSKAWideFuse, DetectDecoupledCosine]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — widefuse @ P4 (box P4)
+        - [14, 1, C3k2, [256, False]]               # 22 — cls_p3 (dedicated)
+        - [21, 1, C3k2, [512, False]]               # 23 — cls_p4
+        - [20, 1, C3k2, [1024, True]]               # 24 — cls_p5
+        - [[14, 21, 20, 22, 23, 24], 1, DetectDecoupledCosine, [nc]]  # 25
+
+  - id: arch_078
+    name: "r29_kernelfix"
+    description: "[2/4] B: widefuse[11,3] (multi-scale fix) + DetectAux@0.5"
+    components: [ZGLSKAWideFuse, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 3]]        # 21 — k11 + strip-3 (genuinely multi-scale)
+        - [[14, 21, 20], 1, DetectAux, [nc, 0.5]]  # 22 — train-only aux
+
+  - id: arch_079
+    name: "r29_decoupled_aux"
+    description: "[3/4] A: widefuse[11,23] + DetectDecoupledAux@0.5 (decoupled cls + aux)"
+    components: [ZGLSKAWideFuse, DetectDecoupledAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]   # 21 — gated wide-fuse @ P4 (box P4)
+        - [14, 1, C3k2, [256, False]]               # 22 — cls_p3 (dedicated)
+        - [21, 1, C3k2, [512, False]]               # 23 — cls_p4 (from widefuse output)
+        - [20, 1, C3k2, [1024, True]]               # 24 — cls_p5 (dedicated)
+        - [[14, 21, 20, 22, 23, 24], 1, DetectDecoupledAux, [nc, 0.5]]  # 25
+
+  - id: arch_080
+    name: "r29_kernelfix_decoupled"
+    description: "[4/4] A+B: widefuse[11,3] + DetectDecoupledAux@0.5"
+    components: [ZGLSKAWideFuse, DetectDecoupledAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 3]]    # 21 — k11 + strip-3 (box P4, kernel fix)
+        - [14, 1, C3k2, [256, False]]               # 22 — cls_p3 (dedicated)
+        - [21, 1, C3k2, [512, False]]               # 23 — cls_p4 (from widefuse output)
+        - [20, 1, C3k2, [1024, True]]               # 24 — cls_p5 (dedicated)
+        - [[14, 21, 20, 22, 23, 24], 1, DetectDecoupledAux, [nc, 0.5]]  # 25
+
+  - id: arch_081
+    name: "r30_p3detail_70"
+    description: "[1/3] widefuse@P4 + ZGSmallDetail@P3 + DetectAux(0.5) -- full stack, direct r21 comparison"
+    components: [ZGLSKAWideFuse, ZGSmallDetail, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]    # 21 -- gated wide-fuse @ P4 (= r11/r21)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]        # 22 -- P3 detail guard (NEW)
+        - [[22, 21, 20], 1, DetectAux, [nc, 0.5]]   # 23 -- detect from guarded-P3, widefuse-P4, P5
+
+  - id: arch_082
+    name: "r30_p3detail_noaux_70"
+    description: "[2/3] widefuse@P4 + ZGSmallDetail@P3 + stock Detect -- P3-guard effect without aux head"
+    components: [ZGLSKAWideFuse, ZGSmallDetail]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+
+        - [17, 1, ZGLSKAWideFuse, [512, 11, 23]]    # 21 -- gated wide-fuse @ P4 (= r11)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]        # 22 -- P3 detail guard (NEW)
+        - [[22, 21, 20], 1, Detect, [nc]]            # 23 -- stock Detect
+
+  - id: arch_083
+    name: "r30_p3detail_only_70"
+    description: "[3/3] stock P4 + ZGSmallDetail@P3 + stock Detect -- P3-guard effect alone (no widefuse)"
+    components: [ZGSmallDetail]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]        # 21 -- P3 detail guard only (NEW)
+        - [[21, 17, 20], 1, Detect, [nc]]            # 22 -- Detect from guarded-P3, stock-P4, P5
+
+  - id: arch_084
+    name: "r31_widefuse_v2_arch_only_70"
+    aliases: [r31_widefuse_v2_besttal_70]
+    description: "[1/2] Arch-only test: WideFuseV2 with DEFAULT TAL params"
+    components: [ZGLSKAWideFuseV2, DetectAux]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]] # 21 -- NEW Hybrid-Branch WideFuseV2 @ P4
+        - [[14, 21, 20], 1, DetectAux, [nc, 0.5]]         # 22 -- Detect from P3, widefuse-v2-P4, P5
+
+  - id: arch_085
+    name: "r32b_auxdual_arch_only_70"
+    aliases: [r32b_auxdual_besttal70_70, r32b_auxdual_reviewtal_70]
+    description: "[3/3] Best-of-both: WideFuseV2 + DetectAuxDual + review TAL (topk13/a07/b4)"
+    components: [ZGLSKAWideFuseV2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [[14, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 22
+
+  - id: arch_086
+    name: "r33_auxdual_p3d_arch_only_70"
+    aliases: [r33_auxdual_p3d_besttal70_70, r33_auxdual_p3d_reviewtal_70]
+    description: "[1/3] Arch-only: R33 (AuxDual + P3 detail) with DEFAULT TAL"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (standard)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- detail-enhanced P3 for aux
+        - [[14, 21, 20, 22, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_087
+    name: "r34_auxdual_p3main_arch_only_70"
+    description: "R34 (AuxDual + P3 detail on MAIN) with DEFAULT TAL — arch only"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (RAW; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (RAW; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- widefuse-enhanced P4 (MAIN)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- detail-enhanced P3 (MAIN, zero-gated)
+        - [[22, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_088
+    name: "r34_proj1x1_arch_only_70"
+    description: "[1/2] Conv 1x1 aux P3 + default TAL (highest confidence)"
+    components: [ZGLSKAWideFuseV2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [14, 1, Conv, [256, 1]]                                    # 22 -- learned 1x1 aux P3 projection
+        - [[14, 21, 20, 22, 17, 20], 1, DetectAuxDual, [nc, 0.5]]   # 23
+
+  - id: arch_089
+    name: "r34_proj3x3_arch_only_70"
+    description: "[2/2] Conv 3x3 aux P3 + default TAL"
+    components: [ZGLSKAWideFuseV2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [14, 1, Conv, [256, 3]]                                    # 22 -- learned 3x3 aux P3 projection
+        - [[14, 21, 20, 22, 17, 20], 1, DetectAuxDual, [nc, 0.5]]   # 23
+
+  - id: arch_090
+    name: "r35_wfv2_p3_70"
+    aliases: [r35_wfv2_p3_arch_only_70]
+    description: "[1/4] WideFuseV2 @ P3 (context+detail) + WideFuseV2 @ P4  -- highest conf"
+    components: [ZGLSKAWideFuseV2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- WideFuseV2 @ P4 (main)
+        - [14, 1, ZGLSKAWideFuseV2, [256, 7, 15, 3, 5]]    # 22 -- WideFuseV2 @ P3 (main; small kernels)
+        - [[22, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_091
+    name: "r35_multiproto_70"
+    description: "[3/4] DetectMultiProto[nc,3] main head -- attack 'other' (high upside)"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, DetectMultiProto]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- WideFuseV2 @ P4 (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- detail @ P3 (main)
+        - [[22, 21, 20], 1, DetectMultiProto, [nc, 3]]     # 23 -- mixture cls head, K=3
+
+  - id: arch_092
+    name: "r35_r34_aux075_70"
+    aliases: [r35_r34_aux075_arch_only_70]
+    description: "[4/4] exact r34, aux_weight 0.75 -- cheap control"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- WideFuseV2 @ P4 (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- detail @ P3 (main)
+        - [[22, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.75]]  # 23 -- aux_weight 0.75
+
+  - id: arch_093
+    name: "r35_p3widefuse_70"
+    description: "A [2/4]. P3 enhancement = ZGLSKAWideFuse[256,7,15] (detail+strip; knife/long_gun small)"
+    components: [ZGLSKAWideFuseV2, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 widefuse (main)
+        - [14, 1, ZGLSKAWideFuse, [256, 7, 15]]            # 22 -- P3 widefuse (main; detail+strip)
+        - [[22, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_094
+    name: "r35_dysample_70"
+    description: "B [4/4]. r34 + DySample content-aware upsampling (UNTESTED module; last on purpose)"
+    components: [DySample, ZGLSKAWideFuseV2, ZGSmallDetail, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, DySample, [2]]                  # 9  content-aware upsample
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, DySample, [2]]                  # 12 content-aware upsample (-> P3)
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (PRE-widefuse)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 widefuse (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [[22, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_095
+    name: "r35_r34_p5detail_arch_only_70"
+    description: "[2/4] R34main + ZGSmallDetail@P5 (enhance all 3 scales) — 70% confidence"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- detail P3 (MAIN)
+        - [20, 1, ZGSmallDetail, [1024, 3, 5]]             # 23 -- detail P5 (MAIN)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_096
+    name: "r35_r32b_aux075_arch_only_70"
+    description: "[4/4] R32B + aux_weight=0.75 (control) — 60% confidence"
+    components: [ZGLSKAWideFuseV2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]  # 21 -- WideFuseV2 @ P4
+        - [[14, 21, 20, 14, 17, 20], 1, DetectAuxDual, [nc, 0.75]]  # 22 -- aux_weight=0.75
+
+  - id: arch_097
+    name: "r36_r32b_p5ctx_70"
+    aliases: [r36_r32b_p5ctx_arch_only_70]
+    description: "[1/4] R32B + P5 context (best-of-both; P3-raw vs P3-detail under P5)"
+    components: [ZGLSKAWideFuseV2, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 22 -- P5 context (main)
+        - [[14, 21, 22, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 23
+
+  - id: arch_098
+    name: "r36_p5big_70"
+    description: "[3/4] p5context, WIDER P5 context [1024,15,31] -- field sweep"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 15, 31]]          # 23 -- P5 context (WIDER field)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_099
+    name: "r36_dysample_p3_70"
+    aliases: [r38_dysample_70]
+    description: "[2/4] AXIS B: DySample content-aware upsampling (registered, untested)"
+    components: [DySample, ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, DySample, [2]]                  # 9  content-aware upsample
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, DySample, [2]]                  # 12 content-aware upsample (-> P3)
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_100
+    name: "r37_selectfuse_p4_70"
+    description: "[1/4] P4 = SelectFuse (per-pixel adaptive RF) -- escape static-fuse limit"
+    components: [ZGLSKASelectFuse, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3 (stride 8)
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4 (stride 16)
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5 (stride 32)
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw)
+        - [17, 1, ZGLSKASelectFuse, [512, 11, 23, 3]]      # 21 -- P4 ADAPTIVE (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_101
+    name: "r37_deepaux_70"
+    description: "[2/4] aux anchors BACKBONE [4,6,8] -- dual-path supervision into backbone"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3 (stride 8)
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4 (stride 16)
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5 (stride 32)
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 4, 6, 8], 1, DetectAuxDual, [nc, 0.5]]  # 24  aux = backbone P3/P4/P5
+
+  - id: arch_102
+    name: "r37_selectfuse_p3_70"
+    description: "[3/4] P3 = SelectFuse (adaptive) -- detail without context-smoothing"
+    components: [ZGLSKAWideFuseV2, ZGLSKASelectFuse, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3 (stride 8)
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4 (stride 16)
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5 (stride 32)
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGLSKASelectFuse, [256, 7, 15, 3]]       # 22 -- P3 ADAPTIVE (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_103
+    name: "r37_p4stack_70"
+    description: "[4/4] 2x WideFuseV2 @ P4 -- capacity test (lowest conf)"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3 (stride 8)
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4 (stride 16)
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5 (stride 32)
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid #1
+        - [21, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 22 -- P4 hybrid #2 (stacked, main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 23 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 24 -- P5 context (main)
+        - [[23, 22, 24, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 25
+
+  - id: arch_104
+    name: "r38_bifpn_70"
+    description: "[1/4] AXIS A: WeightedConcat fusion (BiFPN-style; existing op)"
+    components: [WeightedConcat, ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, WeightedConcat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, WeightedConcat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, WeightedConcat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, WeightedConcat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail (main)
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_105
+    name: "r38_globalctx_70"
+    description: "[3/4] AXIS C: ZGGlobalContext per level (NEW module; attacks 'other')"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [22, 1, ZGGlobalContext, [256]]                  # 24 -- P3 + global context
+        - [21, 1, ZGGlobalContext, [512]]                  # 25 -- P4 + global context
+        - [23, 1, ZGGlobalContext, [1024]]                 # 26 -- P5 + global context
+        - [[24, 25, 26, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 27
+
+  - id: arch_106
+    name: "r38_gather_70"
+    description: "[4/4] AXIS D: ZGGatherContext global cross-scale ctx -> P3 (NEW multi-input)"
+    components: [ZGLSKAWideFuseV2, ZGGatherContext, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]      # 4  backbone P3
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]          # 6  backbone P4
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]         # 8  backbone P5
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid (main)
+        - [[14, 17, 20], 1, ZGGatherContext, []]           # 22 -- P3 + global cross-scale ctx
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context (main)
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_107
+    name: "r39_combo_70"
+    description: "globalctx + DySample (stack the two round-38 winners) -- pure arch, seed 0"
+    components: [DySample, ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, DySample, [2]]                  # 9  content-aware upsample
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, DySample, [2]]                  # 12 content-aware upsample (-> P3)
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [22, 1, ZGGlobalContext, [256]]                  # 24 -- P3 + global context
+        - [21, 1, ZGGlobalContext, [512]]                  # 25 -- P4 + global context
+        - [23, 1, ZGGlobalContext, [1024]]                 # 26 -- P5 + global context
+        - [[24, 25, 26, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 27
+
+  - id: arch_108
+    name: "r40_deep_p3_globalctx_70"
+    description: "[1/3] DeepP3 + globalctx neck (best small-obj scoring) -- 80% confidence"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext, DetectAuxDualDeepP3]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [22, 1, ZGGlobalContext, [256]]                  # 24 -- P3 + global context
+        - [21, 1, ZGGlobalContext, [512]]                  # 25 -- P4 + global context
+        - [23, 1, ZGGlobalContext, [1024]]                 # 26 -- P5 + global context
+        - [[24, 25, 26, 14, 17, 20], 1, DetectAuxDualDeepP3, [nc, 0.5]]  # 27
+
+  - id: arch_109
+    name: "r40_deep_p3_p5ctx_70"
+    description: "[2/3] DeepP3 + p5context neck (best overall mAP50) -- 75% confidence"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDualDeepP3]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDualDeepP3, [nc, 0.5]]  # 24
+
+  - id: arch_110
+    name: "r40_deep_p3_r32b_70"
+    description: "[3/3] DeepP3 + R32B neck (clean ablation) -- 70% confidence"
+    components: [ZGLSKAWideFuseV2, DetectAuxDualDeepP3]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 widefuse
+        - [[14, 21, 20, 14, 17, 20], 1, DetectAuxDualDeepP3, [nc, 0.5]]  # 22
+
+  - id: arch_111
+    name: "r41_globalctx2_70"
+    description: "Architecture variant: ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext2, DetectAuxDual"
+    components: [ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext2, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 -- P3 head (raw; aux anchor)
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 -- P4 bottom-up (raw; aux anchor)
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 -- P5 head (raw; aux anchor)
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [22, 1, ZGGlobalContext2, [256]]                 # 24 -- P3 + avg+max global context
+        - [21, 1, ZGGlobalContext2, [512]]                 # 25 -- P4 + avg+max global context
+        - [23, 1, ZGGlobalContext2, [1024]]                # 26 -- P5 + avg+max global context
+        - [[24, 25, 26, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 27
+
+  - id: arch_112
+    name: "r41_singledy_globalctx_70"
+    description: "[1/2] Single DySample (P3 only) + globalctx neck -- 80% confidence"
+    components: [DySample, ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, ZGGlobalContext, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 9  P5->P4: standard (safe for medium)
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]              # 11
+        - [-1, 1, DySample, [2]]                        # 12 P4->P3: content-aware (helps small)
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]              # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]              # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]                   # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [22, 1, ZGGlobalContext, [256]]                  # 24 -- P3 + global context
+        - [21, 1, ZGGlobalContext, [512]]                  # 25 -- P4 + global context
+        - [23, 1, ZGGlobalContext, [1024]]                 # 26 -- P5 + global context
+        - [[24, 25, 26, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 27
+
+  - id: arch_113
+    name: "r41_singledy_p5ctx_70"
+    description: "[2/2] Single DySample (P3 only) + p5context neck -- 70% confidence"
+    components: [DySample, ZGLSKAWideFuseV2, ZGSmallDetail, ZGLSKAWideFuse, DetectAuxDual]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 9  P5->P4: standard (safe for medium)
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]              # 11
+        - [-1, 1, DySample, [2]]                        # 12 P4->P3: content-aware (helps small)
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]              # 14 -- P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]              # 17 -- P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]                   # 20 -- P5 head
+        - [17, 1, ZGLSKAWideFuseV2, [512, 11, 23, 3, 5]]   # 21 -- P4 hybrid
+        - [14, 1, ZGSmallDetail, [256, 3, 5]]              # 22 -- P3 detail
+        - [20, 1, ZGLSKAWideFuse, [1024, 11, 23]]          # 23 -- P5 context
+        - [[22, 21, 23, 14, 17, 20], 1, DetectAuxDual, [nc, 0.5]]  # 24
+
+  - id: arch_114
+    name: "r5_cgc_70"
+    description: "[1/2] DetectCGC, default TAL — pure head-arch effect"
+    components: [DetectCGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [[14, 17, 20], 1, DetectCGC, [nc]]      # 21 — Context-Gated Cls head
+
+  - id: arch_115
+    name: "r5_zgp4_cgc_70"
+    description: "[2/2] ZGLSKA@P4 + DetectCGC, default TAL — arch combo"
+    components: [ZGLSKA, DetectCGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 7]]               # 21 — gated LSKA on P4
+        - [[14, 21, 20], 1, DetectCGC, [nc]]      # 22 — Context-Gated Cls head
+
+  - id: arch_116
+    name: "r6_zgp4_k11_70"
+    aliases: [zgp4k11_tal_70]
+    description: "[1/2] gated LSKA @ P4, kernel 11 — more context"
+    components: [ZGLSKA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 11]]              # 21 — gated LSKA @ P4, k=11
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_117
+    name: "r7_k15_70"
+    description: "[1/4] gated LSKA @ P4, k=15 — dose-response completion"
+    components: [ZGLSKA]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 15]]              # 21 — gated LSKA @ P4, k=15
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_118
+    name: "r7_k11_gc4_70"
+    description: "[2/4] LSKA k11 + GC stacked @ P4 — local+global, same scale"
+    components: [ZGLSKA, ZGGC]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKA, [512, 11]]              # 21 — gated LSKA @ P4, k=11
+        - [-1, 1, ZGGC,   [512, 8]]               # 22 — gated global context @ P4
+        - [[14, 22, 20], 1, Detect, [nc]]
+
+  - id: arch_119
+    name: "r7_strip23_70"
+    description: "[3/4] strip kernels 1x23+23x1 @ P4 — elongated-shape hypothesis"
+    components: [ZGStrip]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGStrip, [512, 23]]             # 21 — gated strip LSKA 1x23+23x1 @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_120
+    name: "r7_dcn_70"
+    description: "[4/4] gated deformable conv @ P4 — ADAPTIVE context (torchvision op, run last/separately)"
+    components: [ZGDCN]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGDCN, [512, 3]]                # 21 — gated deformable conv @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_121
+    name: "r8_star_p4_70"
+    description: "[1/2] ZGStar: multiplicative feature mixing (StarNet) @ P4 — non-attention"
+    components: [ZGStar]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGStar, [512, 4]]               # 21 — gated star-mixing @ P4 (hidden=4x)
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_122
+    name: "r8_dsconv_p4_70"
+    description: "[2/2] ZGDSConv: dynamic snake conv @ P4 — elongated-shape prior"
+    components: [ZGDSConv]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGDSConv, [512, 7]]             # 21 — gated dynamic snake conv @ P4, k=7
+        - [[14, 21, 20], 1, Detect, [nc]]
+
+  - id: arch_123
+    name: "r9_lskasg_p4_70"
+    description: "[1/1] ZGLSKASG: spatially-gated k11 LSKA @ P4 (per-pixel mask on the k11 winner)"
+    components: [ZGLSKASG]
+    model_yaml: |
+      nc: 4
+      scales:
+        s: [0.50, 0.50, 1024]
+
+      backbone:
+        - [-1, 1, Conv,  [64, 3, 2]]
+        - [-1, 1, Conv,  [128, 3, 2, 1, 2]]
+        - [-1, 2, C3k2,  [256, False, 0.25]]
+        - [-1, 1, Conv,  [256, 3, 2, 1, 4]]
+        - [-1, 2, C3k2,  [512, False, 0.25]]
+        - [-1, 1, Conv,  [512, 3, 2]]
+        - [-1, 4, A2C2f, [512, True, 4]]
+        - [-1, 1, Conv,  [1024, 3, 2]]
+        - [-1, 4, A2C2f, [1024, True, 1]]
+
+      head:
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 6], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 11
+        - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+        - [[-1, 4], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [256, False, -1]]        # 14 — P3 head
+        - [-1, 1, Conv, [256, 3, 2]]
+        - [[-1, 11], 1, Concat, [1]]
+        - [-1, 2, A2C2f, [512, False, -1]]        # 17 — P4 bottom-up
+        - [-1, 1, Conv, [512, 3, 2]]
+        - [[-1, 8], 1, Concat, [1]]
+        - [-1, 2, C3k2, [1024, True]]             # 20 — P5 head
+
+        - [17, 1, ZGLSKASG, [512, 11]]            # 21 — gated + spatially-gated LSKA k=11 @ P4
+        - [[14, 21, 20], 1, Detect, [nc]]
