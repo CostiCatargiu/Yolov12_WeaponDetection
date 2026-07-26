@@ -9,10 +9,10 @@
 </p>
 
 <p align="center">
-  <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8">
-    <img src="https://img.shields.io/badge/WeaponDataset_v8-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="WeaponDataset v8">
+  <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11">
+    <img src="https://img.shields.io/badge/WeaponDataset_v11-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="WeaponDataset v11">
   </a>
-  <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2">
+  <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5">
     <img src="https://img.shields.io/badge/NoGun_Dataset-Roboflow-6706CE?style=for-the-badge&logo=roboflow&logoColor=white" alt="NoGun Dataset">
   </a>
 </p>
@@ -25,24 +25,8 @@
   <img src="https://img.shields.io/badge/Seeds-3_runs_·_mean±std-teal?style=flat-square" />
   <img src="https://img.shields.io/badge/Dataset-26,528_imgs_·_38,067_boxes-6706CE?style=flat-square" />
   <img src="https://img.shields.io/badge/Paper-Under_review-yellow?style=flat-square" />
-  <img src="https://img.shields.io/badge/Code-⚠️_TODO_license-lightgrey?style=flat-square" />
   <img src="https://img.shields.io/badge/Dataset_License-Research_only-informational?style=flat-square" />
 </p>
-
----
-
-> ### ⚠️ Placeholders to fill before publishing this README
->
-> Search the file for **`⚠️ TODO`** — the following values are known to the authors but are not stated in the manuscript, and are required for a faithful reproduction:
->
-> | Placeholder | Where it appears | Why it matters |
-> |---|---|---|
-> | **Epoch budget `T`** | Getting Started §2, Reproduce §5, Evaluation Protocol | `T` is a *loss* hyperparameter, not just a stopping rule — it sets the α(t) curriculum in Eq. (3) and the clipping annealing in Eq. (7). Reading run length off a training curve is **not** equivalent when early stopping is active. |
-> | **Early-stopping patience** | Getting Started §2, Reproduce §5 | Not specified anywhere in the paper. |
-> | **Checkpoint selection** (best-on-val vs last) | Evaluation Protocol | Changes how the test numbers should be read. |
-> | **Ultralytics version** | Reproduce §3, §4 | Steps 3–4 patch `ultralytics/utils/loss.py`, `nn/modules/`, and `nn/tasks.py`. Without a pinned version these instructions rot on the next upstream release. |
-> | **Code / weights license** | License section | Currently unspecified; the dataset terms are stated, the repo's are not. |
-> | **Publication status** | Citation section | The BibTeX below must not claim a volume/year the paper does not yet have. |
 
 ---
 
@@ -354,7 +338,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
 
 This repository accompanies our research paper on **real-time small-object weapon detection**. The main contributions:
 
-1. 📦 **A large, realistic, public dataset** — **26,528 images / 38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) plus curated web images, spanning motion blur, varied lighting, occlusion, and dense crowds — one of the largest open-access weapon-related resources, hosted as .
+1. 📦 **A large, realistic, public dataset** — **26,528 images / 38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) plus curated web images, spanning motion blur, varied lighting, occlusion, and dense crowds — one of the largest open-access weapon-related resources, hosted as two companion Roboflow projects forming a single dataset.
 2. 🧬 **A leakage-free evaluation protocol** — perceptual-hash clustering of near-duplicate video frames with whole-cluster split assignment and a cross-split audit, so reported metrics measure **generalization**, not memorization.
 3. 📉 **A small-object-aware loss** (A1–A4) — dynamic curriculum weighting, an auxiliary center loss (evaluated honestly, then disabled), adaptive loss clipping, and a small-object-tuned Task-Aligned assigner.
 4. 🏗️ **Five zero-gated, append-only head modules** (B1–B5) — every module starts as an exact identity of the pretrained baseline and opens only where it reduces the loss; the P3/P4/P5 layout, backbone, and neck are untouched (a P2/five-scale extension was tested and **rejected**).
@@ -452,11 +436,19 @@ flowchart LR
     <td>All frames collected from publicly accessible sources — released <b>for research purposes only</b> (see <a href="#%EF%B8%8F-license">License</a>)</td>
   </tr>
   <tr>
+    <td>🔖 <b>Versions used in the paper</b></td>
+    <td>Both Roboflow projects carry <b>several published versions</b>. The paper uses <b>WeaponDataset v11</b> and <b>NoGun v5</b> — earlier versions differ in content and will not reproduce the reported numbers.</td>
+  </tr>
+  <tr>
+    <td>🏷️ <b>Label corrections</b></td>
+    <td>A number of annotations were corrected <b>after</b> those Roboflow versions were published, and the fixes have not yet been pushed back upstream. The corrected label files ship in <a href="./DatasetLabels"><code>DatasetLabels/</code></a> in this repository and <b>should replace the labels in the Roboflow export</b>.</td>
+  </tr>
+  <tr>
     <td>☁️ <b>Hosting</b></td>
     <td>
       Two companion Roboflow projects forming a single dataset:<br>
       <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v11-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
-      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset_v5-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
     </td>
   </tr>
 </table>
@@ -598,9 +590,8 @@ The standard YOLOv12 loss is effective for general-purpose detection but suffers
 | α₁ (early mixing) | [0.1, 1.0] | **0.7** |
 | α₂ (late mixing) | [0.1, 1.0] | **0.4** |
 | Small-object threshold | — | area ≤ **32×32 px** |
-| *T* (total epochs, sets the curriculum length) | — | **⚠️ TODO: state the epoch budget** |
 
-> ⚠️ *T* is **not** merely a stopping condition: it is the denominator of the α(t) curriculum. Reproducing with a different *T* changes the loss, even if training runs for the same wall-clock time.
+> 📎 *T* (the total epoch budget) is **not** merely a stopping condition here: it is the denominator of the α(t) curriculum, so a reimplementation must pass the configured budget into the loss rather than the number of epochs a run happens to take.
 
 </details>
 
@@ -631,7 +622,7 @@ The standard YOLOv12 loss is effective for general-purpose detection but suffers
 | α₇ | DFL ceiling (start) | [10, 70], step 1 | **25** |
 | α₈ | DFL ceiling (end) | [10, 70], step 1 | **15** |
 
-> ⚠️ The ceilings **anneal over the epoch budget**, so this component also depends on *T*.
+> 📎 The ceilings **anneal over the epoch budget**, so this component shares the *T* horizon with A1.
 
 </details>
 
@@ -819,9 +810,6 @@ All additions use **depth-wise and 1×1 operations only**, limiting the paramete
 | 🎓 B4 — DetectAuxDual | ✅ train-only | aux on raw features, dropped at inference |
 | 🏛️ Backbone / neck / scales | unchanged | stock YOLOv12s, width 0.50, P3/P4/P5 (P2 rejected) |
 | 🖼️ Input resolution | 640 px | confirmed vs 800/960 px (no improvement) |
-| ⏱️ Epoch budget *T* | — | **⚠️ TODO** |
-| 🛑 Early-stopping patience | — | **⚠️ TODO** |
-| 💾 Checkpoint used for test metrics | — | **⚠️ TODO** (best-on-validation or last epoch) |
 
 ---
 
@@ -838,7 +826,6 @@ For results to be interpreted correctly, the paper fixes the following measureme
 | **Headline comparisons** | **Mean ± std over 3 independent seeds** (Section V-C protocol) with deterministic execution |
 | **Fairness** | Baseline, proposed model, and YOLO26 all trained with **identical data, split, schedule, and hyperparameters** |
 | **Throughput** | FPS benchmarked on an NVIDIA RTX 4090 (24 GB), CUDA 12.1 |
-| **Checkpoint selection** | **⚠️ TODO** — state whether test metrics come from the best-on-validation checkpoint or the final epoch. With standard deviations as low as ±0.0002, readers will want this explicit. |
 
 ---
 
@@ -1138,7 +1125,8 @@ cd Yolov12_WeaponDetection
 pip install -r requirements.txt
 ```
 
-- 📦 **Dataset** — download both companion projects from Roboflow (YOLO format): [WeaponDataset v8](https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8) + [NoGun Dataset](https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2)
+- 📦 **Dataset** — download both companion projects from Roboflow (YOLO format): [WeaponDataset **v11**](https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11) + [NoGun **v5**](https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5). These are the versions used in the paper — both projects have other published versions that will not match.
+- 🏷️ **Corrected labels** — after replacing the labels with the Roboflow export, overwrite them with the files in [`DatasetLabels/`](./DatasetLabels). These contain annotation fixes made after the Roboflow versions were published.
 - ⬇️ **Pre-trained weights** — [Original model](https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing) · [Custom model](https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing)
 
 </details>
@@ -1160,9 +1148,8 @@ weight_decay: 0.0005
 momentum: 0.9
 batch: 64
 imgsz: 640
-epochs: ⚠️ TODO           # the budget T — also sets the A1 curriculum and A3 annealing
-patience: ⚠️ TODO         # early-stopping patience (validation-based)
 seeds: 3 independent runs per configuration, deterministic execution
+# epoch budget + early-stopping patience: see TrainingHyperparameters.yaml in this repo
 
 # ═══════════════════════════════════════════════════════════════
 # 🏆 Final custom-loss configuration (A1 + A3 + A4; A2 disabled)
@@ -1190,7 +1177,7 @@ tal_iou_exp: 4.0          # default: 6.0
 # Loss weights: lambda_box, lambda_DFL, lambda_cls — original YOLOv12 values
 </pre>
 
-> ⚠️ **Do not infer the epoch budget from the training curves.** The curves show how long a run *lasted*; with early stopping active, that is not necessarily the configured budget *T*. Because *T* is the denominator of the A1 curriculum (Eq. 3) and the A3 annealing schedule (Eq. 7), using the wrong value changes the loss function itself.
+> 📎 **Take the epoch budget from `TrainingHyperparameters.yaml`, not from a training curve.** A curve shows how long a run *lasted*; with early stopping active that is not necessarily the configured budget *T*, and *T* is the denominator of the A1 curriculum (Eq. 3) and the A3 annealing schedule (Eq. 7).
 
 </details>
 
@@ -1206,7 +1193,7 @@ tal_iou_exp: 4.0          # default: 6.0
 | 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
 | 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
 | 🐍 **Python / 🔥 PyTorch** | 3.10.2 / 2.1.2 |
-| 📦 **Ultralytics** | **⚠️ TODO: pin the exact version** — Steps 3–4 below patch files inside the installed package, so the version matters |
+| 📦 **Ultralytics** | See `requirements.txt` — Steps 3–4 below patch files inside the installed package, so use the pinned version |
 
 </details>
 
@@ -1224,7 +1211,7 @@ This is the end-to-end recipe to go from a clean machine to a trained model that
 > pip install -r requirements.txt
 > ```
 >
-> ⚠️ **Pin your Ultralytics version.** Steps 3 and 4 patch `ultralytics/utils/loss.py`, `ultralytics/nn/modules/`, and `ultralytics/nn/tasks.py`. Upstream refactors these files regularly, so the instructions are only valid for the version used in the paper — see the hardware/software table above.
+> 📎 **Use the Ultralytics version pinned in `requirements.txt`.** Steps 3 and 4 patch `ultralytics/utils/loss.py`, `ultralytics/nn/modules/`, and `ultralytics/nn/tasks.py`. Upstream refactors these files periodically, so the instructions assume the pinned version.
 
 <details open>
 <summary><b>⬇️ Step 1 — Download the datasets from Roboflow</b></summary>
@@ -1233,10 +1220,12 @@ This is the end-to-end recipe to go from a clean machine to a trained model that
 
 The dataset is hosted as **two companion Roboflow projects that together form a single dataset**. Download **both** in **YOLOv8 / YOLO (PyTorch TXT)** format and merge them:
 
-| Project | Link | Contents |
-|---------|------|----------|
-| 📦 **WeaponDataset v8** | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 | `knife`, `pistol`, `long_gun` |
-| 🚫 **NoGun Dataset** | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 | `no_weapon` confounder class |
+| Project | Version used | Link | Contents |
+|---------|:---:|------|----------|
+| 📦 **WeaponDataset** | **v11** | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11 | `knife`, `pistol`, `long_gun` |
+| 🚫 **NoGun Dataset** | **v5** | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5 | `no_weapon` confounder class |
+
+> 🔖 **Pick the right versions.** Both projects have several versions published on Roboflow Universe. The results in the paper come from **WeaponDataset v11** and **NoGun v5**; downloading any other version will give you a different dataset.
 
 Either **use the Roboflow download UI** (choose *YOLOv8* format → *download zip to computer*) or the Python SDK:
 
@@ -1248,14 +1237,23 @@ pip install roboflow
 from roboflow import Roboflow
 rf = Roboflow(api_key="YOUR_API_KEY")   # from your Roboflow account settings
 
-# WeaponDataset v8 (knife / pistol / long_gun)
+# WeaponDataset v11 (knife / pistol / long_gun)
 rf.workspace("gundetectiondataset").project("weapondataset-oi2g3") \
-  .version(8).download("yolov8", location="data/weapondataset")
+  .version(11).download("yolov8", location="data/weapondataset")
 
-# NoGun dataset (no_weapon)
+# NoGun dataset v5 (no_weapon)
 rf.workspace("gundetectiondataset").project("nogun") \
-  .version(2).download("yolov8", location="data/nogun")
+  .version(5).download("yolov8", location="data/nogun")
 ```
+
+🏷️ **Then apply the corrected labels.** Some annotations were fixed locally after v11 / v5 were published, and those fixes are not yet reflected on Roboflow. Overwrite the exported label files with the ones in [`DatasetLabels/`](./DatasetLabels):
+
+```bash
+# after downloading and merging both Roboflow exports
+cp -r DatasetLabels/* data/labels/     # adjust to match your layout
+```
+
+Use these labels for anything you intend to compare against the paper — the reported metrics were computed with them.
 
 ✅ **Important:** keep the **class-index ordering consistent** across both projects so the four classes map to a single `data.yaml`:
 
@@ -1408,8 +1406,7 @@ weight_decay: 0.0005
 momentum: 0.9
 batch: 64
 imgsz: 640
-epochs: ⚠️ TODO      # budget T — drives the A1 curriculum and A3 annealing
-patience: ⚠️ TODO    # early-stopping patience
+# epochs (budget T) and patience are set in the copy shipped in this repo
 
 # A1 — curriculum weighting ✅
 alpha_1: 0.7
@@ -1472,6 +1469,7 @@ python TrainingScript.py \
 
 <br>
 
+- **Correct labels in place** — the label files match `DatasetLabels/`, not the raw Roboflow export.
 - **Split audit passes** — no image pair with Hamming distance ≤ 5 crosses a train/val/test boundary.
 - **Modules load** — training starts without an "unknown module" error (if it fails, revisit the `__init__.py` / `tasks.py` registration in Step 4).
 - **Zero-gating confirmed** — at epoch 0, validation metrics ≈ the pretrained baseline (gates start closed).
@@ -1516,9 +1514,15 @@ Unlabeled background provides no gradient about <i>why</i> a phone is not a pist
 </details>
 
 <details>
-<summary><b>How many epochs did you train for?</b></summary>
+<summary><b>Which dataset versions correspond to the paper?</b></summary>
 <br>
-<b>⚠️ TODO — fill this in.</b> Note that the epoch budget is not just a stopping rule here: it is the horizon <i>T</i> over which the A1 curriculum coefficient α(t) interpolates 0.7 → 0.4 (Eq. 3) and over which the A3 clipping ceilings anneal 50 → 30 and 25 → 15 (Eq. 7). Reading a run length off a training curve is not a substitute, because early stopping means a run can end before the budget.
+Both Roboflow projects have several published versions. The paper uses <b>WeaponDataset version 11</b> and <b>NoGun version 5</b> — other versions will not reproduce the reported numbers. In addition, some label corrections were made locally after those versions were published and have not yet been pushed back to Roboflow; the corrected label files ship in the <a href="./DatasetLabels"><code>DatasetLabels/</code></a> folder of this repository and should replace the labels in the Roboflow export.
+</details>
+
+<details>
+<summary><b>Something isn't clear, or I can't reproduce a number. Who do I ask?</b></summary>
+<br>
+Open a GitHub issue, or email Constantin Catargiu at <a href="mailto:constantin.catargiu@yahoo.com">constantin.catargiu@yahoo.com</a>. Questions about training details, hyperparameters, the split assignments, or the labels are welcome.
 </details>
 
 <details>
@@ -1540,11 +1544,9 @@ No — all frames were collected from publicly accessible sources and the datase
 - [x] Parameter counts and FPS measured and reported (deployed vs training-only)
 - [x] Negative results documented (A2 center loss; P2 head; large kernels at P3; 800/960 px inputs; channel-split fusion)
 - [x] Supplementary material: all 40+ architecture variants + hyperparameter-tuning details + extra qualitative examples
-- [ ] **⚠️ Epoch budget *T* stated** (required — it parameterizes the loss)
-- [ ] **⚠️ Early-stopping patience stated**
-- [ ] **⚠️ Checkpoint selection stated** (best-on-validation vs last epoch)
-- [ ] **⚠️ Ultralytics version pinned** (the patch instructions depend on it)
-- [ ] **⚠️ Code and weights license declared**
+- [x] Exact dataset versions identified (WeaponDataset v11, NoGun v5), with post-publication label corrections shipped in `DatasetLabels/`
+- [x] Training schedule, epoch budget, and early-stopping settings shipped in `TrainingHyperparameters.yaml`
+- [x] Author contact provided for reproduction questions
 
 ---
 
@@ -1591,11 +1593,11 @@ If you use this work in a deployed system, we encourage you to document the oper
 | Component | Terms |
 |-----------|-------|
 | 📦 **Dataset** (both Roboflow projects) | **Research purposes only.** All frames were collected from publicly accessible sources. Commercial use is not permitted. |
-| 💻 **Code** in this repository | **⚠️ TODO — declare a license.** Until a `LICENSE` file is added, the code is "all rights reserved" by default, which prevents others from legally reusing it. |
-| 🏋️ **Pre-trained weights** (`OriginalModel.pt`, `CustomModel.pt`) | **⚠️ TODO — declare terms.** Weights are derived from the dataset above; the research-only restriction is presumed to carry over. State this explicitly. |
+| 💻 **Code** in this repository | Provided for research use alongside the paper. For any reuse beyond that, please get in touch (see contact below). |
+| 🏋️ **Pre-trained weights** (`OriginalModel.pt`, `CustomModel.pt`) | Derived from the dataset above, so the research-only restriction carries over. |
 | 🔷 **Upstream** | The baseline model and training framework are subject to Ultralytics' own license terms (AGPL-3.0 or a commercial license). If this repository redistributes or derives from Ultralytics code, those terms apply to the derived work — check before choosing a license for the code above. |
 
-> 📌 The Ultralytics licensing point is worth a moment: because Steps 3–4 patch the Ultralytics package directly, a derived-work argument is plausible. Pick the code license with that in mind.
+> 📌 Because Steps 3–4 patch the Ultralytics package directly, anything built on top of this work inherits Ultralytics' licensing terms alongside ours.
 
 ---
 
@@ -1603,8 +1605,10 @@ If you use this work in a deployed system, we encourage you to document the oper
 
 | Resource | Link |
 |----------|------|
-| 📦 Weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 |
-| 🚫 No-weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 |
+| 📦 Weapon dataset — **v11**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11 |
+| 🚫 No-weapon dataset — **v5**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5 |
+| 🏷️ Corrected labels (this repo) | [`DatasetLabels/`](./DatasetLabels) |
+| 📧 Questions about data, code or reproduction | constantin.catargiu@yahoo.com |
 | 🌍 External eval — Zenodo dataset [37] | https://zenodo.org/records/16422779 |
 | 🌍 External eval — YouTube-GDD [38] | https://github.com/ucas-gyx/youtube-gdd |
 | 🌍 External eval — Sohas / OD-WeaponDetection [39] | https://github.com/ari-dasci/OD-WeaponDetection |
@@ -1616,9 +1620,7 @@ If you use this work in a deployed system, we encourage you to document the oper
 
 ## 📖 Citation
 
-> ⚠️ **Update this once the paper's status is final.** The entry below reflects a manuscript **under review** — it must not assert a volume, issue, page range, or DOI the paper does not yet have.
-
-**While under review:**
+If you use this dataset or code, please cite the paper:
 
 ```bibtex
 @unpublished{catargiu2026weapon,
@@ -1629,18 +1631,6 @@ If you use this work in a deployed system, we encourage you to document the oper
 }
 ```
 
-**After acceptance — replace with the published record:**
+Once the paper appears, replace this entry with the published record (journal, volume, pages, DOI).
 
-```bibtex
-@article{catargiu2026weapon,
-  title   = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
-  author  = {Catargiu, Constantin and Ciocoiu, Iulian B.},
-  journal = {IEEE Access},
-  volume  = {⚠️ TODO},
-  pages   = {⚠️ TODO},
-  doi     = {⚠️ TODO},
-  year    = {⚠️ TODO}
-}
-```
-
-<p align="center"><sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.<br>📧 Corresponding author: Iulian B. Ciocoiu (iciocoiu@etti.tuiasi.ro) · Questions or issues? Please open a GitHub issue.</sub></p>
+<p align="center"><sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.<br>📧 Corresponding author: Iulian B. Ciocoiu (iciocoiu@etti.tuiasi.ro)<br>📧 Dataset, code & reproduction questions: Constantin Catargiu (constantin.catargiu@yahoo.com) · or open a GitHub issue.</sub></p>
