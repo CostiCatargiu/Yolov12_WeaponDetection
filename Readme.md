@@ -440,6 +440,10 @@ flowchart LR
     <td>Both Roboflow projects carry <b>several published versions</b>. The paper uses <b>WeaponDataset v11</b> and <b>NoGun v5</b> — earlier versions differ in content and will not reproduce the reported numbers.</td>
   </tr>
   <tr>
+    <td>🖼️ <b>Sample images</b></td>
+    <td>Annotated examples for all four classes — including the <code>no_weapon</code> confounders — are in <a href="./DatasetExamples"><code>DatasetExamples/</code></a>. Browse the full dataset interactively via the Roboflow links below.</td>
+  </tr>
+  <tr>
     <td>🏷️ <b>Label corrections</b></td>
     <td>A number of annotations were corrected <b>after</b> those Roboflow versions were published, and the fixes have not yet been pushed back upstream. The corrected label files ship in <a href="./DatasetLabels"><code>DatasetLabels/</code></a> in this repository and <b>should replace the labels in the Roboflow export</b>.</td>
   </tr>
@@ -462,6 +466,8 @@ flowchart LR
 - 🔫 **`pistol`** — handguns and short firearms
 - 🎯 **`long_gun`** — rifles, shotguns, and other long-barreled firearms
 - 🚫 **`no_weapon`** — a curated set of visually confusable items: phones, remote controls, selfie sticks, and similarly shaped hand-held tools
+
+> 🖼️ See [`DatasetExamples/`](./DatasetExamples) for annotated samples of each class. The `no_weapon` examples are the most informative — they show why the class is needed: a phone held in the same pose as a pistol is a genuinely hard case for an appearance-only detector.
 
 **Why an explicit negative class?** It **supervises the decision boundary directly** instead of leaving confounders as unlabeled background — following the *Not-Pistol* precedent of Bhatti et al. (IEEE Access 2021), where it reduced **both false positives and false negatives**. This design directly targets the dominant failure mode of weapon detectors deployed in the wild: **high false-positive rates on weapon-shaped common objects**.
 
@@ -1127,6 +1133,7 @@ pip install -r requirements.txt
 
 - 📦 **Dataset** — download both companion projects from Roboflow (YOLO format): [WeaponDataset **v11**](https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11) + [NoGun **v5**](https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5). These are the versions used in the paper — both projects have other published versions that will not match.
 - 🏷️ **Corrected labels** — after replacing the labels with the Roboflow export, overwrite them with the files in [`DatasetLabels/`](./DatasetLabels). These contain annotation fixes made after the Roboflow versions were published.
+- 🖼️ **Want to see the data first?** — [`DatasetExamples/`](./DatasetExamples) holds annotated samples of all four classes.
 - ⬇️ **Pre-trained weights** — [Original model](https://drive.google.com/drive/folders/1TECu5MI4lv36sJH50WSmS4iBd8SuhYgF?usp=sharing) · [Custom model](https://drive.google.com/drive/folders/12aaS7CwZfGqb7__BK1UX54j1gQS_DoPi?usp=sharing)
 
 </details>
@@ -1510,7 +1517,7 @@ Because most images come from video, successive frames are nearly identical. A r
 <details>
 <summary><b>Why an explicit <code>no_weapon</code> class instead of treating those objects as background?</b></summary>
 <br>
-Unlabeled background provides no gradient about <i>why</i> a phone is not a pistol. An explicit negative class supervises the decision boundary directly (following Bhatti et al.'s <i>Not-Pistol</i> class, which reduced both FP and FN). It is deliberately the hardest class in the dataset (mAP@50 = 0.689) — and the one where the proposed model gains most (+11.6% mAP@50, +16.4% Recall).
+Unlabeled background provides no gradient about <i>why</i> a phone is not a pistol. An explicit negative class supervises the decision boundary directly (following Bhatti et al.'s <i>Not-Pistol</i> class, which reduced both FP and FN). It is deliberately the hardest class in the dataset (mAP@50 = 0.689) — and the one where the proposed model gains most (+11.6% mAP@50, +16.4% Recall). Annotated examples are in <a href="./DatasetExamples"><code>DatasetExamples/</code></a>.
 </details>
 
 <details>
@@ -1608,6 +1615,7 @@ If you use this work in a deployed system, we encourage you to document the oper
 | 📦 Weapon dataset — **v11**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11 |
 | 🚫 No-weapon dataset — **v5**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5 |
 | 🏷️ Corrected labels (this repo) | [`DatasetLabels/`](./DatasetLabels) |
+| 🖼️ Annotated dataset samples (this repo) | [`DatasetExamples/`](./DatasetExamples) |
 | 📧 Questions about data, code or reproduction | constantin.catargiu@yahoo.com |
 | 🌍 External eval — Zenodo dataset [37] | https://zenodo.org/records/16422779 |
 | 🌍 External eval — YouTube-GDD [38] | https://github.com/ucas-gyx/youtube-gdd |
