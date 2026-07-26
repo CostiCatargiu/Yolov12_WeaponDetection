@@ -354,7 +354,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
 
 This repository accompanies our research paper on **real-time small-object weapon detection**. The main contributions:
 
-1. 📦 **A large, realistic, public dataset** — **26,528 images / 38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) plus curated web images, spanning motion blur, varied lighting, occlusion, and dense crowds — one of the largest open-access weapon-related resources, hosted as two companion Roboflow projects forming a single dataset.
+1. 📦 **A large, realistic, public dataset** — **26,528 images / 38,067 manually annotated instances** across 4 classes (`knife`, `pistol`, `long_gun`, `no_weapon`), extracted from **1,200+ YouTube videos** (CCTV, action films, firearm tutorials, shooting-range & tactical-training footage) plus curated web images, spanning motion blur, varied lighting, occlusion, and dense crowds — one of the largest open-access weapon-related resources, hosted as .
 2. 🧬 **A leakage-free evaluation protocol** — perceptual-hash clustering of near-duplicate video frames with whole-cluster split assignment and a cross-split audit, so reported metrics measure **generalization**, not memorization.
 3. 📉 **A small-object-aware loss** (A1–A4) — dynamic curriculum weighting, an auxiliary center loss (evaluated honestly, then disabled), adaptive loss clipping, and a small-object-tuned Task-Aligned assigner.
 4. 🏗️ **Five zero-gated, append-only head modules** (B1–B5) — every module starts as an exact identity of the pretrained baseline and opens only where it reduces the loss; the P3/P4/P5 layout, backbone, and neck are untouched (a P2/five-scale extension was tested and **rejected**).
@@ -455,7 +455,7 @@ flowchart LR
     <td>☁️ <b>Hosting</b></td>
     <td>
       Two companion Roboflow projects forming a single dataset:<br>
-      <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+      <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v11-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
       <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
     </td>
   </tr>
