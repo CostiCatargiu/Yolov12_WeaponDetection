@@ -455,8 +455,8 @@ flowchart LR
     <td>☁️ <b>Hosting</b></td>
     <td>
       Two companion Roboflow projects forming a single dataset:<br>
-      <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
-      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+      <a href="https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11"><img src="https://img.shields.io/badge/Roboflow-WeaponDataset_v8-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
+      <a href="https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5"><img src="https://img.shields.io/badge/Roboflow-NoGun_Dataset-6706CE?style=flat-square&logo=roboflow&logoColor=white" /></a>
     </td>
   </tr>
 </table>
