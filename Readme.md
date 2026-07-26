@@ -24,8 +24,25 @@
   <img src="https://img.shields.io/badge/Speed-205–210_FPS_@_RTX_4090-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/Seeds-3_runs_·_mean±std-teal?style=flat-square" />
   <img src="https://img.shields.io/badge/Dataset-26,528_imgs_·_38,067_boxes-6706CE?style=flat-square" />
-  <img src="https://img.shields.io/badge/Status-Public-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/Paper-Under_review-yellow?style=flat-square" />
+  <img src="https://img.shields.io/badge/Code-⚠️_TODO_license-lightgrey?style=flat-square" />
+  <img src="https://img.shields.io/badge/Dataset_License-Research_only-informational?style=flat-square" />
 </p>
+
+---
+
+> ### ⚠️ Placeholders to fill before publishing this README
+>
+> Search the file for **`⚠️ TODO`** — the following values are known to the authors but are not stated in the manuscript, and are required for a faithful reproduction:
+>
+> | Placeholder | Where it appears | Why it matters |
+> |---|---|---|
+> | **Epoch budget `T`** | Getting Started §2, Reproduce §5, Evaluation Protocol | `T` is a *loss* hyperparameter, not just a stopping rule — it sets the α(t) curriculum in Eq. (3) and the clipping annealing in Eq. (7). Reading run length off a training curve is **not** equivalent when early stopping is active. |
+> | **Early-stopping patience** | Getting Started §2, Reproduce §5 | Not specified anywhere in the paper. |
+> | **Checkpoint selection** (best-on-val vs last) | Evaluation Protocol | Changes how the test numbers should be read. |
+> | **Ultralytics version** | Reproduce §3, §4 | Steps 3–4 patch `ultralytics/utils/loss.py`, `nn/modules/`, and `nn/tasks.py`. Without a pinned version these instructions rot on the next upstream release. |
+> | **Code / weights license** | License section | Currently unspecified; the dataset terms are stated, the repo's are not. |
+> | **Publication status** | Citation section | The BibTeX below must not claim a volume/year the paper does not yet have. |
 
 ---
 
@@ -35,7 +52,13 @@
 >
 > **How:** **(i)** a small-object-aware **loss** — dynamic curriculum weighting, adaptive loss clipping, and a retuned Task-Aligned assigner — and **(ii)** five **zero-gated, append-only modules** in the detection head. The backbone, PAN neck, and P3/P4/P5 layout stay untouched, so every addition starts as an **exact identity** of the pretrained baseline; the worst realistic outcome is baseline performance.
 >
-> **Result:** **mAP@50 0.812 → 0.852 (+4.9%)**, mAP@50-95 **+7.2%**, Recall **+7.1%**, small-object mAP@50 **+10.6%**, `no_weapon` confounder class **+11.6%** — consistent across **3 independent seeds** (gains ≈ 10× the seed-to-seed noise), at **205–210 FPS** (vs ~220 FPS baseline) on an RTX 4090. Outperforms **YOLO26s** trained under identical conditions **at every object size**, and transfers **zero-shot** to 3 external public datasets (**mAP@50 0.776–0.805**).
+> **Result:** **mAP@50 0.812 → 0.852 (+4.9% relative)**, mAP@50-95 **+7.2%**, Recall **+7.1%**, small-object mAP@50 **+10.6%**, `no_weapon` confounder class **+11.6%** — consistent across **3 independent seeds** (gains ≈ 10× the seed-to-seed noise), at **205–210 FPS** (vs ~220 FPS baseline) on an RTX 4090. Outperforms **YOLO26s** trained under identical conditions **at every object size**, and transfers **zero-shot** to 3 external public datasets (**mAP@50 0.776–0.805**).
+
+> 📐 **Reading the percentages in this README.** Two different quantities appear throughout, and they are now labelled distinctly:
+> - **relative %** — the ratio of the change to the baseline value, e.g. 0.812 → 0.852 is **+4.9% relative**. Used in the headline tables and in the paper's Tables 5 and 6.
+> - **percentage points (pp)** — the arithmetic difference, e.g. 0.812 → 0.852 is **+4.0 pp**. Used in the seed-reproducibility discussion, where the comparison is against a standard deviation.
+>
+> The same underlying gain can therefore appear as "+4.9%" in one section and "+4.0 pp" in another. Where a number could be read either way, the unit is now written out.
 
 <div align="center">
 
@@ -64,13 +87,13 @@
 <td align="center" width="16%">
 
 **+4.9%**
-<br><sub>mAP@50 vs baseline</sub>
+<br><sub>mAP@50 vs baseline (rel.)</sub>
 
 </td>
 <td align="center" width="16%">
 
 **+10.6%**
-<br><sub>small-object mAP@50</sub>
+<br><sub>small-object mAP@50 (rel.)</sub>
 
 </td>
 <td align="center" width="16%">
@@ -136,8 +159,8 @@
 | [🧬 Architecture Search](#-architecture-search-summary-40-variants--full-details-in-the-supplementary-material) | [🎲 Seed Reproducibility](#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration) | [🔶 vs YOLO26](#-controlled-comparison-vs-yolo26-paper--table-7-averages-over-3-runs) |
 | [🌍 External Validation](#-external-dataset-validation--state-of-the-art-context-paper--table-9) | [🩺 Error Analysis](#-error-analysis--what-the-baseline-gets-wrong-paper--figures-810) | [🔍 Visual Comparisons](#-detection-comparison--original-vs-custom-yolov12s) |
 | [🚀 Getting Started](#-getting-started) | [🧭 How To Reproduce](#-how-to-reproduce--step-by-step-walkthrough) | [❓ FAQ](#-faq) |
-| [✅ Reproducibility Checklist](#-reproducibility-checklist) | [⚠️ Limitations](#%EF%B8%8F-limitations--future-work) | [📚 Resources](#-resources) |
-| [📖 Citation](#-citation) | | |
+| [✅ Reproducibility Checklist](#-reproducibility-checklist) | [⚠️ Limitations](#%EF%B8%8F-limitations--future-work) | [🛡️ Responsible Use](#%EF%B8%8F-responsible-use--dual-use-considerations) |
+| [⚖️ License](#%EF%B8%8F-license) | [📚 Resources](#-resources) | [📖 Citation](#-citation) |
 
 ---
 
@@ -146,6 +169,8 @@
 Gun violence remains one of the most alarming public-safety concerns worldwide. Civilians collectively own approximately **857 million firearms** — nearly **393 million in the United States alone**, exceeding the country's population — and roughly **46,000 firearm-related deaths** were reported in the US during 2023, including **656 mass shootings**. Attacks increasingly occur in spaces once considered sanctuaries: schools, churches, concert halls.
 
 Many surveillance setups still rely on **human operators** watching dozens of camera feeds — an approach that is inherently flawed: fatigue, blind spots, and delayed reaction times make manual threat identification stressful and error-prone, especially in fast-paced or crowded environments. Intelligent systems that identify weapons **in real time** are directly applicable to **smart-city monitoring, school safety, and public-transport surveillance**, where both accuracy and speed are indispensable — and where the hardest cases are precisely **small, distant, occluded, or low-contrast** weapons and **weapon-shaped everyday objects** that trigger false alarms.
+
+> 🛡️ Deployment of a detector like this one carries obligations that accuracy numbers do not capture. See [Responsible Use & Dual-Use Considerations](#%EF%B8%8F-responsible-use--dual-use-considerations).
 
 ---
 
@@ -185,11 +210,11 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
   <tr>
     <td align="center" width="50%">
       <img width="100%" alt="Custom YOLOv12s Architecture" src="https://github.com/user-attachments/assets/c3833980-03f3-4ae7-a266-b7c801a60ec0" />
-      <br><sub>🏗️ Modified YOLOv12s architecture — block diagram and structure of the new head modules.</sub>
+      <br><sub>🏗️ Modified YOLOv12s architecture — block diagram (paper Fig. 3, top).</sub>
     </td>
     <td align="center" width="50%">
-      <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/ace0ef75-aa30-4321-8d83-e6756517edb8" />
-      <br><sub>📈 New modules description. </sub>
+      <img width="100%" alt="New head modules — problem, solution, effect" src="https://github.com/user-attachments/assets/ace0ef75-aa30-4321-8d83-e6756517edb8" />
+      <br><sub>🧩 Structure of the new head modules — problem → solution → effect for each block (paper Fig. 3 a–e, bottom).</sub>
     </td>
   </tr>
   <tr>
@@ -199,7 +224,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
     </td>
     <td align="center" width="50%">
       <img width="100%" alt="Learning Dynamics — Train vs Validation" src="https://github.com/user-attachments/assets/da68fd8d-b4f6-4a98-857b-a6d9fd4ba7ef" />
-      <br><sub>📈 Learning dynamics on train & validation sets.</sub>
+      <br><sub>📈 Learning dynamics on train & validation sets (paper Fig. 5): original YOLOv12s (blue); + A1–A4 custom loss (orange).</sub>
     </td>
   </tr>
   <tr>
@@ -224,7 +249,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
 
 <table>
   <tr>
-    <th align="center" colspan="4">📈 Test-Set Performance (mean over 3 seeds — <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">seed study</a>)</th>
+    <th align="center" colspan="4">📈 Test-Set Performance (mean over 3 seeds — <a href="#-seed-reproducibility-study-paper--table-8-3-independent-seeds-per-configuration">seed study</a>). Percentages are <b>relative</b> to the baseline.</th>
   </tr>
   <tr>
     <th align="center">Metric</th>
@@ -314,7 +339,7 @@ The proposed model customizes **YOLOv12s** with **(i)** a **small-object-aware l
   </tr>
   <tr>
     <td align="center">9.10 M → <b>11.68 M</b> <sub>(+2.58 M; 0.82 M aux is training-only)</sub></td>
-    <td align="center">~220 FPS → <b>205–210 FPS</b> <sub>(wide real-time margin)</sub></td>
+    <td align="center">~220 FPS → <b>205–210 FPS</b> <sub>(≈5% overhead; wide real-time margin)</sub></td>
     <td align="center"><b>Small objects</b> +10.6% mAP@50, +12.8% Recall<br><b>no_weapon</b> +11.6% mAP@50, +16.4% Recall</td>
   </tr>
 </table>
@@ -346,6 +371,8 @@ This repository accompanies our research paper on **real-time small-object weapo
 | 🚔 **Law Enforcement** | Real-time threat assessment, evidence analysis, situational awareness |
 | 🤖 **Research & AI** | Benchmark dataset, small-object detection research, negative-class design |
 
+> ⚠️ These are research application areas, not deployment endorsements. A detector at 0.800 Recall misses roughly one in five annotated instances; see [Responsible Use](#%EF%B8%8F-responsible-use--dual-use-considerations) before putting this in a live safety pipeline.
+
 ---
 
 ## 🔬 Method Pipeline at a Glance
@@ -376,7 +403,7 @@ flowchart LR
     style BASE fill:#eef4ff,stroke:#4a76c9
 ```
 
-<sub>🔧 Every colored module is a <b>zero-gated residual</b> (learnable gate γ initialized to 0): at epoch 0 the network reproduces the pretrained baseline <i>exactly</i>; gates open only where the branch reduces training loss — so the worst realistic outcome is baseline performance.</sub>
+<sub>🔧 Every colored module is a <b>zero-gated residual</b> (learnable gate γ initialized to 0): at epoch 0 the network reproduces the pretrained baseline <i>exactly</i>; gates open only where the branch reduces training loss — so the worst realistic outcome is baseline performance. Pretrained detection parameters transfer cleanly after a <b>one-time remap of the detection-head index</b>.</sub>
 
 ---
 
@@ -422,7 +449,7 @@ flowchart LR
   </tr>
   <tr>
     <td>📜 <b>Usage</b></td>
-    <td>All frames collected from publicly accessible sources — released <b>for research purposes only</b></td>
+    <td>All frames collected from publicly accessible sources — released <b>for research purposes only</b> (see <a href="#%EF%B8%8F-license">License</a>)</td>
   </tr>
   <tr>
     <td>☁️ <b>Hosting</b></td>
@@ -571,6 +598,9 @@ The standard YOLOv12 loss is effective for general-purpose detection but suffers
 | α₁ (early mixing) | [0.1, 1.0] | **0.7** |
 | α₂ (late mixing) | [0.1, 1.0] | **0.4** |
 | Small-object threshold | — | area ≤ **32×32 px** |
+| *T* (total epochs, sets the curriculum length) | — | **⚠️ TODO: state the epoch budget** |
+
+> ⚠️ *T* is **not** merely a stopping condition: it is the denominator of the α(t) curriculum. Reproducing with a different *T* changes the loss, even if training runs for the same wall-clock time.
 
 </details>
 
@@ -600,6 +630,8 @@ The standard YOLOv12 loss is effective for general-purpose detection but suffers
 | α₆ | IoU ceiling (end) | [10, 70], step 1 | **30** |
 | α₇ | DFL ceiling (start) | [10, 70], step 1 | **25** |
 | α₈ | DFL ceiling (end) | [10, 70], step 1 | **15** |
+
+> ⚠️ The ceilings **anneal over the epoch budget**, so this component also depends on *T*.
 
 </details>
 
@@ -660,12 +692,15 @@ with $\lambda_{box}, \lambda_{DFL}, \lambda_{cls}$ **unchanged from the original
 
 | # | Module | Level | One-line summary | Status |
 |:-:|--------|:-----:|------------------|:------:|
-| B1 | **Zero-gating principle** | all | Every module = residual branch × learnable gate γ (init 0) → exact identity at start, opens only if it reduces loss | design rule |
+| B1 | **Zero-gating principle** | all | Every module = residual branch × learnable gate γ (init 0) → exact identity at start, opens only if it reduces loss. Pretrained head weights transfer after a one-time index remap | design rule |
 | B2 | 🟦 **ZGSmallDetail** | P3 | Parallel 3×3 + 5×5 depth-wise convs → sum → GroupNorm → gated residual; reinforces fine detail that large kernels wash out | ✅ |
 | B2 | 🟨 **ZGLSKAWideFuseV2** | P4 | Expand-then-fuse: square 11×11 large-kernel attention ⊕ hybrid branch (23-tap strip attention + small-kernel detail path) | ✅ |
 | B2 | 🟥 **ZGLSKAWideFuse** | P5 | Square + strip large-kernel fusion — broad scene context for the coarsest scale | ✅ |
 | B3 | 🌐 **ZGGlobalContext** | P3–P5 | SE-style global recalibration: GAP → 1×1 bottleneck (r=8) + SiLU → 1×1 expand → zero-gated additive broadcast | ✅ |
 | B4 | 🎓 **DetectAuxDual** | head | Main head on enhanced features + auxiliary head on **raw** neck features (keeps backbone detail); **aux dropped at inference** | ✅ (train-only) |
+| B5 | 🧪 **Hyperparameter selection** | — | Not a module: the sweep protocol that fixed kernel sizes, reduction factor, and input resolution | protocol |
+
+> 📎 Note on labelling: **B5 is a protocol, not a block.** The "five modules" counted in the paper are ZGSmallDetail, ZGLSKAWideFuseV2, ZGLSKAWideFuse, ZGGlobalContext, and DetectAuxDual. Ablation columns labelled "+Architecture (B1–B5)" mean *all five modules together with the hyperparameters fixed by the B5 sweeps*.
 
 ### 🔬 Module Deep-Dive: Problem → Solution → Effect <sub>(Paper — Fig. 3 a–e)</sub>
 
@@ -762,9 +797,9 @@ All module hyperparameters went through the **same ablation protocol as the arch
 |---|:---:|:---:|
 | **Parameters (inference)** | 9.10 M | **11.68 M** (+2.58 M, +28% — dominated by the P5 fusion block) |
 | **Training-only aux branch** | — | 0.82 M (removed at deployment) |
-| **Throughput (RTX 4090)** | ~220 FPS | **205–210 FPS** |
+| **Throughput (RTX 4090)** | ~220 FPS | **205–210 FPS** (≈5% overhead) |
 
-All additions use **depth-wise and 1×1 operations only**, limiting the parameter and latency overhead — the measured throughput impact is marginal and a wide real-time margin remains.
+All additions use **depth-wise and 1×1 operations only**, limiting the parameter and latency overhead. The measured cost is a **modest ~5% throughput reduction**, leaving a wide real-time margin — the parameter count rises by 28% while FPS falls by roughly 5%, because the added operations are cheap relative to their parameter footprint.
 
 ---
 
@@ -784,6 +819,9 @@ All additions use **depth-wise and 1×1 operations only**, limiting the paramete
 | 🎓 B4 — DetectAuxDual | ✅ train-only | aux on raw features, dropped at inference |
 | 🏛️ Backbone / neck / scales | unchanged | stock YOLOv12s, width 0.50, P3/P4/P5 (P2 rejected) |
 | 🖼️ Input resolution | 640 px | confirmed vs 800/960 px (no improvement) |
+| ⏱️ Epoch budget *T* | — | **⚠️ TODO** |
+| 🛑 Early-stopping patience | — | **⚠️ TODO** |
+| 💾 Checkpoint used for test metrics | — | **⚠️ TODO** (best-on-validation or last epoch) |
 
 ---
 
@@ -795,11 +833,12 @@ For results to be interpreted correctly, the paper fixes the following measureme
 |--------|-----------|
 | **Metrics** | Precision, Recall, F1-score, mAP@50, mAP@50-95 — overall, per class, and per size bucket |
 | **Size buckets** | COCO convention on the 640×640 resized images: small ≤ 32², medium ≤ 96², large > 96² px (from normalized w×h box areas) |
-| **Operating point (Tables 4–8)** | Per-class P/R/F1 reported at the **F1-optimal operating point** |
+| **Operating point** | Per-class P/R/F1 in **Table 4** are reported at the **F1-optimal operating point** |
 | **Confusion matrices (Figs. 6–7)** | Computed at a **fixed confidence threshold conf = 0.25, IoU ≥ 0.5**; the "background" row/column counts false positives and false negatives — per-class values therefore differ slightly from Table 4 |
 | **Headline comparisons** | **Mean ± std over 3 independent seeds** (Section V-C protocol) with deterministic execution |
 | **Fairness** | Baseline, proposed model, and YOLO26 all trained with **identical data, split, schedule, and hyperparameters** |
 | **Throughput** | FPS benchmarked on an NVIDIA RTX 4090 (24 GB), CUDA 12.1 |
+| **Checkpoint selection** | **⚠️ TODO** — state whether test metrics come from the best-on-validation checkpoint or the final epoch. With standard deviations as low as ±0.0002, readers will want this explicit. |
 
 ---
 
@@ -813,7 +852,7 @@ For results to be interpreted correctly, the paper fixes the following measureme
 | 🚫 no_weapon | **0.689** / 0.617 | **0.385** / 0.332 | **0.807** / 0.761 | **0.582** / 0.500 | **0.678** / 0.609 |
 | **All** | **0.852** / 0.812 | **0.553** / 0.516 | **0.865** / 0.833 | **0.800** / 0.747 | **0.831** / 0.788 |
 
-### 📈 Relative Improvements & Attribution <sub>(Paper — Table 5)</sub>
+### 📈 Relative Improvements & Attribution <sub>(Paper — Table 5; all values are relative %)</sub>
 
 ```
 🚫 no_weapon   +11.6% mAP@50  ████████████████████████████████████████
@@ -841,12 +880,14 @@ For results to be interpreted correctly, the paper fixes the following measureme
 ### 📊 At a Glance — mAP@50 Gain, New Model vs Baseline
 
 ```
-🔍 Small   (0.640 → 0.708)  ████████████████████████████████████████  +10.63%
-📦 Medium  (0.781 → 0.826)  ███████████████████████                    +5.76%
-🟫 Large   (0.848 → 0.872)  ███████████                                 +2.83%
+🔍 Small   (0.640 → 0.708)  ████████████████████████████████████████  +10.63% rel.  (+6.8 pp)
+📦 Medium  (0.781 → 0.826)  ███████████████████████                    +5.76% rel.  (+4.5 pp)
+🟫 Large   (0.848 → 0.872)  ███████████                                 +2.83% rel.  (+2.4 pp)
 ```
 
 <sub>Gains scale inversely with object size — exactly the intended behavior of a small-object-targeted design. Full per-metric breakdown below.</sub>
+
+> 📐 In the tables below, the paper reports a relative % only for the final **New model** column. The relative percentages shown for the intermediate columns (+A1 … +Architecture) are **computed in this README** from the paper's own values for readability; they are not printed in the manuscript.
 
 <details>
 <summary><b>🔍 Small Objects (area ≤ 32×32 px)</b> — click to expand</summary>
@@ -887,7 +928,7 @@ For results to be interpreted correctly, the paper fixes the following measureme
 
 </details>
 
-> 📌 **How to read this:** every proposed component (A1, A3, A4, B1–B5) helps in isolation; **A2 slightly hurts small/medium objects** — which is exactly why it is disabled in the final model. The full combination is strongest on every metric at every object size, and gains **scale inversely with object size** (small +10.6% > medium +5.8% > large +2.8% mAP@50) — the intended behavior of a small-object-targeted design.
+> 📌 **How to read this:** every proposed component (A1, A3, A4, B1–B5) helps in isolation; **A2 slightly hurts small/medium objects** — which is exactly why it is disabled in the final model. The full combination is strongest on every metric at every object size, and gains **scale inversely with object size** (small +10.6% > medium +5.8% > large +2.8% mAP@50, relative) — the intended behavior of a small-object-targeted design.
 
 ---
 
@@ -925,7 +966,9 @@ Over **40 distinct model variants** were tested before converging on B1–B5:
 
 ## 🎲 Seed Reproducibility Study <sub>(Paper — Table 8; 3 independent seeds per configuration)</sub>
 
-Neural-network training is stochastic — weight initialization, batch ordering, and non-deterministic GPU kernels all depend on the random seed, so two runs differing only in seed can yield different scores. Reporting a single run risks mistaking a **lucky seed** for a real improvement — a particular concern when configurations differ by only a few points. The four configurations form a **2×2 ablation** (loss × architecture), each trained **3×** with all other factors fixed (same dataset & split, 640 px, batch 64, deterministic execution):
+Neural-network training is stochastic — weight initialization, batch ordering, and non-deterministic GPU kernels all depend on the random seed, so two runs differing only in seed can yield different scores. Reporting a single run risks mistaking a **lucky seed** for a real improvement — a particular concern when configurations differ by only a few points. The four configurations form a **2×2 ablation** (loss × architecture), each trained **3×** with all other factors fixed (same dataset & split, 640 px, batch 64, deterministic execution).
+
+> 📐 **This section uses percentage points (pp)**, not relative %, because the comparison of interest is gap-vs-standard-deviation and both must be in the same units.
 
 | Configuration | n | mAP@50 | mAP@50-95 | Precision | Recall | mAP@50 (Small) | mAP@50 (Med.) | mAP@50 (Large) |
 |---------------|:-:|:------:|:---------:|:---------:|:------:|:--------------:|:-------------:|:--------------:|
@@ -933,6 +976,8 @@ Neural-network training is stochastic — weight initialization, batch ordering,
 | + Custom Loss | 3 | 0.839 (±0.0007) | 0.539 (±0.0015) | 0.852 (±0.0025) | 0.782 (±0.0017) | 0.681 (±0.0155) | 0.818 (±0.0018) | 0.866 (±0.0001) |
 | + Custom Arch | 3 | 0.845 (±0.0008) | **0.557** (±0.0014) | 0.853 (±0.0094) | 0.780 (±0.0044) | 0.664 (±0.0065) | 0.797 (±0.0022) | 0.856 (±0.0008) |
 | **+ Loss + Arch (Proposed)** | **3** | **0.852 (±0.0002)** | 0.553 (±0.0021) | **0.865 (±0.0031)** | **0.800 (±0.0007)** | **0.708 (±0.0129)** | **0.826 (±0.0021)** | **0.872 (±0.0019)** |
+
+<sub>⚠️ Note on bolding: in the <b>mAP@50-95</b> column the highest value is <b>0.557</b> (architecture-only), not the proposed model's 0.553. This README bolds the true maximum. The trade-off is deliberate and discussed below.</sub>
 
 ```
 mAP@50 — mean of 3 seeds (gap between bars ≫ seed-to-seed noise, std ≤ ±0.0008)
@@ -943,13 +988,13 @@ Baseline               0.812  ████████████████�
 Proposed (Loss+Arch)      0.852  █████████████████████████████████████████████
 ```
 
-<sub>Configuration gaps (+2.7 to +4.0 points) are ~10× larger than any seed's standard deviation — the improvements cannot be explained by seed variance.</sub>
+<sub>Configuration gaps (+2.7 to +4.0 pp) are ~10× larger than any seed's standard deviation — the improvements cannot be explained by seed variance.</sub>
 
 **Key observations:**
 
-- 🎯 **Signal ≫ noise:** mAP@50 varies by at most **±0.0008** across seeds (±0.0002 for the proposed model), while configuration gaps are **+2.7 points** (loss alone), **+3.3** (architecture alone), and **+4.0** (full model, 0.812 → 0.852) — an **order of magnitude larger** than the noise floor. The gains cannot be ascribed to seed selection.
+- 🎯 **Signal ≫ noise:** mAP@50 varies by at most **±0.0008** across seeds (±0.0002 for the proposed model), while configuration gaps are **+2.7 pp** (loss alone), **+3.3 pp** (architecture alone), and **+4.0 pp** (full model, 0.812 → 0.852) — an **order of magnitude larger** than the noise floor. The gains cannot be ascribed to seed selection.
 - ⚖️ **A deliberate, documented trade-off:** at strict mAP@50-95 the architecture-only variant is slightly highest (0.557 vs 0.553 — small but consistent). The custom loss trades a marginal amount of strict-IoU localization for **substantially higher Recall (0.800 vs 0.780), Precision (0.865 vs 0.853), and small-object mAP@50 (0.708 vs 0.664)** — the operationally critical metrics for surveillance. The two contributions are otherwise complementary: each helps in isolation, and the combination is strongest on every remaining metric.
-- 🔍 Only the small-object metric shows sizeable variance (std up to ~0.015 — expected from the smaller number of small instances), yet the proposed model's **6.8-point small-object gain still clears the spread**.
+- 🔍 Only the small-object metric shows sizeable variance (std up to ~0.015 — expected from the smaller number of small instances), yet the proposed model's **6.8-pp small-object gain still clears the spread**.
 - 📐 **Protocol takeaway:** mean ± std over multiple seeds is the reporting basis for **all** headline comparisons in the paper.
 
 ---
@@ -980,12 +1025,14 @@ For a fair, reproducible comparison, **YOLO26 ("s" scale, official Ultralytics i
 
 The proposed model, trained **only on our custom dataset**, was evaluated **zero-shot (no retraining)** on three public weapon datasets:
 
-| Model / Dataset | Precision | Recall | mAP@50 | Dataset |
-|-----------------|:---------:|:------:|:------:|---------|
-| **New YOLOv12s (ours) — own test set** | **0.865** | **0.800** | **0.852** | 26,528 images (knife, pistol, long_gun, no_weapon) |
-| **↳ [Zenodo dataset](https://zenodo.org/records/16422779)** | 0.833 | 0.778 | 0.792 | 8,478 images (machete, knife, baseball bat, rifle, gun) |
-| **↳ [YouTube-GDD](https://github.com/ucas-gyx/youtube-gdd)** | 0.854 | 0.781 | 0.805 | 5,000 images (gun) |
-| **↳ [Sohas / OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection)** | 0.828 | 0.760 | 0.776 | 5,859 images (pistol, smartphone, knife, coin purse, ticket, card) |
+| Model / Dataset | Precision | Recall | mAP@50 | Dataset | Paper ref. |
+|-----------------|:---------:|:------:|:------:|---------|:----------:|
+| **New YOLOv12s (ours) — own test set** | **0.865** | **0.800** | **0.852** | 26,528 images (knife, pistol, long_gun, no_weapon) | — |
+| **↳ [Zenodo dataset](https://zenodo.org/records/16422779)** | 0.833 | 0.778 | 0.792 | 8,478 images (machete, knife, baseball bat, rifle, gun) | [37] Omiotek, *Electronics* 14(17):3540, 2025 |
+| **↳ [YouTube-GDD](https://github.com/ucas-gyx/youtube-gdd)** | 0.854 | 0.781 | 0.805 | 5,000 images (gun) | [38] Gu, Liao & Qin, arXiv:2203.04129 |
+| **↳ [Sohas / OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection)** | 0.828 | 0.760 | 0.776 | 5,859 images (pistol, smartphone, knife, coin purse, ticket, card) | [39] OD-WeaponDetection |
+
+<sub>📎 The manuscript cites references [37]–[39] as publications; the links above point to the corresponding data repositories.</sub>
 
 <details>
 <summary><b>📚 Context: prior weapon-detection studies (⚠️ each row uses a different dataset — indicative, not directly comparable)</b></summary>
@@ -1018,6 +1065,8 @@ The paper dedicates three figures to qualitative failure analysis on the test se
 | Fig. 10 | **Weapons misclassified as `no_weapon`** — the most **safety-critical** error mode | Genuine weapons absorbed into the confounder class | Reduced relative to the baseline |
 
 **Summary:** the baseline struggles with challenging edge cases involving **low resolution, motion blur, and complex backgrounds**; the enhanced model mitigates these through improved feature extraction and attention mechanisms, producing **more complete and stable detections**, particularly for small or partially occluded targets — while the sharp Recall rise came **without sacrificing Precision** (0.865 vs 0.833).
+
+> ⚠️ **Residual risk is not zero.** Fig. 10 documents that genuine weapons are still occasionally absorbed into `no_weapon`. This error mode is reduced, not eliminated. Any deployment must assume it occurs.
 
 ---
 
@@ -1111,7 +1160,8 @@ weight_decay: 0.0005
 momentum: 0.9
 batch: 64
 imgsz: 640
-epochs: identical for all configurations
+epochs: ⚠️ TODO           # the budget T — also sets the A1 curriculum and A3 annealing
+patience: ⚠️ TODO         # early-stopping patience (validation-based)
 seeds: 3 independent runs per configuration, deterministic execution
 
 # ═══════════════════════════════════════════════════════════════
@@ -1140,7 +1190,7 @@ tal_iou_exp: 4.0          # default: 6.0
 # Loss weights: lambda_box, lambda_DFL, lambda_cls — original YOLOv12 values
 </pre>
 
-> 📌 Detailed hyperparameter-tuning results, the full list of 40+ architecture variants, and the exact image-level split assignments are provided in the **Supplementary Material** and in this repository.
+> ⚠️ **Do not infer the epoch budget from the training curves.** The curves show how long a run *lasted*; with early stopping active, that is not necessarily the configured budget *T*. Because *T* is the denominator of the A1 curriculum (Eq. 3) and the A3 annealing schedule (Eq. 7), using the wrong value changes the loss function itself.
 
 </details>
 
@@ -1156,6 +1206,7 @@ tal_iou_exp: 4.0          # default: 6.0
 | 🧠 **CPU** | Intel Core i9-13900KF (5.8 GHz) |
 | 🗄️ **RAM** | DDR5 64GB (6000 MHz) |
 | 🐍 **Python / 🔥 PyTorch** | 3.10.2 / 2.1.2 |
+| 📦 **Ultralytics** | **⚠️ TODO: pin the exact version** — Steps 3–4 below patch files inside the installed package, so the version matters |
 
 </details>
 
@@ -1172,6 +1223,8 @@ This is the end-to-end recipe to go from a clean machine to a trained model that
 > cd Yolov12_WeaponDetection
 > pip install -r requirements.txt
 > ```
+>
+> ⚠️ **Pin your Ultralytics version.** Steps 3 and 4 patch `ultralytics/utils/loss.py`, `ultralytics/nn/modules/`, and `ultralytics/nn/tasks.py`. Upstream refactors these files regularly, so the instructions are only valid for the version used in the paper — see the hardware/software table above.
 
 <details open>
 <summary><b>⬇️ Step 1 — Download the datasets from Roboflow</b></summary>
@@ -1218,7 +1271,7 @@ names:
   3: pistol
 ```
 
-Merge the images/labels from both downloads into one dataset root (`images/` + `labels/`) before splitting, remapping the `no_weapon` label index to `3` if Roboflow exported it as `0`.
+Merge the images/labels from both downloads into one dataset root (`images/` + `labels/`) before splitting, remapping the `no_weapon` label index to `2` if Roboflow exported it as `0`.
 
 </details>
 
@@ -1308,6 +1361,8 @@ Copy the contents of **[`CustomLoss.py`](./CustomLoss.py)** into the Ultralytics
 3. The loss-side knobs (TAL `top-k`, score/IoU exponents, clipping ceilings, curriculum α's) are all read from the hyperparameter file in Step 5, so you don't hard-code them here.
 
 > ⚠️ **Editable install recommended.** If Ultralytics is installed as a normal package, edits live inside `site-packages`. Prefer `pip install -e .` on a local Ultralytics checkout so your edits are version-controlled and survive reinstalls.
+>
+> 🕐 **The curriculum needs the epoch budget.** A1 and A3 both interpolate over *T*. Make sure the trainer passes the configured `epochs` value into the loss — not the number of epochs actually run.
 
 </details>
 
@@ -1334,7 +1389,7 @@ Copy the five zero-gated head modules from **[`ultralytics_modules/`](./ultralyt
 
 4. Use **[`Architectures_ablation.yaml`](./Architectures_ablation.yaml)** as the model definition — it wires the modules onto the unchanged YOLOv12s backbone + PAN neck at the P3/P4/P5 heads (backbone/neck/scales untouched; P2 head intentionally omitted). Point your training config at this YAML.
 
-> 🔧 Every module is a **zero-gated residual** (gate γ initialized to 0): at epoch 0 the network is an exact identity of the pretrained baseline, so a mis-wire degrades gracefully to baseline rather than breaking training. If a module name isn't recognized, you missed the registration in `__init__.py` / `tasks.py` in step 3.
+> 🔧 Every module is a **zero-gated residual** (gate γ initialized to 0): at epoch 0 the network is an exact identity of the pretrained baseline, so a mis-wire degrades gracefully to baseline rather than breaking training. Pretrained detection weights transfer after a **one-time remap of the detection-head index**. If a module name isn't recognized, you missed the registration in `__init__.py` / `tasks.py` in step 3.
 
 </details>
 
@@ -1353,6 +1408,8 @@ weight_decay: 0.0005
 momentum: 0.9
 batch: 64
 imgsz: 640
+epochs: ⚠️ TODO      # budget T — drives the A1 curriculum and A3 annealing
+patience: ⚠️ TODO    # early-stopping patience
 
 # A1 — curriculum weighting ✅
 alpha_1: 0.7
@@ -1418,6 +1475,7 @@ python TrainingScript.py \
 - **Split audit passes** — no image pair with Hamming distance ≤ 5 crosses a train/val/test boundary.
 - **Modules load** — training starts without an "unknown module" error (if it fails, revisit the `__init__.py` / `tasks.py` registration in Step 4).
 - **Zero-gating confirmed** — at epoch 0, validation metrics ≈ the pretrained baseline (gates start closed).
+- **Curriculum wired correctly** — log α(t) for the first and last epoch; it should run 0.7 → 0.4 across the full configured budget, not across the number of epochs the run happened to take.
 - **Ballpark results** — the proposed model should land near **mAP@50 ≈ 0.852**, **Recall ≈ 0.800**, **small-object mAP@50 ≈ 0.708** on the test set (mean over 3 seeds), at **~205–210 FPS** on an RTX 4090.
 - **Prefer exact reproduction?** — download the published image-level split assignments and the provided weights (`OriginalModel.pt`, `CustomModel.pt`) instead of regenerating from scratch.
 
@@ -1458,9 +1516,15 @@ Unlabeled background provides no gradient about <i>why</i> a phone is not a pist
 </details>
 
 <details>
+<summary><b>How many epochs did you train for?</b></summary>
+<br>
+<b>⚠️ TODO — fill this in.</b> Note that the epoch budget is not just a stopping rule here: it is the horizon <i>T</i> over which the A1 curriculum coefficient α(t) interpolates 0.7 → 0.4 (Eq. 3) and over which the A3 clipping ceilings anneal 50 → 30 and 25 → 15 (Eq. 7). Reading a run length off a training curve is not a substitute, because early stopping means a run can end before the budget.
+</details>
+
+<details>
 <summary><b>Can I use the dataset commercially?</b></summary>
 <br>
-No — all frames were collected from publicly accessible sources and the dataset is released <b>for research purposes only</b>.
+No — all frames were collected from publicly accessible sources and the dataset is released <b>for research purposes only</b>. See <a href="#%EF%B8%8F-license">License</a>.
 </details>
 
 ---
@@ -1469,13 +1533,18 @@ No — all frames were collected from publicly accessible sources and the datase
 
 - [x] Dataset publicly hosted (Roboflow, two companion projects) with exact image-level split assignments published
 - [x] Leakage-free split protocol fully specified (dHash 64-bit, Hamming ≤ 5, union-find, stratified greedy 70/15/15, cross-split audit)
-- [x] All hyperparameters, search ranges, and optima reported (loss: grid search on validation set; architecture: design sweeps)
+- [x] All loss and architecture hyperparameters, search ranges, and optima reported
 - [x] Baseline, proposed model, and YOLO26 trained under **identical** data, split, schedule, and hyperparameters
 - [x] Headline results reported as **mean ± std over 3 seeds** with deterministic execution
-- [x] Evaluation conventions fixed (F1-optimal operating point for tables; conf = 0.25 / IoU ≥ 0.5 for confusion matrices)
+- [x] Evaluation conventions fixed (F1-optimal operating point for Table 4; conf = 0.25 / IoU ≥ 0.5 for confusion matrices)
 - [x] Parameter counts and FPS measured and reported (deployed vs training-only)
 - [x] Negative results documented (A2 center loss; P2 head; large kernels at P3; 800/960 px inputs; channel-split fusion)
 - [x] Supplementary material: all 40+ architecture variants + hyperparameter-tuning details + extra qualitative examples
+- [ ] **⚠️ Epoch budget *T* stated** (required — it parameterizes the loss)
+- [ ] **⚠️ Early-stopping patience stated**
+- [ ] **⚠️ Checkpoint selection stated** (best-on-validation vs last epoch)
+- [ ] **⚠️ Ultralytics version pinned** (the patch instructions depend on it)
+- [ ] **⚠️ Code and weights license declared**
 
 ---
 
@@ -1484,8 +1553,11 @@ No — all frames were collected from publicly accessible sources and the datase
 **Known limitations:**
 
 - 🚫 `no_weapon` remains the hardest class (mAP@50 = 0.689) — the diversity of real-life items that can be mistaken for weapons is effectively unbounded
+- 🎯 Overall Recall is **0.800**: roughly **one in five** annotated instances is still missed, and Fig. 10 shows genuine weapons are occasionally absorbed into the `no_weapon` class
 - 🔍 Small-object metrics carry the largest seed variance (std up to ~0.015), an inherent consequence of the smaller number of small instances
+- 🎬 A substantial share of the training data comes from **YouTube video, including action films and staged tutorial/range footage**. Cinematic and instructional weapon handling is not distributed like real incident footage, so performance on genuine CCTV may differ from the numbers reported here
 - 🌒 Like all RGB-only detectors, performance is bounded by what is visible: fully concealed weapons are out of scope for this modality
+- 🌍 Zero-shot external results (0.776–0.805 mAP@50) are strong but measured on three datasets only, all in the same broad domain
 
 **Future directions (paper — Section VI):**
 
@@ -1496,30 +1568,78 @@ No — all frames were collected from publicly accessible sources and the datase
 
 ---
 
+## 🛡️ Responsible Use & Dual-Use Considerations
+
+This model and dataset are released **for research purposes**. A weapon detector is a dual-use artifact: the same properties that make it useful for public safety make it useful for surveillance of people who have done nothing wrong. A few points we ask users to take seriously.
+
+**What the metrics do and do not say.** The reported numbers are computed on this dataset's test split, at the F1-optimal operating point. They do **not** transfer automatically to a different camera, resolution, mounting height, population, or lighting regime. Anyone deploying should re-measure on data from the actual deployment site before trusting any figure here.
+
+**This is a detector, not a decision system.** At Recall = 0.800 the model misses a meaningful fraction of instances, and the `no_weapon` class — the one guarding against false alarms on phones and hand tools — is the weakest at mAP@50 = 0.689. A detection is a cue for human review, not grounds for an automated response. Systems that trigger alerts, dispatch, or physical intervention without a person in the loop are outside the intended use of this work.
+
+**Error costs are asymmetric and fall unevenly.** A false positive on someone holding a phone can produce an armed response against an innocent person. Detector performance can also vary across skin tone, clothing, body size, and camera placement — we did **not** audit for that, and the dataset was not constructed to support such an audit. Deployers should assume disparate performance until they have measured otherwise.
+
+**Provenance and privacy.** Frames were collected from publicly accessible sources and include identifiable people who did not consent to inclusion in a training set. The dataset is provided for research only; do not use it to build biometric, re-identification, or tracking systems, and do not redistribute it for commercial purposes.
+
+**Legal compliance is the deployer's responsibility.** Video surveillance is regulated (GDPR in the EU, and various state and national regimes elsewhere), and automated processing of biometric or behavioral data often carries additional obligations, including impact assessments. Nothing in this repository constitutes a compliance assessment.
+
+If you use this work in a deployed system, we encourage you to document the operating threshold, the measured on-site performance, and the human-review procedure.
+
+---
+
+## ⚖️ License
+
+| Component | Terms |
+|-----------|-------|
+| 📦 **Dataset** (both Roboflow projects) | **Research purposes only.** All frames were collected from publicly accessible sources. Commercial use is not permitted. |
+| 💻 **Code** in this repository | **⚠️ TODO — declare a license.** Until a `LICENSE` file is added, the code is "all rights reserved" by default, which prevents others from legally reusing it. |
+| 🏋️ **Pre-trained weights** (`OriginalModel.pt`, `CustomModel.pt`) | **⚠️ TODO — declare terms.** Weights are derived from the dataset above; the research-only restriction is presumed to carry over. State this explicitly. |
+| 🔷 **Upstream** | The baseline model and training framework are subject to Ultralytics' own license terms (AGPL-3.0 or a commercial license). If this repository redistributes or derives from Ultralytics code, those terms apply to the derived work — check before choosing a license for the code above. |
+
+> 📌 The Ultralytics licensing point is worth a moment: because Steps 3–4 patch the Ultralytics package directly, a derived-work argument is plausible. Pick the code license with that in mind.
+
+---
+
 ## 📚 Resources
 
 | Resource | Link |
 |----------|------|
 | 📦 Weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/8 |
 | 🚫 No-weapon dataset (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/2 |
-| 🌍 External eval — Zenodo dataset | https://zenodo.org/records/16422779 |
-| 🌍 External eval — YouTube-GDD | https://github.com/ucas-gyx/youtube-gdd |
-| 🌍 External eval — Sohas / OD-WeaponDetection | https://github.com/ari-dasci/OD-WeaponDetection |
+| 🌍 External eval — Zenodo dataset [37] | https://zenodo.org/records/16422779 |
+| 🌍 External eval — YouTube-GDD [38] | https://github.com/ucas-gyx/youtube-gdd |
+| 🌍 External eval — Sohas / OD-WeaponDetection [39] | https://github.com/ari-dasci/OD-WeaponDetection |
 | 🔶 YOLO26 (Ultralytics) | https://docs.ultralytics.com/models/yolo26/ |
 | 📄 YOLOv12 paper | https://arxiv.org/abs/2502.12524 |
+| 📄 YouTube-GDD paper | https://arxiv.org/abs/2203.04129 |
 
 ---
 
 ## 📖 Citation
 
-If you use this dataset or code, please cite the paper:
+> ⚠️ **Update this once the paper's status is final.** The entry below reflects a manuscript **under review** — it must not assert a volume, issue, page range, or DOI the paper does not yet have.
+
+**While under review:**
+
+```bibtex
+@unpublished{catargiu2026weapon,
+  title  = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
+  author = {Catargiu, Constantin and Ciocoiu, Iulian B.},
+  note   = {Manuscript under review},
+  year   = {2026}
+}
+```
+
+**After acceptance — replace with the published record:**
 
 ```bibtex
 @article{catargiu2026weapon,
   title   = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
   author  = {Catargiu, Constantin and Ciocoiu, Iulian B.},
   journal = {IEEE Access},
-  year    = {2026}
+  volume  = {⚠️ TODO},
+  pages   = {⚠️ TODO},
+  doi     = {⚠️ TODO},
+  year    = {⚠️ TODO}
 }
 ```
 
