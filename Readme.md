@@ -832,6 +832,7 @@ For results to be interpreted correctly, the paper fixes the following measureme
 | **Headline comparisons** | **Mean ± std over 3 independent seeds** (Section V-C protocol) with deterministic execution |
 | **Fairness** | Baseline, proposed model, and YOLO26 all trained with **identical data, split, schedule, and hyperparameters** |
 | **Throughput** | FPS benchmarked on an NVIDIA RTX 4090 (24 GB), CUDA 12.1 |
+| **Tooling** | The per-size and per-class numbers are produced by the scripts in [`EvalScripts/`](./EvalScripts) — stock `model.val()` does not report a COCO size breakdown for custom datasets. See [Step 7](#-how-to-reproduce--step-by-step-walkthrough). |
 
 ---
 
@@ -1208,7 +1209,7 @@ tal_iou_exp: 4.0          # default: 6.0
 
 ## 🧭 How To Reproduce — Step-by-Step Walkthrough
 
-This is the end-to-end recipe to go from a clean machine to a trained model that matches the paper. It follows the exact workflow used in the study: **download the data → rebuild the leakage-free split → install our custom loss → install our custom modules → apply our hyperparameters → launch our training script**. Baseline, custom model, and YOLO26 all use the *same* data, split, schedule, and hyperparameters — only the loss/architecture toggles change.
+This is the end-to-end recipe to go from a clean machine to a trained model that matches the paper. It follows the exact workflow used in the study: **download the data → rebuild the leakage-free split → install our custom loss → install our custom modules → apply our hyperparameters → launch our training script → evaluate with the per-size breakdown**. Baseline, custom model, and YOLO26 all use the *same* data, split, schedule, and hyperparameters — only the loss/architecture toggles change.
 
 > 📌 **Before you start:** clone this repo and install dependencies (see [Getting Started](#-getting-started)). All paths below assume you are in the repository root and that Ultralytics is installed in your environment. An **editable checkout is recommended** (`pip install -e .` on a local Ultralytics clone) so you can edit the package files in place and keep your edits version-controlled.
 >
@@ -1471,6 +1472,49 @@ python TrainingScript.py \
 
 </details>
 
+<details open>
+<summary><b>📏 Step 7 — Evaluate with the per-size / per-class breakdown</b></summary>
+
+<br>
+
+Ultralytics' own `model.val()` reports overall mAP, precision and recall, but **not** the COCO size buckets that Tables 6–8 are built on. The two scripts in **[`EvalScripts/`](./EvalScripts)** produce those. Run them in order:
+
+**7a — Convert YOLO labels to COCO ground truth**
+
+The evaluator needs a COCO-format annotation file. The converter walks each split, reads every image's real dimensions, converts normalized YOLO boxes to absolute COCO boxes, and writes one JSON per split.
+
+```python
+# edit the constants at the top of the converter
+BASE        = Path("/path/to/your/dataset")
+CLASS_NAMES = ["knife", "long_gun", "no_weapon", "pistol"]   # YOLO class-index order
+SPLITS      = {"test": {"images": "test/images",
+                        "labels": "test/labels",
+                        "output": "annotations_coco_test.json"}}
+CATEGORY_ID_OFFSET = 1        # pycocotools expects 1-based category ids
+```
+
+It also accepts **segmentation-style labels** (`class x1 y1 x2 y2 …`), reducing each polygon to its axis-aligned bounding box, and reports a per-split tally of skipped or malformed lines — worth reading, since a large `missing_labels` or `degenerate_boxes` count usually means the label folder didn't line up with the image folder.
+
+**7b — Run the COCO evaluation**
+
+```python
+WEIGHTS       = "runs/.../weights/best.pt"
+DATA_YAML     = "data/data.yaml"
+COCO_ANN_FILE = "annotations_coco_test.json"   # from 7a
+OUTPUT_JSON   = "results.json"
+IMG_SIZE      = 640
+SMALL_THRESH  = 32      # ⚠️ paper convention — see note below
+LARGE_THRESH  = 96
+```
+
+The script runs `model.val(save_json=True)`, remaps the model's prediction category ids onto the ground-truth ids **by class name**, resolves Roboflow's hashed filenames (`…rf.<hash>.jpg`) back to image ids, then runs `COCOeval` twice — once at IoU 0.50 and once over 0.50:0.95 — with the area ranges overridden to your size thresholds. It prints Ultralytics' own metrics alongside the COCO ones and writes everything to `OUTPUT_JSON`.
+
+> ⚠️ **Set the size thresholds to match what you're reproducing.** The paper's Tables 2, 3 and 6 use the COCO convention on 640×640 images: **small ≤ 32², medium ≤ 96², large > 96²**. The thresholds shipped in the script are set for a different evaluation, so change `SMALL_THRESH` / `LARGE_THRESH` to **32 / 96** before reproducing any paper table.
+
+> 📎 **Evaluating on an external dataset?** The script skips `no_weapon` predictions automatically (no external set has that class) and matches remaining classes by name, so a dataset whose classes are `knife`, `gun`, `rifle` will only score the names it shares with ours. Check the `[FIX] Category mapping:` line it prints — that is the mapping actually used. The built-in spot check reports the IoU of one matched GT/prediction pair; a near-zero value there means a coordinate-space mismatch, not a bad model.
+
+</details>
+
 <details>
 <summary><b>✅ Sanity checks — did it work?</b></summary>
 
@@ -1481,6 +1525,9 @@ python TrainingScript.py \
 - **Modules load** — training starts without an "unknown module" error (if it fails, revisit the `__init__.py` / `tasks.py` registration in Step 4).
 - **Zero-gating confirmed** — at epoch 0, validation metrics ≈ the pretrained baseline (gates start closed).
 - **Curriculum wired correctly** — log α(t) for the first and last epoch; it should run 0.7 → 0.4 across the full configured budget, not across the number of epochs the run happened to take.
+- **COCO GT looks right** — the converter's annotation count for the test split should be **6,111**, over **3,978** images.
+- **Category mapping is sane** — the evaluator prints `[FIX] Category mapping:`; confirm each model class lands on the intended ground-truth class before trusting any number.
+- **Spot-check IoU is not ~0** — a near-zero IoU on a matched pair means predictions and ground truth are in different coordinate spaces.
 - **Ballpark results** — the proposed model should land near **mAP@50 ≈ 0.852**, **Recall ≈ 0.800**, **small-object mAP@50 ≈ 0.708** on the test set (mean over 3 seeds), at **~205–210 FPS** on an RTX 4090.
 - **Prefer exact reproduction?** — download the published image-level split assignments and the provided weights (`OriginalModel.pt`, `CustomModel.pt`) instead of regenerating from scratch.
 
@@ -1521,6 +1568,12 @@ Unlabeled background provides no gradient about <i>why</i> a phone is not a pist
 </details>
 
 <details>
+<summary><b>How do I reproduce the per-size (small / medium / large) numbers?</b></summary>
+<br>
+Ultralytics' <code>model.val()</code> does not report COCO size buckets for custom datasets, so Tables 6–8 are produced by the scripts in <a href="./EvalScripts"><code>EvalScripts/</code></a>: first convert your YOLO labels to a COCO annotation file, then run the COCO evaluator over it. Set <code>SMALL_THRESH = 32</code> and <code>LARGE_THRESH = 96</code> to match the paper's convention — the values shipped in the script are set for a different evaluation. See <a href="#-how-to-reproduce--step-by-step-walkthrough">Step 7</a>.
+</details>
+
+<details>
 <summary><b>Which dataset versions correspond to the paper?</b></summary>
 <br>
 Both Roboflow projects have several published versions. The paper uses <b>WeaponDataset version 11</b> and <b>NoGun version 5</b> — other versions will not reproduce the reported numbers. In addition, some label corrections were made locally after those versions were published and have not yet been pushed back to Roboflow; the corrected label files ship in the <a href="./DatasetLabels"><code>DatasetLabels/</code></a> folder of this repository and should replace the labels in the Roboflow export.
@@ -1553,6 +1606,7 @@ No — all frames were collected from publicly accessible sources and the datase
 - [x] Supplementary material: all 40+ architecture variants + hyperparameter-tuning details + extra qualitative examples
 - [x] Exact dataset versions identified (WeaponDataset v11, NoGun v5), with post-publication label corrections shipped in `DatasetLabels/`
 - [x] Training schedule, epoch budget, and early-stopping settings shipped in `TrainingHyperparameters.yaml`
+- [x] Evaluation tooling published — YOLO→COCO conversion and per-size / per-class COCO scoring in `EvalScripts/`
 - [x] Author contact provided for reproduction questions
 
 ---
@@ -1616,6 +1670,7 @@ If you use this work in a deployed system, we encourage you to document the oper
 | 🚫 No-weapon dataset — **v5**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5 |
 | 🏷️ Corrected labels (this repo) | [`DatasetLabels/`](./DatasetLabels) |
 | 🖼️ Annotated dataset samples (this repo) | [`DatasetExamples/`](./DatasetExamples) |
+| 📏 Evaluation scripts — COCO conversion + per-size mAP (this repo) | [`EvalScripts/`](./EvalScripts) |
 | 📧 Questions about data, code or reproduction | constantin.catargiu@yahoo.com |
 | 🌍 External eval — Zenodo dataset [37] | https://zenodo.org/records/16422779 |
 | 🌍 External eval — YouTube-GDD [38] | https://github.com/ucas-gyx/youtube-gdd |
