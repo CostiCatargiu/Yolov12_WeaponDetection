@@ -19,8 +19,8 @@ DATA_YAML = "/home/constantin/Downloads/YouTube-GDD/images/data.yaml"
 COCO_ANN_FILE = "/home/constantin/Downloads/YouTube-GDD/annotations_coco_matched.json"
 OUTPUT_JSON = "/home/constantin/Downloads/YouTube-GDD/images/test/results.json"
 IMG_SIZE = 640
-SMALL_THRESH = 48
-LARGE_THRESH = 128
+SMALL_THRESH = 32
+LARGE_THRESH = 96
 
 # Model prediction category IDs (1-indexed from Ultralytics JSON)
 # → mapped to GT category IDs (from COCO annotation file)
