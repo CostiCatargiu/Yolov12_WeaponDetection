@@ -283,7 +283,7 @@ def main():
     print(f"[INFO] Loading model: {weights}")
     model = YOLO(str(weights))
 
-    val_results = model.val(data=DATA_YAML, imgsz=IMG_SIZE, save_json=True, verbose=True)
+    val_results = model.val(data=DATA_YAML, imgsz=IMG_SIZE, save_json=True, verbose=True, split="test")
     save_dir = Path(val_results.save_dir)
     pred_json = save_dir / "predictions.json"
 
