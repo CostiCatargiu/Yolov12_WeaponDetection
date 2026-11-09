@@ -1,6 +1,14 @@
 <h1 align="center">🔫 Real-Time Weapon Detection with Enhanced YOLOv12s & a Custom Dataset</h1>
 
-<p align="center"><sub>Official repository for the paper <b>"Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset"</b><br>Constantin Catargiu & Iulian B. Ciocoiu — Faculty of Electronics, Telecommunications and Information Technology,<br>Gheorghe Asachi Technical University of Iasi, Romania</sub></p>
+<p align="center"><sub>Official repository for the paper <b>"Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset"</b>, published in <b><a href="https://ieeexplore.ieee.org/document/11643761">IEEE Access</a></b><br>Constantin Catargiu & Iulian B. Ciocoiu — Faculty of Electronics, Telecommunications and Information Technology,<br>Gheorghe Asachi Technical University of Iasi, Romania</sub></p>
+
+<p align="center">
+  <a href="https://ieeexplore.ieee.org/document/11643761">
+    <img src="https://img.shields.io/badge/Paper_accepted-IEEE_Access_2026-00629B?style=for-the-badge&logo=ieee&logoColor=white" alt="Published in IEEE Access" />
+  </a>
+</p>
+
+> 📢 **The paper behind this repository has been accepted and published in *IEEE Access*.** Read it on IEEE Xplore: **[ieeexplore.ieee.org/document/11643761](https://ieeexplore.ieee.org/document/11643761)** · DOI [`10.1109/ACCESS.2026.3721157`](https://doi.org/10.1109/ACCESS.2026.3721157) · cite it as shown in [Citation](#-citation).
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/0754c712-7237-44ff-b93b-e7b061b34bcd" alt="test1gun" width="30%">
@@ -24,7 +32,7 @@
   <img src="https://img.shields.io/badge/Speed-205–210_FPS_@_RTX_4090-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/Seeds-3_runs_·_mean±std-teal?style=flat-square" />
   <img src="https://img.shields.io/badge/Dataset-26,528_imgs_·_38,067_boxes-6706CE?style=flat-square" />
-  <img src="https://img.shields.io/badge/Paper-Under_review-yellow?style=flat-square" />
+  <a href="https://ieeexplore.ieee.org/document/11643761"><img src="https://img.shields.io/badge/Paper-IEEE_Access_2026-00629B?style=flat-square" /></a>
   <img src="https://img.shields.io/badge/Dataset_License-Research_only-informational?style=flat-square" />
 </p>
 
@@ -1666,6 +1674,7 @@ If you use this work in a deployed system, we encourage you to document the oper
 
 | Resource | Link |
 |----------|------|
+| 📄 **The paper — IEEE Access (2026)** | https://ieeexplore.ieee.org/document/11643761 |
 | 📦 Weapon dataset — **v11**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/weapondataset-oi2g3/dataset/11 |
 | 🚫 No-weapon dataset — **v5**, used in the paper (Roboflow) | https://universe.roboflow.com/gundetectiondataset/nogun/dataset/5 |
 | 🏷️ Corrected labels (this repo) | [`DatasetLabels/`](./DatasetLabels) |
@@ -1686,14 +1695,16 @@ If you use this work in a deployed system, we encourage you to document the oper
 If you use this dataset or code, please cite the paper:
 
 ```bibtex
-@unpublished{catargiu2026weapon,
-  title  = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
-  author = {Catargiu, Constantin and Ciocoiu, Iulian B.},
-  note   = {Manuscript under review},
-  year   = {2026}
+@article{catargiu2026weapon,
+  title   = {Real-Time Weapon Detection Using Enhanced YOLOv12 Models and a Custom Dataset},
+  author  = {Catargiu, Constantin and Ciocoiu, Iulian B.},
+  journal = {IEEE Access},
+  volume  = {14},
+  year    = {2026},
+  doi     = {10.1109/ACCESS.2026.3721157}
 }
 ```
 
-Once the paper appears, replace this entry with the published record (journal, volume, pages, DOI).
+📄 Published in *IEEE Access* — [IEEE Xplore](https://ieeexplore.ieee.org/document/11643761) · [doi.org/10.1109/ACCESS.2026.3721157](https://doi.org/10.1109/ACCESS.2026.3721157)
 
 <p align="center"><sub>⚠️ Dataset released for <b>research purposes only</b>. All frames were collected from publicly accessible sources.<br>📧 Corresponding author: Iulian B. Ciocoiu (iciocoiu@etti.tuiasi.ro)<br>📧 Dataset, code & reproduction questions: Constantin Catargiu (constantin.catargiu@yahoo.com) · or open a GitHub issue.</sub></p>
